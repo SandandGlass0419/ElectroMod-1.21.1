@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "electromod",
+	"version": "${version}",
+	"name": "ElectroMod",
+	"description": "This mod is a physics project implementing stuff related to electromagnetism!",
+	"authors": [
+		"SandandGlass"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/electromod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.devs.electromod.ElectroMod"
+		],
+		"fabric-datagen": [
+			"net.devs.electromod.ElectroModDataGenerator"
+		],
+        "client": [
+            "net.devs.electromod.ElectroModClient"
+        ]
+	},
+	"mixins": [
+		"electromod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.2",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
