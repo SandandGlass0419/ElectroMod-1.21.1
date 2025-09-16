@@ -5,7 +5,8 @@
 	"name": "ElectroMod",
 	"description": "This mod is a physics project implementing stuff related to electromagnetism!",
 	"authors": [
-		"SandandGlass","jjuuny2008"
+		"SandandGlass",
+        "jjuuny2008"
 	],
 	"contact": {
 		"sources": "https://github.com/SandandGlass0419/ElectroMod-1.21.1"
