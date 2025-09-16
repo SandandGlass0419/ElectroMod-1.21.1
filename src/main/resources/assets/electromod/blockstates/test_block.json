@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "electromod:block/test_block"
+    }
+  }
+}
