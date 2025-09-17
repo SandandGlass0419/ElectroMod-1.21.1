@@ -18,6 +18,8 @@ public class ModBlocks
                     .strength(0f)
                     .sounds(BlockSoundGroup.HONEY)));
 
+    // blocks from magnetic
+
     public static void registerModBlocks()
     {
         ElectroMod.LOGGER.info("Registering Mod Blocks (" + ElectroMod.MOD_ID + ")");

@@ -1,6 +1,7 @@
 package net.devs.electromod;
 
 import net.devs.electromod.block.ModBlocks;
+import net.devs.electromod.item.ModItemGroups;
 import net.devs.electromod.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
@@ -17,5 +18,6 @@ public class ElectroMod implements ModInitializer
     {
         ModItems.registerModItems();
         ModBlocks.registerModBlocks();
+        ModItemGroups.registerModItemGroups();
 	}
 }
