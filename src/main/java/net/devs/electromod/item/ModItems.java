@@ -10,8 +10,9 @@ import net.minecraft.util.Identifier;
 
 public class ModItems
 {
+    // test item for item adding test
     public static final Item TEST_ITEM
-            = addItem("test_item", new TestItem(new Item.Settings())); // test item for adding item
+            = addItem("test_item", new TestItem(new Item.Settings()));
 
     // items from magnetic
 

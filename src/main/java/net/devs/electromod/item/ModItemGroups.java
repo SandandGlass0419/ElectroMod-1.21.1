@@ -13,7 +13,7 @@ public class ModItemGroups
 {
     // items to add in Magnetic Items item group
     public static final ItemGroup MAGNETIC_ITEM_GROUP = Registry.register(Registries.ITEM_GROUP,
-            Identifier.of(ElectroMod.MOD_ID,"magnetic_items"),
+            Identifier.of(ElectroMod.MOD_ID, "magnetic_items"),
             FabricItemGroup.builder()
                     .icon(() -> new ItemStack(ModItems.MAGNET_ITEM))
                     .displayName(Text.translatable("itemGroup.electromod.magnetic_items"))

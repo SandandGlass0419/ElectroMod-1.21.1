@@ -22,7 +22,6 @@ public class TestItem extends Item
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand)
     {
         World world = user.getWorld();
-
         if (world.isClient()) return ActionResult.FAIL;
 
         BlockPos pos = entity.getBlockPos();

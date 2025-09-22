@@ -2,6 +2,6 @@
   "item.electromod.test_item": "Middle Finger (test_item)",
   "block.electromod.test_block": "Poo Poo Block (test_block)",
 
-  "itemGroup.electromod.magnetic_items": "Magnetic Items",
-  "item.electromod.magnet_item": "Magnet"
+  "item.electromod.magnet_item": "Magnet",
+  "itemGroup.electromod.magnetic_items": "Magnetic Items"
 }

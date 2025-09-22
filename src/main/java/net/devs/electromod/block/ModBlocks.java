@@ -13,6 +13,7 @@ import net.minecraft.util.Identifier;
 
 public class ModBlocks
 {
+    // test block for testing block adding
     public static final Block TEST_BLOCK = addBlock("test_block",
             new TestBlock(AbstractBlock.Settings.create()
                     .strength(0f)
