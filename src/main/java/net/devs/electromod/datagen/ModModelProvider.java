@@ -1,0 +1,35 @@
+package net.devs.electromod.datagen;
+
+import net.devs.electromod.item.ModItems;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.minecraft.data.client.BlockStateModelGenerator;
+import net.minecraft.data.client.ItemModelGenerator;
+import net.minecraft.data.client.Models;
+
+public class ModModelProvider extends FabricModelProvider
+{
+    public ModModelProvider(FabricDataOutput output)
+    {
+        super(output);
+    }
+
+    // generates block model json files. please add blocks with simple form. (cube...)
+    // + mention blocks not registered here
+
+    @Override
+    public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator)
+    {
+        // magnetic
+        // iron_coil (custom json)
+    }
+
+    // generates item model json files. please add ALL items using method
+
+    @Override
+    public void generateItemModels(ItemModelGenerator itemModelGenerator)
+    {
+        // magnetic
+        itemModelGenerator.register(ModItems.MAGNET_ITEM, Models.HANDHELD);
+    }
+}

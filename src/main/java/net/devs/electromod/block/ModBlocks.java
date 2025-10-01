@@ -2,10 +2,13 @@ package net.devs.electromod.block;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.TestBlock;
+import net.devs.electromod.block.custom.magnetic.IronCoilBlock;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
@@ -20,10 +23,19 @@ public class ModBlocks
                     .sounds(BlockSoundGroup.HONEY)));
 
     // blocks from magnetic
+    public static final Block IRON_COIL = addBlock("iron_coil",
+            new IronCoilBlock(AbstractBlock.Settings.create()
+                    .strength(1f)
+                    .sounds(BlockSoundGroup.METAL)));
 
     public static void registerModBlocks()
     {
         ElectroMod.LOGGER.info("Registering Mod Blocks (" + ElectroMod.MOD_ID + ")");
+
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries ->
+        {
+            entries.add(IRON_COIL);
+        });
     }
 
     private static void addBlockItem(String name, Block block)

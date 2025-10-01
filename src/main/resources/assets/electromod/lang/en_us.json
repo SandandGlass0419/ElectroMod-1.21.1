@@ -3,5 +3,8 @@
   "block.electromod.test_block": "Poo Poo Block (test_block)",
 
   "item.electromod.magnet_item": "Magnet",
+
+  "block.electromod.iron_coil": "Iron Coil",
+
   "itemGroup.electromod.magnetic_items": "Magnetic Items"
 }

@@ -6,6 +6,6 @@ public class IronCoilBlock extends Block
 {
     public IronCoilBlock(Settings settings)
     {
-        super(settings);
+        super(settings.nonOpaque());
     }
 }

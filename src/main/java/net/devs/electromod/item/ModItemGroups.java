@@ -1,6 +1,7 @@
 package net.devs.electromod.item;
 
 import net.devs.electromod.ElectroMod;
+import net.devs.electromod.block.ModBlocks;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -19,11 +20,13 @@ public class ModItemGroups
                     .displayName(Text.translatable("itemGroup.electromod.magnetic_items"))
                     .entries(((displayContext, entries) ->
                     {
+                        // magnetic item
                         entries.add(ModItems.MAGNET_ITEM);
 
+                        // magnetic block
+                        entries.add(ModBlocks.IRON_COIL);
+
                     })).build());
-
-
 
     public static void registerModItemGroups()
     {

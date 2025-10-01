@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "electromod:block/iron_coil"
+    }
+  }
+}
