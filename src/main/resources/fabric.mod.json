@@ -11,7 +11,7 @@
 	"contact": {
 		"sources": "https://github.com/SandandGlass0419/ElectroMod-1.21.1"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/electromod/icon.png",
 	"environment": "*",
 	"entrypoints": {
