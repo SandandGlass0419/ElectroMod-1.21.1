@@ -1,8 +1,8 @@
-package net.devs.electromod.item.entity;
+package net.devs.electromod.block.entity;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.ModBlocks;
-import net.devs.electromod.item.entity.custom.magnetic.CoilBlockEntity;
+import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;

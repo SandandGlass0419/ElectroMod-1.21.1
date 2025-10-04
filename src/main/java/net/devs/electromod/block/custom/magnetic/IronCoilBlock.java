@@ -1,9 +1,9 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
+import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.custom.magnetic.MagnetItem;
-import net.devs.electromod.item.entity.custom.magnetic.CoilBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
