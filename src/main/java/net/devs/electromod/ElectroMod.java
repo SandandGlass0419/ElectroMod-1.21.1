@@ -4,6 +4,7 @@ import net.devs.electromod.block.ModBlocks;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.ModItemGroups;
 import net.devs.electromod.item.ModItems;
+import net.devs.electromod.item.entity.ModBlockEntities;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,5 +21,6 @@ public class ElectroMod implements ModInitializer
         ModBlocks.registerModBlocks();
         ModItemGroups.registerModItemGroups();
         ModDataComponentTypes.registerModDataComponentTypes();
+        ModBlockEntities.registerModBlockEntities();
 	}
 }

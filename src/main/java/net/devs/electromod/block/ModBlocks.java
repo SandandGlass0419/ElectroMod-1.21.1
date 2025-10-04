@@ -26,6 +26,7 @@ public class ModBlocks
     public static final Block IRON_COIL = addBlock("iron_coil",
             new IronCoilBlock(AbstractBlock.Settings.create()
                     .strength(1f)
+                    .nonOpaque()
                     .sounds(BlockSoundGroup.METAL)));
 
     public static void registerModBlocks()

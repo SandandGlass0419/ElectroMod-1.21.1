@@ -39,9 +39,9 @@ public class ModRecipeProvider extends FabricRecipeProvider
 
         // magnetic block
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.IRON_COIL)
-                .pattern("# #")
-                .pattern("# #")
                 .pattern("#*#")
+                .pattern("# #")
+                .pattern("# #")
                 .input('#', Items.IRON_INGOT)
                 .input('*', Items.REDSTONE)
                 .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(NumberRange.IntRange.atLeast(6), Items.IRON_INGOT))

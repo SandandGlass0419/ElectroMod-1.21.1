@@ -17,10 +17,13 @@ public class MagnetItem extends Item
 {
     public MagnetItem(Settings settings)
     {
-        super(settings.maxCount(1));
+        super(settings
+                .maxCount(1)
+                .component(ModDataComponentTypes.MAGNET_FORCE, ModDataComponentTypes.min_force));
     }
 
-    @Override public ActionResult useOnBlock(ItemUsageContext context)
+    @Override
+    public ActionResult useOnBlock(ItemUsageContext context)
     {
         World world = context.getWorld();
         if (world.isClient()) return ActionResult.FAIL;
@@ -47,7 +50,7 @@ public class MagnetItem extends Item
         return NewForce;
     }
 
-    private int getNewForce(ItemStack itemStack, int increment)
+    public static int getNewForce(ItemStack itemStack, int increment)
     {
         int current_force = itemStack.getOrDefault(ModDataComponentTypes.MAGNET_FORCE, ModDataComponentTypes.max_force);
         int new_force = current_force >= ModDataComponentTypes.max_force ?
@@ -61,6 +64,6 @@ public class MagnetItem extends Item
 
     private void displayForce(PlayerEntity player, int force)
     {
-        player.sendMessage(Text.literal("Current Force: " + force), true);
+        player.sendMessage(Text.literal("New Force: " + force), true);
     }
 }
