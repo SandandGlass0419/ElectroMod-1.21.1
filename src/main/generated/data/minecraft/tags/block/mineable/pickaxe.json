@@ -2,6 +2,7 @@
   "values": [
     "electromod:iron_coil",
     "electromod:golden_coil",
-    "electromod:copper_coil"
+    "electromod:copper_coil",
+    "electromod:magnet_block"
   ]
 }

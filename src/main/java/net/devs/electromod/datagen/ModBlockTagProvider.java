@@ -21,6 +21,7 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider
         getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE) // tags for adding blocks that can be mined with a pickaxe
                 .add(ModBlocks.IRON_COIL)
                 .add(ModBlocks.GOLDEN_COIL)
-                .add(ModBlocks.COPPER_COIL);
+                .add(ModBlocks.COPPER_COIL)
+                .add(ModBlocks.MAGNET_BLOCK);
     }
 }

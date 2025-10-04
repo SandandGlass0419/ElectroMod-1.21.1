@@ -1,4 +1,5 @@
-// 1.21.1	2025-10-04T21:58:13.3846155	ElectroMod/Recipes
+// 1.21.1	2025-10-05T01:04:35.6305587	ElectroMod/Recipes
+e97634604b5b5dd2ee415eb4e37ec4fe86cc4eab data\electromod\advancement\recipes\redstone\magnet_block.json
 8001b02f9233864f9e68046df3fcd91311aa00c0 data\electromod\advancement\recipes\redstone\iron_coil.json
 87f22d241b3d7af095cd7d632a42eaa9d921e86d data\electromod\advancement\recipes\redstone\copper_coil.json
 9ad8ed54f09f00233a3234368dd853c249f2a05a data\electromod\recipe\golden_coil.json
@@ -7,3 +8,4 @@ cce1883bdf0e11932310f731729977fb8797acd1 data\electromod\advancement\recipes\red
 d64bfbda51146cc9e7c23a78f6d8fe915aca823d data\electromod\recipe\iron_coil.json
 f45f37c60915d6c9d0c11dba5bccdeb5bf8a0f73 data\electromod\recipe\magnet_item.json
 afd38a39779f02113cbe3f7ae26bb824717ae097 data\electromod\recipe\copper_coil.json
+1e894a81032a0ca2d6a530bbaccb7c1cd6027c76 data\electromod\recipe\magnet_block.json

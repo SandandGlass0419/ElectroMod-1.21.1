@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=up": { "model": "electromod:block/magnet_block" },
+    "facing=down": { "model": "electromod:block/magnet_block", "x": 180 },
+    "facing=north": { "model": "electromod:block/magnet_block", "x": 90 },
+    "facing=south": { "model": "electromod:block/magnet_block", "x": 270 },
+    "facing=east": { "model": "electromod:block/magnet_block", "x": 90, "y": 90 },
+    "facing=west": { "model": "electromod:block/magnet_block", "x": 90, "y": 270 }
+  }
+}
