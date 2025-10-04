@@ -46,5 +46,23 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .input('*', Items.REDSTONE)
                 .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(NumberRange.IntRange.atLeast(6), Items.IRON_INGOT))
                 .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.GOLDEN_COIL)
+                .pattern("#*#")
+                .pattern("# #")
+                .pattern("# #")
+                .input('#', Items.GOLD_INGOT)
+                .input('*', Items.REDSTONE)
+                .criterion(hasItem(Items.GOLD_INGOT), conditionsFromItem(NumberRange.IntRange.atLeast(6), Items.GOLD_INGOT))
+                .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.COPPER_COIL)
+                .pattern("#*#")
+                .pattern("# #")
+                .pattern("# #")
+                .input('#', Items.COPPER_INGOT)
+                .input('*', Items.REDSTONE)
+                .criterion(hasItem(Items.COPPER_INGOT), conditionsFromItem(NumberRange.IntRange.atLeast(6), Items.COPPER_INGOT))
+                .offerTo(recipeExporter);
     }
 }

@@ -26,8 +26,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class IronCoilBlock extends BlockWithEntity implements BlockEntityProvider {
-    public static final MapCodec<IronCoilBlock> CODEC = IronCoilBlock.createCodec(IronCoilBlock::new);
+public class GoldenCoilBlock extends BlockWithEntity implements BlockEntityProvider
+{
+    public static final MapCodec<GoldenCoilBlock> CODEC = GoldenCoilBlock.createCodec(GoldenCoilBlock::new);
     public static final DirectionProperty FACING = Properties.FACING;
     public static final IntProperty DENSITY = IntProperty.of("density", 2, 4); // coil n
 
@@ -42,7 +43,7 @@ public class IronCoilBlock extends BlockWithEntity implements BlockEntityProvide
     public static final VoxelShape Y_SHAPE = VoxelShapes.union(NORTH, SOUTH, EAST, WEST);
     public static final VoxelShape Z_SHAPE = VoxelShapes.union(TOP, BOTTOM, EAST, WEST);
 
-    public IronCoilBlock(Settings settings)
+    public GoldenCoilBlock(Settings settings)
     {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState()
@@ -114,7 +115,7 @@ public class IronCoilBlock extends BlockWithEntity implements BlockEntityProvide
             int newDensity = newBlockState.get(DENSITY);
 
             world.setBlockState(pos, newBlockState, Block.NOTIFY_ALL);
-            world.playSound(null, pos, SoundEvents.BLOCK_CHAIN_HIT, SoundCategory.BLOCKS);
+            world.playSound(null, pos, SoundEvents.BLOCK_METAL_HIT, SoundCategory.BLOCKS);
 
             return ActionResult.success(world.isClient);
         }

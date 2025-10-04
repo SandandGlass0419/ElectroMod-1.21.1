@@ -25,6 +25,8 @@ public class ModItemGroups
 
                         // magnetic block
                         entries.add(ModBlocks.IRON_COIL);
+                        entries.add(ModBlocks.GOLDEN_COIL);
+                        entries.add(ModBlocks.COPPER_COIL);
 
                     })).build());
 

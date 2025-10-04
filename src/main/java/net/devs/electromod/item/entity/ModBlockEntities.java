@@ -10,9 +10,13 @@ import net.minecraft.util.Identifier;
 
 public class ModBlockEntities
 {
-    public static final BlockEntityType<CoilBlockEntity> IRON_COIL_BE =
-            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "iron_coil_be"),
-                    BlockEntityType.Builder.create(CoilBlockEntity::new, ModBlocks.IRON_COIL).build());
+    public static final BlockEntityType<CoilBlockEntity> COIL_BE =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "coil_be"),
+                    BlockEntityType.Builder.create(CoilBlockEntity::new,
+                            ModBlocks.IRON_COIL,
+                            ModBlocks.GOLDEN_COIL,
+                            ModBlocks.COPPER_COIL
+                    ).build());
 
     public static void registerModBlockEntities()
     {

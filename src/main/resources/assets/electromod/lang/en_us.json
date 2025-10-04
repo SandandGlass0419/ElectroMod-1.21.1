@@ -5,6 +5,8 @@
   "item.electromod.magnet_item": "Magnet",
 
   "block.electromod.iron_coil": "Iron Coil",
+  "block.electromod.golden_coil": "Golden Coil",
+  "block.electromod.copper_coil": "Copper Coil",
 
   "itemGroup.electromod.magnetic_items": "Magnetic Items"
 }

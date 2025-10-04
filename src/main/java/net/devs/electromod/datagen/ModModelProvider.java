@@ -22,6 +22,8 @@ public class ModModelProvider extends FabricModelProvider
     {
         // magnetic
         // iron_coil (custom json)
+        // golder_coil (custom json)
+        // copper_coil (custom json)
     }
 
     // generates item model json files. please add ALL items using method

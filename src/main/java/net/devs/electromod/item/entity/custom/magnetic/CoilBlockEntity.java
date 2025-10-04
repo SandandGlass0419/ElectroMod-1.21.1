@@ -15,7 +15,7 @@ public class CoilBlockEntity extends BlockEntity
 {
     public CoilBlockEntity(BlockPos pos, BlockState state)
     {
-        super(ModBlockEntities.IRON_COIL_BE, pos, state);
+        super(ModBlockEntities.COIL_BE, pos, state);
     }
 
     @Override

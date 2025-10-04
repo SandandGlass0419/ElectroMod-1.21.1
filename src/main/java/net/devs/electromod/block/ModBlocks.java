@@ -2,6 +2,8 @@ package net.devs.electromod.block;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.TestBlock;
+import net.devs.electromod.block.custom.magnetic.CopperCoilBlock;
+import net.devs.electromod.block.custom.magnetic.GoldenCoilBlock;
 import net.devs.electromod.block.custom.magnetic.IronCoilBlock;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
@@ -25,9 +27,21 @@ public class ModBlocks
     // blocks from magnetic
     public static final Block IRON_COIL = addBlock("iron_coil",
             new IronCoilBlock(AbstractBlock.Settings.create()
-                    .strength(1f)
+                    .strength(2f)
                     .nonOpaque()
                     .sounds(BlockSoundGroup.METAL)));
+
+    public static final Block GOLDEN_COIL = addBlock("golden_coil",
+            new GoldenCoilBlock(AbstractBlock.Settings.create()
+                    .strength(2f)
+                    .nonOpaque()
+                    .sounds(BlockSoundGroup.METAL)));
+
+    public static final Block COPPER_COIL = addBlock("copper_coil",
+            new CopperCoilBlock(AbstractBlock.Settings.create()
+                    .strength(2f)
+                    .nonOpaque()
+                    .sounds(BlockSoundGroup.COPPER)));
 
     public static void registerModBlocks()
     {
@@ -36,6 +50,8 @@ public class ModBlocks
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries ->
         {
             entries.add(IRON_COIL);
+            entries.add(GOLDEN_COIL);
+            entries.add(COPPER_COIL);
         });
     }
 
