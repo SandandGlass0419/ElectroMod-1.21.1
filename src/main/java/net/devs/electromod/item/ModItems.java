@@ -2,6 +2,7 @@ package net.devs.electromod.item;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.item.custom.TestItem;
+import net.devs.electromod.item.custom.electro.RubberGloves;
 import net.devs.electromod.item.custom.magnetic.MagnetItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
@@ -24,14 +25,20 @@ public class ModItems
     public static final Item ELECTRO_ITEM
             = addItem("electro_item", new Item(new Item.Settings()));
 
+    public static final Item RUBBER_GLOVES
+            = addItem("rubber_gloves", new RubberGloves(new Item.Settings()));
+
     public static void registerModItems()
     {
         ElectroMod.LOGGER.info("Registering Mod Items (" + ElectroMod.MOD_ID + ")");
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries ->
         {
+            //magnetic
             entries.add(MAGNET_ITEM);
+            //electro
             entries.add(ELECTRO_ITEM);
+            entries.add(RUBBER_GLOVES);
         });
     }
 

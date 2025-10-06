@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.ItemModelGenerator;
+import net.minecraft.data.client.Model;
 import net.minecraft.data.client.Models;
 
 public class ModModelProvider extends FabricModelProvider
@@ -39,5 +40,6 @@ public class ModModelProvider extends FabricModelProvider
         itemModelGenerator.register(ModItems.MAGNET_ITEM, Models.HANDHELD);
         //electro
         itemModelGenerator.register(ModItems.ELECTRO_ITEM, Models.HANDHELD);
+        itemModelGenerator.register(ModItems.RUBBER_GLOVES, Models.HANDHELD);
     }
 }
