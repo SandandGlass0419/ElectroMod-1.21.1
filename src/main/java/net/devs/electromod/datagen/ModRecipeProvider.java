@@ -93,5 +93,15 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .criterion(hasItem(Items.COPPER_INGOT), conditionsFromItem(Items.COPPER_INGOT))
                 .offerTo(recipeExporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.RUBBER_GLOVES, 1)
+                .pattern("***")
+                .pattern("*=*")
+                .pattern("***")
+                .input('=', Items.PINK_DYE)
+                .input('*', Items.SLIME_BALL)
+                .criterion(hasItem(Items.REDSTONE), conditionsFromItem(Items.REDSTONE))
+                .offerTo(recipeExporter);
+
+
     }
 }

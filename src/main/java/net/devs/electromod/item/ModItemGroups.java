@@ -43,6 +43,7 @@ public class ModItemGroups
 
                         // electro block
                         entries.add(ModBlocks.COPPER_WIRE);
+                        entries.add(ModItems.RUBBER_GLOVES);
 
                     })).build());
 
