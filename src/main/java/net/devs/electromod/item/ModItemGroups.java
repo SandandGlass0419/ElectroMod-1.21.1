@@ -30,6 +30,21 @@ public class ModItemGroups
                         entries.add(ModBlocks.MAGNET_BLOCK);
 
                     })).build());
+public static final ItemGroup ELECTRO_ITEM_GROUP = Registry.register(Registries.ITEM_GROUP,
+            Identifier.of(ElectroMod.MOD_ID, "electro_items"),
+            FabricItemGroup.builder()
+                    .icon(() -> new ItemStack(ModItems.ELECTRO_ITEM))
+                    .displayName(Text.translatable("itemGroup.electromod.electro_items"))
+                    .entries(((displayContext, entries) ->
+                    {
+                        // magnetic item
+                        entries.add(ModItems.ELECTRO_ITEM);
+
+                        // magnetic block
+
+                    })).build());
+
+
 
     public static void registerModItemGroups()
     {

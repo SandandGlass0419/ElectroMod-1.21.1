@@ -19,6 +19,8 @@ public class ModItems
     // items from magnetic
     public static final Item MAGNET_ITEM
             = addItem("magnet_item", new MagnetItem(new Item.Settings()));
+    public static final Item ELECTRO_ITEM
+            = addItem("electro_item", new Item(new Item.Settings()));
 
     public static void registerModItems()
     {
@@ -27,6 +29,7 @@ public class ModItems
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries ->
         {
             entries.add(MAGNET_ITEM);
+            entries.add(ELECTRO_ITEM);
         });
     }
 
