@@ -46,7 +46,7 @@ public class CopperWire extends Block {
             world.spawnEntity(lightning);
 
             player.kill();
-            player.sendMessage(Text.literal("Oops!"), true);
+            player.sendMessage(Text.literal("Oops!"));
         }
         return ActionResult.SUCCESS;
     }
