@@ -55,12 +55,12 @@ public class ModBlocks
                     .sounds(BlockSoundGroup.COPPER)
                     .nonOpaque()));
 
-    //Blocks from Electro
+    // blocks from electro
     public static final Block COPPER_WIRE = addBlock("copper_wire",
             new CopperWire(AbstractBlock.Settings.create()
                     .strength(1f)
-                    .sounds(BlockSoundGroup.COPPER).
-                    nonOpaque()));
+                    .sounds(BlockSoundGroup.COPPER)
+                    .nonOpaque()));
 
     public static void registerModBlocks()
     {
