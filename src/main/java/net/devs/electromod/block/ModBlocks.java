@@ -51,6 +51,11 @@ public class ModBlocks
                     .pistonBehavior(PistonBehavior.BLOCK)
                     .sounds(BlockSoundGroup.LODESTONE)));
 
+    public static final Block COOPER_WIRE = addBlock("cooper_wire_block",
+            new MagnetBlock(AbstractBlock.Settings.create()
+                    .strength(1f)
+                    .sounds(BlockSoundGroup.COPPER)));
+
     public static void registerModBlocks()
     {
         ElectroMod.LOGGER.info("Registering Mod Blocks (" + ElectroMod.MOD_ID + ")");
@@ -62,6 +67,7 @@ public class ModBlocks
             entries.add(GOLDEN_COIL);
             entries.add(COPPER_COIL);
             entries.add(MAGNET_BLOCK);
+            entries.add(COOPER_WIRE);
         });
     }
 
