@@ -2,10 +2,7 @@ package net.devs.electromod.block;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.TestBlock;
-import net.devs.electromod.block.custom.magnetic.CopperCoilBlock;
-import net.devs.electromod.block.custom.magnetic.GoldenCoilBlock;
-import net.devs.electromod.block.custom.magnetic.IronCoilBlock;
-import net.devs.electromod.block.custom.magnetic.MagnetBlock;
+import net.devs.electromod.block.custom.magnetic.*;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -48,10 +45,16 @@ public class ModBlocks
     public static final Block MAGNET_BLOCK = addBlock("magnet_block",
             new MagnetBlock(AbstractBlock.Settings.create()
                     .strength(3.5f)
-                    .pistonBehavior(PistonBehavior.BLOCK)
-                    .sounds(BlockSoundGroup.LODESTONE)));
+                    .sounds(BlockSoundGroup.LODESTONE)
+                    .pistonBehavior(PistonBehavior.BLOCK)));
 
-    public static final Block COOPER_WIRE = addBlock("cooper_wire",
+    public static final Block MAGNETIC_DETECTOR = addBlock("magnetic_detector",
+            new MagneticDetector(AbstractBlock.Settings.create()
+                    .strength(0f)
+                    .sounds(BlockSoundGroup.COPPER)
+                    .nonOpaque()));
+
+    public static final Block COPPER_WIRE = addBlock("copper_wire",
             new MagnetBlock(AbstractBlock.Settings.create()
                     .strength(1f)
                     .sounds(BlockSoundGroup.COPPER)));
@@ -67,7 +70,9 @@ public class ModBlocks
             entries.add(GOLDEN_COIL);
             entries.add(COPPER_COIL);
             entries.add(MAGNET_BLOCK);
-            entries.add(COOPER_WIRE);
+
+            // electro blocks
+            entries.add(COPPER_WIRE);
         });
     }
 

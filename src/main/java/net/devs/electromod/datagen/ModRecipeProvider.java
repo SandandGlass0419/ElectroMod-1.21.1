@@ -74,5 +74,15 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .input('B', Items.BLUE_DYE)
                 .criterion(hasItem(Items.LODESTONE), conditionsFromItem(Items.LODESTONE))
                 .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.MAGNETIC_DETECTOR, 2)
+                .pattern("===")
+                .pattern("=*=")
+                .pattern("###")
+                .input('=', Items.COPPER_INGOT)
+                .input('*', Items.COMPASS)
+                .input('#', Items.POLISHED_DEEPSLATE_SLAB)
+                .criterion(hasItem(Items.COMPASS), conditionsFromItem(Items.COMPASS))
+                .offerTo(recipeExporter);
     }
 }

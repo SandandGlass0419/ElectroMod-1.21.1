@@ -19,6 +19,8 @@ public class ModItems
     // items from magnetic
     public static final Item MAGNET_ITEM
             = addItem("magnet_item", new MagnetItem(new Item.Settings()));
+
+    // items from electro
     public static final Item ELECTRO_ITEM
             = addItem("electro_item", new Item(new Item.Settings()));
 

@@ -26,5 +26,6 @@ public class ModLootTableProvider extends FabricBlockLootTableProvider
         addDrop(ModBlocks.GOLDEN_COIL);
         addDrop(ModBlocks.COPPER_COIL);
         addDrop(ModBlocks.MAGNET_BLOCK);
+        addDrop(ModBlocks.MAGNETIC_DETECTOR);
     }
 }

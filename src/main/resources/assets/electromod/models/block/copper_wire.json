@@ -1,11 +1,11 @@
 {
   "parent": "block/block",
   "textures": {
-    "particle": "electromod:block/cooper_wire",
-    "top": "electromod:block/cooper_wire",
-    "bottom": "electromod:block/cooper_wire",
-    "side": "electromod:block/cooper_wire",
-    "inside": "electromod:block/cooper_wire"
+    "particle": "electromod:block/copper_wire",
+    "top": "electromod:block/copper_wire",
+    "bottom": "electromod:block/copper_wire",
+    "side": "electromod:block/copper_wire",
+    "inside": "electromod:block/copper_wire"
   },
   "elements": [
     {   "from": [ 0, 0, 0 ],
