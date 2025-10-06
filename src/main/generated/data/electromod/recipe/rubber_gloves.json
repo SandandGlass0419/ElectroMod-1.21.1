@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "*": {
+      "item": "minecraft:slime_ball"
+    },
+    "=": {
+      "item": "minecraft:pink_dye"
+    }
+  },
+  "pattern": [
+    "***",
+    "*=*",
+    "***"
+  ],
+  "result": {
+    "count": 1,
+    "id": "electromod:rubber_gloves"
+  }
+}

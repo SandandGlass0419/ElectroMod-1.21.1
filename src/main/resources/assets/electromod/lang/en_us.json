@@ -13,7 +13,7 @@
   "block.electromod.magnetic_detector": "Magnetic Detector",
 
   "block.electromod.copper_wire": "Copper Wire",
-  "block.electromod.rubber_gloves" : "Rubber Gloves",
+  "item.electromod.rubber_gloves" : "Rubber Gloves",
 
   "itemGroup.electromod.magnetic_items": "Magnetic Items",
   "itemGroup.electromod.electro_items" : "Electro Items"
