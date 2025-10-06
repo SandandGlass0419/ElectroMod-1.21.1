@@ -60,7 +60,8 @@ public class ModBlocks
             new CopperWire(AbstractBlock.Settings.create()
                     .strength(1f)
                     .sounds(BlockSoundGroup.COPPER)
-                    .nonOpaque()));
+                    .nonOpaque()
+                    .requiresTool()));
 
     public static void registerModBlocks()
     {
