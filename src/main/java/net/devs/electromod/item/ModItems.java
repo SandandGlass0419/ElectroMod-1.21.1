@@ -34,9 +34,10 @@ public class ModItems
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries ->
         {
-            //magnetic
+            // magnetic
             entries.add(MAGNET_ITEM);
-            //electro
+
+            // electro
             entries.add(ELECTRO_ITEM);
             entries.add(RUBBER_GLOVES);
         });

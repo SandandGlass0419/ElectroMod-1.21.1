@@ -74,6 +74,7 @@ public class ModBlocks
             entries.add(GOLDEN_COIL);
             entries.add(COPPER_COIL);
             entries.add(MAGNET_BLOCK);
+            entries.add(MAGNETIC_DETECTOR);
 
             // electro blocks
             entries.add(COPPER_WIRE);

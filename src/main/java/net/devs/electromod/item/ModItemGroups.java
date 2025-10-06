@@ -28,7 +28,7 @@ public class ModItemGroups
                         entries.add(ModBlocks.GOLDEN_COIL);
                         entries.add(ModBlocks.COPPER_COIL);
                         entries.add(ModBlocks.MAGNET_BLOCK);
-
+                        entries.add(ModBlocks.MAGNETIC_DETECTOR);
                     })).build());
 
     public static final ItemGroup ELECTRO_ITEM_GROUP = Registry.register(Registries.ITEM_GROUP,
