@@ -19,9 +19,12 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider
     public void configure(RegistryWrapper.WrapperLookup wrapperLookup)
     {
         getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE) // tags for adding blocks that can be mined with a pickaxe
+                //magnetic
                 .add(ModBlocks.IRON_COIL)
                 .add(ModBlocks.GOLDEN_COIL)
                 .add(ModBlocks.COPPER_COIL)
-                .add(ModBlocks.MAGNET_BLOCK);
+                .add(ModBlocks.MAGNET_BLOCK)
+                //electro
+                .add(ModBlocks.COPPER_WIRE);
     }
 }

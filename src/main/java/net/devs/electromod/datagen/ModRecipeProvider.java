@@ -84,5 +84,14 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .input('#', Items.POLISHED_DEEPSLATE_SLAB)
                 .criterion(hasItem(Items.COMPASS), conditionsFromItem(Items.COMPASS))
                 .offerTo(recipeExporter);
+        // electro
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.COPPER_WIRE, 2)
+                .pattern("   ")
+                .pattern("===")
+                .pattern("   ")
+                .input('=', Items.COPPER_INGOT)
+                .criterion(hasItem(Items.COPPER_INGOT), conditionsFromItem(Items.COPPER_INGOT))
+                .offerTo(recipeExporter);
+
     }
 }
