@@ -1,7 +1,29 @@
 {
   "variants": {
-    "": {
+    "facing=up": {
       "model": "electromod:block/copper_wire"
+    },
+    "facing=down": {
+      "model": "electromod:block/copper_wire",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "electromod:block/copper_wire",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "electromod:block/copper_wire",
+      "x": 270
+    },
+    "facing=east": {
+      "model": "electromod:block/copper_wire",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "electromod:block/copper_wire",
+      "x": 90,
+      "y": 270
     }
   }
 }
