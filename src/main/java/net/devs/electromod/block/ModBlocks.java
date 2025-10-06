@@ -2,6 +2,7 @@ package net.devs.electromod.block;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.TestBlock;
+import net.devs.electromod.block.custom.electro.CopperWire;
 import net.devs.electromod.block.custom.magnetic.*;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
@@ -54,10 +55,12 @@ public class ModBlocks
                     .sounds(BlockSoundGroup.COPPER)
                     .nonOpaque()));
 
+    //Blocks from Electro
     public static final Block COPPER_WIRE = addBlock("copper_wire",
-            new MagnetBlock(AbstractBlock.Settings.create()
+            new CopperWire(AbstractBlock.Settings.create()
                     .strength(1f)
-                    .sounds(BlockSoundGroup.COPPER)));
+                    .sounds(BlockSoundGroup.COPPER).
+                    nonOpaque()));
 
     public static void registerModBlocks()
     {
