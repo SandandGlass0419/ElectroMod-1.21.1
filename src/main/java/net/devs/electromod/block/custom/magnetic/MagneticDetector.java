@@ -22,6 +22,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
 public class MagneticDetector extends BlockWithEntity
@@ -92,6 +94,22 @@ public class MagneticDetector extends BlockWithEntity
     }
 
     // blockstates - direction (facing, horizontal axis)
+    @Override
+    protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos)
+    {
+        Direction facing = state.get(FACING);
+        BlockPos supportPos = pos.offset(facing.getOpposite());
+        return world.getBlockState(supportPos).isSideSolidFullSquare(world, supportPos, facing);
+    }
+
+    @Override
+    protected BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos)
+    {
+        return direction == state.get(FACING).getOpposite() && !canPlaceAt(state, world, pos) ?
+                Blocks.AIR.getDefaultState() :
+                super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    }
+
     @Override
     @Nullable
     public BlockState getPlacementState(ItemPlacementContext ctx)

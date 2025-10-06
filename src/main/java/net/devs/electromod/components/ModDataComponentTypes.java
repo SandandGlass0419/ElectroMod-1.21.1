@@ -14,7 +14,7 @@ public class ModDataComponentTypes
 {
     // mod defined component types - see DataComponentTypes.java in net.minecraft
 
-    public static final int min_force = 1; public static final int max_force = 5;
+    public static final int min_force = 1; public static final int max_force = 15;
     public static final ComponentType<Integer> MAGNET_FORCE = addComponentType(
             "magnet_force", builder -> builder.codec(Codecs.rangedInt(min_force, max_force)).packetCodec(PacketCodecs.VAR_INT));
 
