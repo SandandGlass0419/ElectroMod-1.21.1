@@ -1,7 +1,7 @@
-// 1.21.1	2025-10-06T18:41:28.9548417	ElectroMod/Block Loot Tables
+// 1.21.1	2025-10-06T17:03:16.485616	ElectroMod/Block Loot Tables
+2c32b51f2fd76aa3b2de94a58bb39ff010be21db data\electromod\loot_table\blocks\copper_coil.json
 81198a44c353899530679b73a441e700b9a1c373 data\electromod\loot_table\blocks\iron_coil.json
+fb59afcde9b3a66f747fddf9cb3dc3ec2951e961 data\electromod\loot_table\blocks\copper_wire.json
+bce96377afd045e573ff235c5ba261eb6313de3c data\electromod\loot_table\blocks\magnet_block.json
 a66b8c977756f3cd11d94ce48f73b450d459f69c data\electromod\loot_table\blocks\golden_coil.json
 aea588e66b5c306f4aaf72c40c0f9487fe1c327a data\electromod\loot_table\blocks\magnetic_detector.json
-2c32b51f2fd76aa3b2de94a58bb39ff010be21db data\electromod\loot_table\blocks\copper_coil.json
-bce96377afd045e573ff235c5ba261eb6313de3c data\electromod\loot_table\blocks\magnet_block.json
-fb59afcde9b3a66f747fddf9cb3dc3ec2951e961 data\electromod\loot_table\blocks\copper_wire.json

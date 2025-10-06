@@ -5,13 +5,17 @@ import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DebugStickItem;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -23,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 public class MagneticDetector extends BlockWithEntity
 {
     public static final MapCodec<MagneticDetector> CODEC = MagneticDetector.createCodec(MagneticDetector::new);
-    public static final IntProperty DETECT_MODE = IntProperty.of("detect_mode", 0, 3);
+    public static final EnumProperty<DetectState> DETECT_STATE = EnumProperty.of("detect_state", DetectState.class);
     public static final DirectionProperty FACING = Properties.FACING;
     public static final EnumProperty<Direction.Axis> HORIZONTAL_AXIS = Properties.HORIZONTAL_AXIS;
 
@@ -40,14 +44,14 @@ public class MagneticDetector extends BlockWithEntity
     {
         super(settings);
         this.setDefaultState(this.getDefaultState()
-                .with(DETECT_MODE, 0)
+                .with(DETECT_STATE, DetectState.EMPTY)
                 .with(FACING, Direction.UP)
                 .with(HORIZONTAL_AXIS, Direction.Axis.Z));
     }
 
     // register properties
     @Override protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(DETECT_MODE, FACING, HORIZONTAL_AXIS);
+        builder.add(DETECT_STATE, FACING, HORIZONTAL_AXIS);
     }
 
     // block entity methods
@@ -97,10 +101,56 @@ public class MagneticDetector extends BlockWithEntity
                 .with(HORIZONTAL_AXIS, ctx.getHorizontalPlayerFacing().getAxis());
     }
 
+    @Override
+    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved)
+    {
+        if (state.getBlock() == newState.getBlock()) return;
+
+        if (world.getBlockEntity(pos) instanceof MagneticDetectorEntity)
+        {
+            ItemStack stack = state.get(DETECT_STATE).getStoredItem();
+            ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+        }
+
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
     // block features
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
     {
-        return ActionResult.SUCCESS;
+        if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity)) return ActionResult.FAIL;
+        if (!player.getAbilities().allowModifyWorld) return ActionResult.PASS;
+        if (player.isSneaking()) return ActionResult.FAIL;
+
+        ItemStack stack = player.getMainHandStack();
+        DetectState detect_state = state.get(DETECT_STATE);
+
+        if (stack.getItem() instanceof DebugStickItem) return ActionResult.FAIL;
+
+        if (detect_state != DetectState.EMPTY) // give item to player
+        {
+            player.giveItemStack(detect_state.getStoredItem());
+            world.setBlockState(pos, state.with(DETECT_STATE, DetectState.EMPTY));
+
+            world.playSound(null, pos, SoundEvents.BLOCK_COPPER_BULB_STEP, SoundCategory.BLOCKS);
+            player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, 1f);
+
+            return ActionResult.SUCCESS;
+        }
+
+        DetectState foundState = DetectState.findStateWith(stack.getItem());
+
+        if (foundState != null) // get item from player
+        {
+            world.setBlockState(pos, state.with(DETECT_STATE, foundState));
+            if (!player.isCreative()) { stack.decrement(1); }
+
+            world.playSound(null, pos, SoundEvents.BLOCK_COPPER_BULB_STEP, SoundCategory.BLOCKS);
+
+            return ActionResult.SUCCESS;
+        }
+
+        return ActionResult.FAIL;
     }
 }
