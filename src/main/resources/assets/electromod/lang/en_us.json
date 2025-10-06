@@ -12,7 +12,7 @@
   "block.electromod.magnet_block": "Magnet Block",
   "block.electromod.magnetic_detector": "Magnetic Detector",
 
-  "block.electromod.cooper_wire": "Cooper Wire",
+  "block.electromod.copper_wire": "Copper Wire",
 
   "itemGroup.electromod.magnetic_items": "Magnetic Items",
   "itemGroup.electromod.electro_items" : "Electro Items"
