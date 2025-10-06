@@ -11,7 +11,7 @@
   "block.electromod.copper_coil": "Copper Coil",
   "block.electromod.magnet_block": "Magnet Block",
 
-  "block.electromod.cooper_wire_block": "Cooper Wire",
+  "block.electromod.cooper_wire": "Cooper Wire",
 
   "itemGroup.electromod.magnetic_items": "Magnetic Items",
   "itemGroup.electromod.electro_items" : "Electro Items"

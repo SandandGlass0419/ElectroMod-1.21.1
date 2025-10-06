@@ -51,7 +51,7 @@ public class ModBlocks
                     .pistonBehavior(PistonBehavior.BLOCK)
                     .sounds(BlockSoundGroup.LODESTONE)));
 
-    public static final Block COOPER_WIRE = addBlock("cooper_wire_block",
+    public static final Block COOPER_WIRE = addBlock("cooper_wire",
             new MagnetBlock(AbstractBlock.Settings.create()
                     .strength(1f)
                     .sounds(BlockSoundGroup.COPPER)));
