@@ -4,16 +4,20 @@ import com.mojang.serialization.MapCodec;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class MagneticDetector extends BlockWithEntity
@@ -89,9 +93,14 @@ public class MagneticDetector extends BlockWithEntity
     public BlockState getPlacementState(ItemPlacementContext ctx)
     {
         return this.getDefaultState()
-                .with(FACING, ctx.getPlayerLookDirection().getOpposite())
+                .with(FACING, ctx.getSide())
                 .with(HORIZONTAL_AXIS, ctx.getHorizontalPlayerFacing().getAxis());
     }
 
     // block features
+    @Override
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
+    {
+        return ActionResult.SUCCESS;
+    }
 }
