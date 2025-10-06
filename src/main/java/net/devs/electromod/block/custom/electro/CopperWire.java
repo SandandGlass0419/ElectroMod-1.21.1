@@ -35,6 +35,7 @@ public class CopperWire extends Block {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (world.isClient()) return ActionResult.FAIL; // prevent double message
 
         if(!player.getMainHandStack().getItem().equals(ModItems.RUBBER_GLOVES)) //dies when you click it without rubber gloves
         {
@@ -53,7 +54,7 @@ public class CopperWire extends Block {
 
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-        super.onSteppedOn(world, pos, state, entity);
+        if (world.isClient()) return;
 
         BlockPos blockpos = entity.getBlockPos();
 
