@@ -2,7 +2,6 @@ package net.devs.electromod.block.custom.electro;
 
 
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.block.custom.magnetic.CopperCoilBlock;
 import net.devs.electromod.item.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -20,7 +19,6 @@ import net.minecraft.world.World;
 
 public class CopperWire extends Block {
 
-    public static final MapCodec<CopperWire> CODEC = CopperWire.createCodec(CopperWire::new);
     public static final DirectionProperty FACING = Properties.FACING;
 
     public CopperWire(Settings settings)
