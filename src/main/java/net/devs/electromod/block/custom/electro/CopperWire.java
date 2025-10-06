@@ -6,6 +6,8 @@ import net.devs.electromod.item.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -36,6 +38,13 @@ public class CopperWire extends Block {
 
         if(!player.getMainHandStack().getItem().equals(ModItems.RUBBER_GLOVES)) //dies when you click it without rubber gloves
         {
+            BlockPos blockpos = player.getBlockPos();
+
+            LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT,world);
+            lightning.refreshPositionAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(),0,0);
+
+            world.spawnEntity(lightning);
+
             player.kill();
             player.sendMessage(Text.literal("Oops!"), true);
         }
@@ -45,6 +54,13 @@ public class CopperWire extends Block {
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         super.onSteppedOn(world, pos, state, entity);
+
+        BlockPos blockpos = entity.getBlockPos();
+
+        LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT,world);
+        lightning.refreshPositionAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(),0,0);
+
+        world.spawnEntity(lightning);
 
         entity.kill();
     }
