@@ -7,9 +7,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.IntProperty;
@@ -91,6 +89,12 @@ public class CoilBlock extends BlockWithEntity implements BlockEntityProvider
         };
     }
 
+    @Override
+    protected VoxelShape getRaycastShape(BlockState state, BlockView world, BlockPos pos)
+    {
+        return VoxelShapes.fullCube();
+    }
+
     // blockstate - direction (facing)
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
@@ -99,14 +103,13 @@ public class CoilBlock extends BlockWithEntity implements BlockEntityProvider
 
     // redstone
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        if (world.isClient()) super.onPlaced(world, pos, state, placer, itemStack);
-
+    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
+    {
         if (world.getBlockEntity(pos) instanceof CoilBlockEntity coilBlockEntity) {
             coilBlockEntity.setRedstoneInput(getRecievedRedstonePower(world, pos, state));
         }
 
-        super.onPlaced(world, pos, state, placer, itemStack);
+        super.onBlockAdded(state, world, pos, oldState, notify);
     }
 
     @Override

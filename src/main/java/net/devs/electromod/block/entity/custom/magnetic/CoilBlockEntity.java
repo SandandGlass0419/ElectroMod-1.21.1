@@ -40,6 +40,7 @@ public class CoilBlockEntity extends BlockEntity
         if (this.redstoneInput != power)
         {
             this.redstoneInput = power;
+            markDirty();
             ElectroMod.LOGGER.info("new power: " + this.redstoneInput);
         }
     }

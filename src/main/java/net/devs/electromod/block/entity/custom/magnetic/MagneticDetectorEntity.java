@@ -13,6 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class MagneticDetectorEntity extends BlockEntity
 {
+    int redstoneOutput = 0;
+
     public MagneticDetectorEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.DETECTOR_BE, pos, state);
     }
