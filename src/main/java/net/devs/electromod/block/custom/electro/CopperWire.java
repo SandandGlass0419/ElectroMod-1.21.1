@@ -192,4 +192,9 @@ public class CopperWire extends BlockWithEntity implements BlockEntityProvider {
     protected MapCodec<? extends BlockWithEntity> getCodec() {
         return CODEC;
     }
+
+    @Override
+    protected BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
+    }
 }
