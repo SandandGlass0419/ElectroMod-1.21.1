@@ -1,6 +1,5 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
-import net.devs.electromod.block.custom.magnetic.CoilBlock;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -27,11 +26,11 @@ public class CoilBlockEntity extends BlockEntity
     {
         if (world.isClient()) return;
 
-        if (needsUpdate)
-        {
-            setRedstoneInput(CoilBlock.getRecievedRedstonePower(world, pos, state));
-            needsUpdate = false;
-        }
+//        if (needsUpdate) // keep eye on
+//        {
+//            setRedstoneInput(CoilBlock.getRecievedRedstonePower(world, pos, state));
+//            needsUpdate = false;
+//        }
     }
 
     public void setRedstoneInput(int power)

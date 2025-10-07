@@ -1,6 +1,5 @@
 package net.devs.electromod.block.custom.magnetic;
 
-import com.mojang.serialization.MapCodec;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.minecraft.block.*;
@@ -9,6 +8,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
@@ -20,11 +20,11 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class CoilBlock extends BlockWithEntity implements BlockEntityProvider
+public abstract class CoilBlock extends BlockWithEntity implements BlockEntityProvider
 {
-    public static final MapCodec<? extends BlockWithEntity> CODEC = CoilBlock.createCodec(CoilBlock::new);
     public static final DirectionProperty FACING = Properties.FACING;
     public static final IntProperty DENSITY = IntProperty.of("density", 2, 4); // coil n
+    public static final BooleanProperty POWERED = Properties.POWERED;
 
     private static final VoxelShape TOP = Block.createCuboidShape(0, 14, 0, 16, 16, 16);
     private static final VoxelShape BOTTOM = Block.createCuboidShape(0, 0, 0, 16, 2, 16);
@@ -42,13 +42,14 @@ public class CoilBlock extends BlockWithEntity implements BlockEntityProvider
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState()
                 .with(FACING, Direction.UP)
-                .with(DENSITY, 3));
+                .with(DENSITY, 3)
+                .with(POWERED, false));
     }
 
     // register properties
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, DENSITY);
+        builder.add(FACING, DENSITY, POWERED);
     }
 
     // settings for blockentity
@@ -56,11 +57,6 @@ public class CoilBlock extends BlockWithEntity implements BlockEntityProvider
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new CoilBlockEntity(pos, state);
-    }
-
-    @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return CODEC;
     }
 
     @Override
@@ -85,18 +81,21 @@ public class CoilBlock extends BlockWithEntity implements BlockEntityProvider
             case UP, DOWN -> Y_SHAPE;
             case NORTH, SOUTH -> Z_SHAPE;
             case EAST, WEST -> X_SHAPE;
-            default -> Y_SHAPE;
         };
     }
 
     @Override
     protected VoxelShape getRaycastShape(BlockState state, BlockView world, BlockPos pos) { return VoxelShapes.fullCube(); }
 
-    // blockstate - direction (facing)
+    // blockstates - direction (facing)
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite());
     }
+
+    // blockstates
+
+    // used to have custom neighbor updater
 
     // redstone
     @Override
@@ -112,15 +111,23 @@ public class CoilBlock extends BlockWithEntity implements BlockEntityProvider
     @Override
     protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify)
     {
-        if (world.isClient()) super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
-
-        if (world.getBlockEntity(pos) instanceof CoilBlockEntity coilBlockEntity)
-        {
-            int power = getRecievedRedstonePower(world, pos, state);
-            coilBlockEntity.setRedstoneInput(power);
+        if (!world.isClient()) {
+            updatePower(world, pos, state);
         }
 
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+    }
+
+    private void updatePower(World world, BlockPos pos, BlockState state)
+    {
+        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBlockEntity)) return;
+
+        int newPower = getRecievedRedstonePower(world, pos, state);
+
+        if (newPower == 0 && state.get(POWERED))       { world.setBlockState(pos, state.with(POWERED, false), Block.NOTIFY_ALL); }
+        else if (newPower != 0 && !state.get(POWERED)) { world.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL); }
+
+        coilBlockEntity.setRedstoneInput(newPower);
     }
 
     public static int getRecievedRedstonePower(World world, BlockPos pos, BlockState state)

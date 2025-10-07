@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
@@ -37,6 +38,7 @@ public class MagneticDetector extends BlockWithEntity
     public static final EnumProperty<DetectState> DETECT_STATE = EnumProperty.of("detect_state", DetectState.class);
     public static final DirectionProperty FACING = Properties.FACING;
     public static final EnumProperty<Direction.Axis> HORIZONTAL_AXIS = Properties.HORIZONTAL_AXIS;
+    public static final BooleanProperty POWERED = Properties.POWERED;
 
     public static final VoxelShape UP_Z_SHAPE = Block.createCuboidShape(0, 0, 6, 16, 15, 10);
     public static final VoxelShape UP_X_SHAPE = Block.createCuboidShape(6, 0, 0, 10, 15, 16);
@@ -53,12 +55,13 @@ public class MagneticDetector extends BlockWithEntity
         this.setDefaultState(this.getDefaultState()
                 .with(DETECT_STATE, DetectState.EMPTY)
                 .with(FACING, Direction.UP)
-                .with(HORIZONTAL_AXIS, Direction.Axis.Z));
+                .with(HORIZONTAL_AXIS, Direction.Axis.Z)
+                .with(POWERED, false));
     }
 
     // register properties
     @Override protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(DETECT_STATE, FACING, HORIZONTAL_AXIS);
+        builder.add(DETECT_STATE, FACING, HORIZONTAL_AXIS, POWERED);
     }
 
     // block entity methods
@@ -108,6 +111,36 @@ public class MagneticDetector extends BlockWithEntity
 
     // blockstates - direction (facing, horizontal axis)
     @Override
+    @Nullable
+    public BlockState getPlacementState(ItemPlacementContext ctx)
+    {
+        return this.getDefaultState()
+                .with(FACING, ctx.getSide())
+                .with(HORIZONTAL_AXIS, ctx.getHorizontalPlayerFacing().getAxis());
+    }
+
+    // blockstates
+    @Override
+    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved)
+    {
+        if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity)) return;
+
+        if (state.getBlock() == newState.getBlock()) // state change
+        {
+            updatePower(world, pos, state);
+        }
+
+        else // block break
+        {
+            ItemStack stack = state.get(DETECT_STATE).getStoredItem();
+            ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+        }
+
+        this.updateNeighbors(world, pos, state);
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    @Override
     protected boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos)
     {
         Direction facing = state.get(FACING);
@@ -123,40 +156,21 @@ public class MagneticDetector extends BlockWithEntity
                 super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
-    @Override
-    @Nullable
-    public BlockState getPlacementState(ItemPlacementContext ctx)
+    private void updateNeighbors(World world, BlockPos pos, BlockState state)
     {
-        return this.getDefaultState()
-                .with(FACING, ctx.getSide())
-                .with(HORIZONTAL_AXIS, ctx.getHorizontalPlayerFacing().getAxis());
-    }
-
-    @Override
-    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved)
-    {
-        if (state.getBlock() == newState.getBlock()) return;
-
-        if (world.getBlockEntity(pos) instanceof MagneticDetectorEntity)
-        {
-            ItemStack stack = state.get(DETECT_STATE).getStoredItem();
-            ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-        }
-
-        super.onStateReplaced(state, world, pos, newState, moved);
+        world.updateNeighborsAlways(pos, this);
+        world.updateNeighborsAlways(pos.offset(state.get(FACING).getOpposite()), this);
     }
 
     // redstone
-    @Override public boolean emitsRedstonePower(BlockState state) {
-        return true;
-    }
+    @Override public boolean emitsRedstonePower(BlockState state) { return true; }
 
     @Override
     public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction)
     {
         if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return 0;
 
-        return Arrays.asList(getRedstoneDirections(state, false)).contains(direction) ?
+        return Arrays.asList(getRedstoneDirections(state, false)).contains(direction) && state.get(POWERED) ?
                 detectorEntity.getRedstoneOutput() : 0;
     }
 
@@ -165,11 +179,33 @@ public class MagneticDetector extends BlockWithEntity
     {
         if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return 0;
 
-        return Arrays.asList(getRedstoneDirections(state, true)).contains(direction) ?
+        return Arrays.asList(getRedstoneDirections(state, true)).contains(direction) && state.get(POWERED) ?
                 detectorEntity.getRedstoneOutput() : 0;
     }
 
-    public static int getDefaultPower() { return 12; }
+    private void updatePower(World world, BlockPos pos, BlockState state)
+    {
+        if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return;
+
+        int newPower = defaultPowerFormula(state);
+
+        if (newPower == 0 && state.get(POWERED))       { world.setBlockState(pos, state.with(POWERED, false), Block.NOTIFY_ALL); }
+        else if (newPower != 0 && !state.get(POWERED)) { world.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL); }
+
+        this.updateNeighbors(world, pos, state);
+        detectorEntity.setRedstoneOutput(newPower);
+    }
+
+    public static int defaultPowerFormula(BlockState state)
+    {
+        return switch (state.get(DETECT_STATE))
+        {
+            case IRON_COIL -> 1;
+            case GOLDEN_COIL -> 2;
+            case COPPER_COIL -> 3;
+            default -> 0;
+        };
+    }
 
     public static Direction[] getRedstoneDirections(BlockState state, boolean isstrong)
     {
@@ -187,21 +223,8 @@ public class MagneticDetector extends BlockWithEntity
     @Override
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
     {
-        if (world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity) {
-            detectorEntity.setRedstoneOutput(getDefaultPower());
-        }
-
-        super.onBlockAdded(state, world, pos, oldState, notify);
-    }
-
-    @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player)
-    {
-        if (emitsRedstonePower(state) || !world.isClient()) {
-            world.updateNeighborsAlways(pos.offset(state.get(FACING)), this);
-        }
-
-        return super.onBreak(world, pos, state, player);
+        updatePower(world, pos, state);
+        this.updateNeighbors(world, pos, state);
     }
 
     // block features
