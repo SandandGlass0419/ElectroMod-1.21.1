@@ -2,10 +2,10 @@
   "multipart": [
     { "when": { "facing": "up" },    "apply": { "model": "electromod:block/copper_wire" } },
     { "when": { "facing": "down" },  "apply": { "model": "electromod:block/copper_wire", "x": 180 } },
-    { "when": { "facing": "north" }, "apply": { "model": "electromod:block/copper_wire", "x": 90 } },
-    { "when": { "facing": "south" }, "apply": { "model": "electromod:block/copper_wire", "x": 270 } },
-    { "when": { "facing": "east" },  "apply": { "model": "electromod:block/copper_wire", "x": 90, "y": 90 } },
-    { "when": { "facing": "west" },  "apply": { "model": "electromod:block/copper_wire", "x": 90, "y": 270 } },
+    { "when": { "facing": "north" }, "apply": { "model": "electromod:block/copper_wire_dot", "x": 90 } },
+    { "when": { "facing": "south" }, "apply": { "model": "electromod:block/copper_wire_dot", "x": 270 } },
+    { "when": { "facing": "east" },  "apply": { "model": "electromod:block/copper_wire_dot", "x": 90, "y": 90 } },
+    { "when": { "facing": "west" },  "apply": { "model": "electromod:block/copper_wire_dot", "x": 90, "y": 270 } },
 
     { "when": { "facing": "up",    "north": true }, "apply": { "model": "electromod:block/copper_wire_side", "x": 0,   "y": 0   } },
     { "when": { "facing": "up",    "east":  true }, "apply": { "model": "electromod:block/copper_wire_side", "x": 0,   "y": 90  } },
