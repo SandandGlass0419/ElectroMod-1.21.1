@@ -28,7 +28,7 @@ public class ModBlockEntities
                     ).build());
     //electro
     public static final BlockEntityType<WireBlockEntity> WIRE_BE =
-            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "detector_be"),
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "wire_be"),
                     BlockEntityType.Builder.create(WireBlockEntity::new,
                             ModBlocks.COPPER_WIRE
                     ).build());

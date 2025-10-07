@@ -1,11 +1,12 @@
 package net.devs.electromod.block.custom.electro;
 
+
 import com.mojang.serialization.MapCodec;
 import net.devs.electromod.block.ModBlocks;
+import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.item.ModItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -25,8 +26,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class CopperWire extends Block {
+public class CopperWire extends BlockWithEntity implements BlockEntityProvider {
 
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty NORTH = Properties.NORTH;
@@ -41,6 +43,7 @@ public class CopperWire extends Block {
     private static final VoxelShape EAST_SHAPE  = Block.createCuboidShape(11, 5, 5, 16, 11, 11); // 동쪽 연결
     private static final VoxelShape WEST_SHAPE  = Block.createCuboidShape(0, 5, 5, 5, 11, 11);   // 서쪽 연결
 
+    public static final MapCodec<CopperWire> CODEC = CopperWire.createCodec(CopperWire::new);
 
     public CopperWire(Settings settings) {
         super(settings);
@@ -52,10 +55,7 @@ public class CopperWire extends Block {
                 .with(WEST, false));
     }
 
-    @Override
-    protected MapCodec<? extends Block> getCodec() {
-        return super.getCodec();
-    }
+
 
     // ⚡ 우클릭 감전 이벤트
     @Override
@@ -181,5 +181,15 @@ public class CopperWire extends Block {
             case WEST  -> WEST_SHAPE;
             default -> CORE; // UP/DOWN은 필요 없음
         };
+    }
+
+    @Override
+    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new WireBlockEntity(pos, state);
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 }

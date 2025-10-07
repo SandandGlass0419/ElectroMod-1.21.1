@@ -16,9 +16,17 @@ public class WireBlockEntity extends BlockEntity {
     }
 
     // 값 읽기/쓰기
-
+    public void setStoredValue(int value) {
+        this.storedValue = value;
+        markDirty(); // 값 변경 후 월드에 반영
+    }
 
     // 월드 저장용 NBT
+    public int getStoredValue() {
+        return storedValue;
+    }
+
+
 
 
     @Override
