@@ -5,6 +5,7 @@ import net.devs.electromod.block.ModBlocks;
 import net.devs.electromod.item.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -21,6 +22,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class CopperWire extends Block {
@@ -30,6 +33,14 @@ public class CopperWire extends Block {
     public static final BooleanProperty EAST = Properties.EAST;
     public static final BooleanProperty SOUTH = Properties.SOUTH;
     public static final BooleanProperty WEST = Properties.WEST;
+
+    private static final VoxelShape CORE = Block.createCuboidShape(5, 5, 5, 11, 11, 11); // 중심 점(dot)
+
+    private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(5, 5, 0, 11, 11, 5);  // 북쪽 연결
+    private static final VoxelShape SOUTH_SHAPE = Block.createCuboidShape(5, 5, 11, 11, 11, 16); // 남쪽 연결
+    private static final VoxelShape EAST_SHAPE  = Block.createCuboidShape(11, 5, 5, 16, 11, 11); // 동쪽 연결
+    private static final VoxelShape WEST_SHAPE  = Block.createCuboidShape(0, 5, 5, 5, 11, 11);   // 서쪽 연결
+
 
     public CopperWire(Settings settings) {
         super(settings);
@@ -51,11 +62,12 @@ public class CopperWire extends Block {
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.isClient()) return ActionResult.FAIL;
         Item stackItem = player.getMainHandStack().getItem();
+        Item leftHandStackITem = player.getOffHandStack().getItem();
 
         if (stackItem instanceof DebugStickItem ||
-            stackItem.equals(ModBlocks.COPPER_WIRE.asItem())) return ActionResult.FAIL;
+                stackItem.equals(ModBlocks.COPPER_WIRE.asItem())) return ActionResult.FAIL;
 
-        if (!stackItem.equals(ModItems.RUBBER_GLOVES)) {
+        if (!stackItem.equals(ModItems.RUBBER_GLOVES)&&!leftHandStackITem.equals(ModItems.RUBBER_GLOVES)) {
             BlockPos blockpos = player.getBlockPos();
 
             LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
@@ -98,15 +110,15 @@ public class CopperWire extends Block {
         checkAndChange(world, pos, true);
     }
 
-    @Override protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+    @Override
+    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() == newState.getBlock()) return;
 
         checkAndChange(world, pos, false);
         super.onStateReplaced(state, world, pos, newState, moved);
     }
 
-    private void checkAndChange(World world, BlockPos pos, boolean value)
-    {
+    private void checkAndChange(World world, BlockPos pos, boolean value) {
         BlockState eastState = world.getBlockState(pos.offset(Direction.EAST));
         BlockState westState = world.getBlockState(pos.offset(Direction.WEST));
         BlockState southState = world.getBlockState(pos.offset(Direction.SOUTH));
@@ -115,7 +127,7 @@ public class CopperWire extends Block {
         eastState = checkDirection(eastState, value, CopperWire.SOUTH, CopperWire.NORTH, CopperWire.EAST, CopperWire.WEST);
         westState = checkDirection(westState, value, CopperWire.NORTH, CopperWire.SOUTH, CopperWire.WEST, CopperWire.EAST);
         southState = checkDirection(southState, value, CopperWire.WEST, CopperWire.EAST, CopperWire.SOUTH, CopperWire.NORTH);
-        northState = checkDirection(northState, value, CopperWire. EAST, CopperWire.WEST, CopperWire.NORTH, CopperWire.SOUTH);
+        northState = checkDirection(northState, value, CopperWire.EAST, CopperWire.WEST, CopperWire.NORTH, CopperWire.SOUTH);
 
         world.setBlockState(pos.offset(Direction.EAST), eastState, Block.NOTIFY_ALL);
         world.setBlockState(pos.offset(Direction.WEST), westState, Block.NOTIFY_ALL);
@@ -123,13 +135,11 @@ public class CopperWire extends Block {
         world.setBlockState(pos.offset(Direction.NORTH), northState, Block.NOTIFY_ALL);
     }
 
-    private BlockState checkDirection(BlockState state, boolean value, BooleanProperty... hasDirection)
-    {
+    private BlockState checkDirection(BlockState state, boolean value, BooleanProperty... hasDirection) {
         if (!(state.getBlock() instanceof CopperWire)) return state;
 
         Direction facing = state.get(FACING);
-        return switch (facing)
-        {
+        return switch (facing) {
             case Direction.EAST -> state.with(hasDirection[0], value);
             case Direction.WEST -> state.with(hasDirection[1], value);
             case Direction.SOUTH -> state.with(hasDirection[2], value);
@@ -138,104 +148,37 @@ public class CopperWire extends Block {
         };
     }
 
-    protected void onBlockAddedOld(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
-    {
-        // 주변 좌표 기준 블록 상태 가져오기
-        BlockState eastState = world.getBlockState(new BlockPos(pos.getX()+1, pos.getY(), pos.getZ()));
-        BlockState westState = world.getBlockState(new BlockPos(pos.getX()-1, pos.getY(), pos.getZ()));
-        BlockState southState = world.getBlockState(new BlockPos(pos.getX(), pos.getY(), pos.getZ()+1));
-        BlockState northState = world.getBlockState(new BlockPos(pos.getX(), pos.getY(), pos.getZ()-1));
+    //Voxel
 
-        // 각 블록이 커스텀 블록인지 확인 후 FACING 값 읽기
-        if (eastState.getBlock() instanceof CopperWire) {
-            Direction eastFacing = eastState.get(CopperWire.FACING);
-            if (eastFacing == Direction.SOUTH) { eastState = eastState.with(CopperWire.EAST, true);}
-            if (eastFacing == Direction.NORTH) { eastState = eastState.with(CopperWire.WEST, true);}
-            if (eastFacing == Direction.EAST) { eastState = eastState.with(CopperWire.SOUTH, true);}
-            if (eastFacing == Direction.WEST) { eastState = eastState.with(CopperWire.NORTH, true);}
-            world.setBlockState(new BlockPos(pos.getX()+1, pos.getY(), pos.getZ()), eastState, Block.NOTIFY_ALL);
-        }
 
-        // WEST
-        if (westState.getBlock() instanceof CopperWire) {
-            Direction westFacing = westState.get(CopperWire.FACING);
-            if (westFacing == Direction.SOUTH) {westState = westState.with(CopperWire.WEST, true);}
-            if (westFacing == Direction.NORTH) {westState = westState.with(CopperWire.EAST, true);}
-            if (westFacing == Direction.EAST) {westState = westState.with(CopperWire.NORTH, true);}
-            if (westFacing == Direction.WEST) {westState = westState.with(CopperWire.SOUTH, true);}
-            world.setBlockState(pos.offset(Direction.WEST), westState, 3);
-        }
+    @Override
+    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        VoxelShape shape = CORE; // 중심은 항상 표시
 
-        // SOUTH
-        if (southState.getBlock() instanceof CopperWire) {
-            Direction southFacing = southState.get(CopperWire.FACING);
-            if (southFacing == Direction.EAST) {southState = southState.with(CopperWire.WEST, true);}
-            if (southFacing == Direction.WEST) {southState = southState.with(CopperWire.EAST, true);}
-            if (southFacing == Direction.SOUTH) {southState = southState.with(CopperWire.SOUTH, true);}
-            if (southFacing == Direction.NORTH) {southState = southState.with(CopperWire.NORTH, true);}
-            world.setBlockState(pos.offset(Direction.SOUTH), southState, 3);
-        }
+        Direction facing = state.get(FACING);
 
-        // NORTH
-        if (northState.getBlock() instanceof CopperWire) {
-            Direction northFacing = northState.get(CopperWire.FACING);
-            if (northFacing == Direction.EAST) { northState = northState.with(CopperWire.EAST, true); }
-            if (northFacing == Direction.WEST) { northState = northState.with(CopperWire.WEST, true); }
-            if (northFacing == Direction.SOUTH) { northState = northState.with(CopperWire.NORTH, true); }
-            if (northFacing == Direction.NORTH) { northState = northState.with(CopperWire.SOUTH, true); }
-            world.setBlockState(pos.offset(Direction.NORTH), northState, 3);
-        }
+        // 블록기준 상대 방향 계산
+        Direction back = facing.getOpposite();
+        Direction left = facing.getAxis().isHorizontal() ? facing.rotateYCounterclockwise() : null;
+        Direction right = facing.getAxis().isHorizontal() ? facing.rotateYClockwise() : null;
+
+        // 연결 여부에 따라 shape 합치기
+        if (state.get(NORTH)) shape = net.minecraft.util.shape.VoxelShapes.union(shape, getShapeForDirection(facing));
+        if (state.get(SOUTH)) shape = net.minecraft.util.shape.VoxelShapes.union(shape, getShapeForDirection(back));
+        if (state.get(EAST)  && right != null) shape = net.minecraft.util.shape.VoxelShapes.union(shape, getShapeForDirection(right));
+        if (state.get(WEST)  && left != null)  shape = net.minecraft.util.shape.VoxelShapes.union(shape, getShapeForDirection(left));
+
+        return shape;
     }
 
-    protected void onStateReplacedOld(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved)
-    {
-        if (state.getBlock() == newState.getBlock()) return;
-
-        BlockState eastState = world.getBlockState(new BlockPos(pos.getX()+1, pos.getY(), pos.getZ()));
-        BlockState westState = world.getBlockState(new BlockPos(pos.getX()-1, pos.getY(), pos.getZ()));
-        BlockState southState = world.getBlockState(new BlockPos(pos.getX(), pos.getY(), pos.getZ()+1));
-        BlockState northState = world.getBlockState(new BlockPos(pos.getX(), pos.getY(), pos.getZ()-1));
-
-        // 각 블록이 커스텀 블록인지 확인 후 FACING 값 읽기
-        if (eastState.getBlock() instanceof CopperWire) {
-            Direction eastFacing = eastState.get(CopperWire.FACING);
-            if (eastFacing == Direction.SOUTH) { eastState = eastState.with(CopperWire.EAST, false);}
-            if (eastFacing == Direction.NORTH) { eastState = eastState.with(CopperWire.WEST, false);}
-            if (eastFacing == Direction.EAST) { eastState = eastState.with(CopperWire.SOUTH, false);}
-            if (eastFacing == Direction.WEST) { eastState = eastState.with(CopperWire.NORTH, false);}
-            world.setBlockState(new BlockPos(pos.getX()+1, pos.getY(), pos.getZ()), eastState, 3);
-        }
-
-        // WEST
-        if (westState.getBlock() instanceof CopperWire) {
-            Direction westFacing = westState.get(CopperWire.FACING);
-            if (westFacing == Direction.SOUTH) {westState = westState.with(CopperWire.WEST, false);}
-            if (westFacing == Direction.NORTH) {westState = westState.with(CopperWire.EAST, false);}
-            if (westFacing == Direction.EAST) {westState = westState.with(CopperWire.NORTH, false);}
-            if (westFacing == Direction.WEST) {westState = westState.with(CopperWire.SOUTH, false);}
-            world.setBlockState(pos.offset(Direction.WEST), westState, 3);
-        }
-
-        // SOUTH
-        if (southState.getBlock() instanceof CopperWire) {
-            Direction southFacing = southState.get(CopperWire.FACING);
-            if (southFacing == Direction.EAST) {southState = southState.with(CopperWire.WEST, false);}
-            if (southFacing == Direction.WEST) {southState = southState.with(CopperWire.EAST, false);}
-            if (southFacing == Direction.SOUTH) {southState = southState.with(CopperWire.SOUTH, false);}
-            if (southFacing == Direction.NORTH) {southState = southState.with(CopperWire.NORTH, false);}
-            world.setBlockState(pos.offset(Direction.SOUTH), southState, 3);
-        }
-
-        // NORTH
-        if (northState.getBlock() instanceof CopperWire) {
-            Direction northFacing = northState.get(CopperWire.FACING);
-            if (northFacing == Direction.EAST) {northState = northState.with(CopperWire.EAST, false);}
-            if (northFacing == Direction.WEST) {northState = northState.with(CopperWire.WEST, false);}
-            if (northFacing == Direction.SOUTH) {northState = northState.with(CopperWire.NORTH, false);}
-            if (northFacing == Direction.NORTH) {northState = northState.with(CopperWire.SOUTH, false);}
-            world.setBlockState(pos.offset(Direction.NORTH), northState, 3);
-        }
-
-        super.onStateReplaced(state, world, pos, newState, moved);
+    // 절대 좌표 방향에 맞는 shape 반환
+    private static VoxelShape getShapeForDirection(Direction dir) {
+        return switch (dir) {
+            case NORTH -> NORTH_SHAPE;
+            case SOUTH -> SOUTH_SHAPE;
+            case EAST  -> EAST_SHAPE;
+            case WEST  -> WEST_SHAPE;
+            default -> CORE; // UP/DOWN은 필요 없음
+        };
     }
 }
