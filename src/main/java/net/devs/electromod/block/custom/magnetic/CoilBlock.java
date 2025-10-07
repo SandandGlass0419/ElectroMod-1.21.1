@@ -90,10 +90,7 @@ public class CoilBlock extends BlockWithEntity implements BlockEntityProvider
     }
 
     @Override
-    protected VoxelShape getRaycastShape(BlockState state, BlockView world, BlockPos pos)
-    {
-        return VoxelShapes.fullCube();
-    }
+    protected VoxelShape getRaycastShape(BlockState state, BlockView world, BlockPos pos) { return VoxelShapes.fullCube(); }
 
     // blockstate - direction (facing)
     @Override

@@ -1,9 +1,12 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
+import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DebugStickItem;
 import net.minecraft.item.ItemPlacementContext;
@@ -25,6 +28,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 public class MagneticDetector extends BlockWithEntity
 {
@@ -62,6 +67,14 @@ public class MagneticDetector extends BlockWithEntity
     @Nullable
     @Override public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new MagneticDetectorEntity(pos, state);
+    }
+
+    @Override
+    @Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type)
+    {
+        return validateTicker(type, ModBlockEntities.DETECTOR_BE,
+                (world1, pos, state1, blockEntity) -> blockEntity.tick(world1, pos, state1));
     }
 
     @Override protected BlockRenderType getRenderType(BlockState state) { return BlockRenderType.MODEL; }
@@ -131,6 +144,64 @@ public class MagneticDetector extends BlockWithEntity
         }
 
         super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    // redstone
+    @Override public boolean emitsRedstonePower(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction)
+    {
+        if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return 0;
+
+        return Arrays.asList(getRedstoneDirections(state, false)).contains(direction) ?
+                detectorEntity.getRedstoneOutput() : 0;
+    }
+
+    @Override
+    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction)
+    {
+        if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return 0;
+
+        return Arrays.asList(getRedstoneDirections(state, true)).contains(direction) ?
+                detectorEntity.getRedstoneOutput() : 0;
+    }
+
+    public static int getDefaultPower() { return 12; }
+
+    public static Direction[] getRedstoneDirections(BlockState state, boolean isstrong)
+    {
+        Direction facing = state.get(FACING);
+        if (isstrong || facing.getAxis() != Direction.Axis.Y) return new Direction[] { facing };
+
+        return switch (state.get(HORIZONTAL_AXIS))
+        {
+            case X -> new Direction[] { Direction.NORTH, Direction.SOUTH };
+            case Z -> new Direction[] { Direction.EAST, Direction.WEST };
+            default -> new Direction[] {};
+        };
+    }
+
+    @Override
+    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
+    {
+        if (world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity) {
+            detectorEntity.setRedstoneOutput(getDefaultPower());
+        }
+
+        super.onBlockAdded(state, world, pos, oldState, notify);
+    }
+
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player)
+    {
+        if (emitsRedstonePower(state) || !world.isClient()) {
+            world.updateNeighborsAlways(pos.offset(state.get(FACING)), this);
+        }
+
+        return super.onBreak(world, pos, state, player);
     }
 
     // block features

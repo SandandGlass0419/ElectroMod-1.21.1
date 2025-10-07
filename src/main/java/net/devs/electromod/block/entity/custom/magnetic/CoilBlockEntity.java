@@ -1,6 +1,5 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
-import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.magnetic.CoilBlock;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
@@ -41,9 +40,9 @@ public class CoilBlockEntity extends BlockEntity
         {
             this.redstoneInput = power;
             markDirty();
-            ElectroMod.LOGGER.info("new power: " + this.redstoneInput);
         }
     }
+
     public int getRedstoneInput() { return this.redstoneInput; }
 
     @Override
@@ -53,7 +52,8 @@ public class CoilBlockEntity extends BlockEntity
         nbt.putInt("redstone_input", redstoneInput);
     }
 
-    @Override protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup)
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup)
     {
         super.readNbt(nbt, registryLookup);
         nbt.getInt("redstone_input");
