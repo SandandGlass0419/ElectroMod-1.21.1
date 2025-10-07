@@ -4,10 +4,10 @@ import net.minecraft.util.StringIdentifiable;
 
 public enum ForceProfile implements StringIdentifiable
 {
-    ALL("all"),
-    SIDE("side"),
-    FRONT("front"),
-    BACK("back");
+    DISTANCE_ALL("all"),
+    DISTANCE_SIDE("side"),
+    DISTANCE_FRONT("front"),
+    DISTANCE_BACK("back");
 
     private String name;
 
