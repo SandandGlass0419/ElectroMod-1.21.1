@@ -2,12 +2,10 @@ package net.devs.electromod.block.custom.electro;
 
 import com.mojang.serialization.MapCodec;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class CopperWire extends WireBlock {
