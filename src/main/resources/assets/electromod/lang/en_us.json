@@ -14,6 +14,7 @@
 
   "block.electromod.copper_wire": "Copper Wire",
   "item.electromod.rubber_gloves" : "Rubber Gloves",
+  "item.electromod.electro_staff" : "Electro Staff",
 
   "itemGroup.electromod.magnetic_items": "Magnetic Items",
   "itemGroup.electromod.electro_items" : "Electro Items"

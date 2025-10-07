@@ -7,6 +7,8 @@ import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.item.ModItems;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -78,7 +80,7 @@ public class CopperWire extends BlockWithEntity implements BlockEntityProvider {
             player.sendMessage(Text.literal("Oops!"));
         }
 
-        return ActionResult.SUCCESS;
+        return ActionResult.PASS;
     }
 
     // ⚡ 밟았을 때 감전 이벤트
@@ -196,5 +198,12 @@ public class CopperWire extends BlockWithEntity implements BlockEntityProvider {
     @Override
     protected BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
+    }
+
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+
+
+        return null;
     }
 }

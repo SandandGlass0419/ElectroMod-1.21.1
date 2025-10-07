@@ -41,5 +41,6 @@ public class ModModelProvider extends FabricModelProvider
         //electro
         itemModelGenerator.register(ModItems.ELECTRO_ITEM, Models.HANDHELD);
         itemModelGenerator.register(ModItems.RUBBER_GLOVES, Models.HANDHELD);
+        itemModelGenerator.register(ModItems.ELECTRO_STAFF, Models.HANDHELD);
     }
 }

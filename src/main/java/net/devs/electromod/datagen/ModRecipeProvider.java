@@ -102,6 +102,15 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .criterion(hasItem(Items.REDSTONE), conditionsFromItem(Items.REDSTONE))
                 .offerTo(recipeExporter);
 
+ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_STAFF, 1)
+                .pattern(" * ")
+                .pattern(" = ")
+                .pattern(" = ")
+                .input('=', Items.STICK)
+                .input('*', ModItems.ELECTRO_ITEM)
+                .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.STICK))
+                .offerTo(recipeExporter);
+
 
     }
 }
