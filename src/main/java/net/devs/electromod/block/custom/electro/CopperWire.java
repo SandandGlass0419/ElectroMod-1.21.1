@@ -1,6 +1,7 @@
 package net.devs.electromod.block.custom.electro;
 
 import com.mojang.serialization.MapCodec;
+import net.devs.electromod.block.ModBlocks;
 import net.devs.electromod.item.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -8,6 +9,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DebugStickItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -15,9 +18,9 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
 public class CopperWire extends Block {
@@ -47,8 +50,12 @@ public class CopperWire extends Block {
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.isClient()) return ActionResult.FAIL;
+        Item stackItem = player.getMainHandStack().getItem();
 
-        if (!player.getMainHandStack().getItem().equals(ModItems.RUBBER_GLOVES)) {
+        if (stackItem instanceof DebugStickItem ||
+            stackItem.equals(ModBlocks.COPPER_WIRE.asItem())) return ActionResult.FAIL;
+
+        if (!stackItem.equals(ModItems.RUBBER_GLOVES)) {
             BlockPos blockpos = player.getBlockPos();
 
             LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
@@ -88,6 +95,51 @@ public class CopperWire extends Block {
 
     @Override
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        checkAndChange(world, pos, true);
+    }
+
+    @Override protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.getBlock() == newState.getBlock()) return;
+
+        checkAndChange(world, pos, false);
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    private void checkAndChange(World world, BlockPos pos, boolean value)
+    {
+        BlockState eastState = world.getBlockState(pos.offset(Direction.EAST));
+        BlockState westState = world.getBlockState(pos.offset(Direction.WEST));
+        BlockState southState = world.getBlockState(pos.offset(Direction.SOUTH));
+        BlockState northState = world.getBlockState(pos.offset(Direction.NORTH));
+
+        eastState = checkDirection(eastState, value, CopperWire.SOUTH, CopperWire.NORTH, CopperWire.EAST, CopperWire.WEST);
+        westState = checkDirection(westState, value, CopperWire.NORTH, CopperWire.SOUTH, CopperWire.WEST, CopperWire.EAST);
+        southState = checkDirection(southState, value, CopperWire.WEST, CopperWire.EAST, CopperWire.SOUTH, CopperWire.NORTH);
+        northState = checkDirection(northState, value, CopperWire. EAST, CopperWire.WEST, CopperWire.NORTH, CopperWire.SOUTH);
+
+        world.setBlockState(pos.offset(Direction.EAST), eastState, Block.NOTIFY_ALL);
+        world.setBlockState(pos.offset(Direction.WEST), westState, Block.NOTIFY_ALL);
+        world.setBlockState(pos.offset(Direction.SOUTH), southState, Block.NOTIFY_ALL);
+        world.setBlockState(pos.offset(Direction.NORTH), northState, Block.NOTIFY_ALL);
+    }
+
+    private BlockState checkDirection(BlockState state, boolean value, BooleanProperty... hasDirection)
+    {
+        if (!(state.getBlock() instanceof CopperWire)) return state;
+
+        Direction facing = state.get(FACING);
+        return switch (facing)
+        {
+            case Direction.EAST -> state.with(hasDirection[0], value);
+            case Direction.WEST -> state.with(hasDirection[1], value);
+            case Direction.SOUTH -> state.with(hasDirection[2], value);
+            case Direction.NORTH -> state.with(hasDirection[3], value);
+            default -> state;
+        };
+    }
+
+    protected void onBlockAddedOld(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
+    {
         // 주변 좌표 기준 블록 상태 가져오기
         BlockState eastState = world.getBlockState(new BlockPos(pos.getX()+1, pos.getY(), pos.getZ()));
         BlockState westState = world.getBlockState(new BlockPos(pos.getX()-1, pos.getY(), pos.getZ()));
@@ -101,7 +153,7 @@ public class CopperWire extends Block {
             if (eastFacing == Direction.NORTH) { eastState = eastState.with(CopperWire.WEST, true);}
             if (eastFacing == Direction.EAST) { eastState = eastState.with(CopperWire.SOUTH, true);}
             if (eastFacing == Direction.WEST) { eastState = eastState.with(CopperWire.NORTH, true);}
-            world.setBlockState(new BlockPos(pos.getX()+1, pos.getY(), pos.getZ()), eastState, 3);
+            world.setBlockState(new BlockPos(pos.getX()+1, pos.getY(), pos.getZ()), eastState, Block.NOTIFY_ALL);
         }
 
         // WEST
@@ -127,17 +179,18 @@ public class CopperWire extends Block {
         // NORTH
         if (northState.getBlock() instanceof CopperWire) {
             Direction northFacing = northState.get(CopperWire.FACING);
-            if (northFacing == Direction.EAST) {northState = northState.with(CopperWire.EAST, true);}
-            if (northFacing == Direction.WEST) {northState = northState.with(CopperWire.WEST, true);}
-            if (northFacing == Direction.SOUTH) {northState = northState.with(CopperWire.NORTH, true);}
-            if (northFacing == Direction.NORTH) {northState = northState.with(CopperWire.SOUTH, true);}
-
+            if (northFacing == Direction.EAST) { northState = northState.with(CopperWire.EAST, true); }
+            if (northFacing == Direction.WEST) { northState = northState.with(CopperWire.WEST, true); }
+            if (northFacing == Direction.SOUTH) { northState = northState.with(CopperWire.NORTH, true); }
+            if (northFacing == Direction.NORTH) { northState = northState.with(CopperWire.SOUTH, true); }
             world.setBlockState(pos.offset(Direction.NORTH), northState, 3);
         }
     }
 
-    @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    protected void onStateReplacedOld(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved)
+    {
+        if (state.getBlock() == newState.getBlock()) return;
+
         BlockState eastState = world.getBlockState(new BlockPos(pos.getX()+1, pos.getY(), pos.getZ()));
         BlockState westState = world.getBlockState(new BlockPos(pos.getX()-1, pos.getY(), pos.getZ()));
         BlockState southState = world.getBlockState(new BlockPos(pos.getX(), pos.getY(), pos.getZ()+1));
@@ -180,9 +233,9 @@ public class CopperWire extends Block {
             if (northFacing == Direction.WEST) {northState = northState.with(CopperWire.WEST, false);}
             if (northFacing == Direction.SOUTH) {northState = northState.with(CopperWire.NORTH, false);}
             if (northFacing == Direction.NORTH) {northState = northState.with(CopperWire.SOUTH, false);}
-
             world.setBlockState(pos.offset(Direction.NORTH), northState, 3);
         }
-        return  null;
+
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 }
