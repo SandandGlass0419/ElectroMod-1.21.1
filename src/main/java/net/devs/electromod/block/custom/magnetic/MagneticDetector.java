@@ -149,7 +149,7 @@ public class MagneticDetector extends BlockWithEntity
         if (detect_state != DetectState.EMPTY) // give item to player
         {
             player.giveItemStack(detect_state.getStoredItem());
-            world.setBlockState(pos, state.with(DETECT_STATE, DetectState.EMPTY));
+            world.setBlockState(pos, state.with(DETECT_STATE, DetectState.EMPTY), Block.NOTIFY_ALL);
 
             world.playSound(null, pos, SoundEvents.BLOCK_COPPER_BULB_STEP, SoundCategory.BLOCKS);
             player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, 1f);
@@ -161,7 +161,7 @@ public class MagneticDetector extends BlockWithEntity
 
         if (foundState != null) // get item from player
         {
-            world.setBlockState(pos, state.with(DETECT_STATE, foundState));
+            world.setBlockState(pos, state.with(DETECT_STATE, foundState), Block.NOTIFY_ALL);
             if (!player.isCreative()) { stack.decrement(1); }
 
             world.playSound(null, pos, SoundEvents.BLOCK_COPPER_BULB_STEP, SoundCategory.BLOCKS);
