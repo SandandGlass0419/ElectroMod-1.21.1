@@ -34,10 +34,12 @@ public class ElectroStaff extends Item {
             WireBlockEntity wireEntity = (WireBlockEntity) world.getBlockEntity(context.getBlockPos());
             assert context.getPlayer() != null;
             assert wireEntity != null;
-            context.getPlayer().sendMessage(Text.literal("ELECTROCITY : " + wireEntity.getStoredValue()), true);
+            context.getPlayer().sendMessage(Text.literal("ELECTRICITY : " + wireEntity.getStoredValue()), true);
+
+            return ActionResult.SUCCESS;
         }
 
-        return ActionResult.PASS;
+        return ActionResult.FAIL;
     }
 
     //최강의 번개다 그지 깽꺵이들아!!!!!
@@ -56,6 +58,6 @@ public class ElectroStaff extends Item {
 
         user.sendMessage(Text.literal("TAKE THE POWER OF LIGHTNING!!!!!"), true);
 
-        return ActionResult.PASS;
+        return ActionResult.SUCCESS;
     }
 }
