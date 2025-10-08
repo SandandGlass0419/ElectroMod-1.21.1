@@ -9,7 +9,8 @@ import net.minecraft.util.math.BlockPos;
 
 public class WireBlockEntity extends BlockEntity {
 
-    private float storedValue = 0; // 여기에 큰 값 저장 가능
+    private float Electrocity = 0; // 여기에 큰 값 저장 가능
+    private float voltage = 0;
 
     public WireBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.WIRE_BE, pos, state);
@@ -17,27 +18,39 @@ public class WireBlockEntity extends BlockEntity {
 
 
     // 값 읽기/쓰기
-    public void setStoredValue(float value) {
-        this.storedValue = value;
+    public void setElectrocity(float value) {
+        this.Electrocity = value;
         markDirty(); // 값 변경 후 월드에 반영
     }
 
     // 월드 저장용 NBT
-    public float getStoredValue() {
-        return storedValue;
+    public float getElectrocity() {
+        return Electrocity;
     }
+
+    public void addVoltage(float value) {
+        this.voltage += value;
+        markDirty(); // 값 변경 후 월드에 반영
+    }
+
+    // 월드 저장용 NBT
+    public float getVoltage() {
+        return voltage;
+    }
+
+
 
 
 
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        this.storedValue = nbt.getInt("StoredValue");
+        this.Electrocity = nbt.getInt("StoredValue");
     }
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        nbt.putFloat("StoredValue", storedValue);
+        nbt.putFloat("StoredValue", Electrocity);
     }
 }

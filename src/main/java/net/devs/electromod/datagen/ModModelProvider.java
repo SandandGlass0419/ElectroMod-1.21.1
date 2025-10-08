@@ -31,6 +31,7 @@ public class ModModelProvider extends FabricModelProvider
         // copper_wire (custom json)
         // golden_wire (custom json)
         // wire (custom json)
+        // battery (custom json)
     }
 
     // generates item model json files. please add ALL items using method

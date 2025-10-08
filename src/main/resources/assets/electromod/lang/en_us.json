@@ -14,6 +14,7 @@
 
   "block.electromod.copper_wire": "Copper Wire",
   "block.electromod.gold_wire": "Golden Wire",
+  "block.electromod.battery" : "Battery",
   "block.electromod.wire": "Wire",
 
 

@@ -2,7 +2,7 @@
   "parent": "block/block",
   "textures": {
     "particle": "electromod:block/wire",
-    "all": "electromod:block/wire_dot",
+    "all": "electromod:block/wire",
     "other" : "electromod:block/wire"
   },
   "elements": [

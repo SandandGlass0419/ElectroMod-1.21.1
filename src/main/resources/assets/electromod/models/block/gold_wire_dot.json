@@ -2,7 +2,7 @@
   "parent": "block/block",
   "textures": {
     "particle": "electromod:block/gold_wire",
-    "all": "electromod:block/gold_wire_dot",
+    "all": "electromod:block/gold_wire",
     "other" : "electromod:block/gold_wire"
   },
   "elements": [

@@ -1,0 +1,23 @@
+{
+  "parent": "block/block",
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": { "texture": "#side"},
+        "south": { "texture": "#side"},
+        "east":  { "texture": "#side"},
+        "west":  { "texture": "#side"},
+        "up":    { "texture": "#top" },
+        "down":  { "texture": "#bottom" }
+      }
+    }
+  ],
+  "textures": {
+    "top": "electromod:block/battery_up",
+    "bottom": "electromod:block/battery_down",
+    "side": "electromod:block/battery_side",
+    "particle" : "electromod:block/battery_side"
+  }
+}

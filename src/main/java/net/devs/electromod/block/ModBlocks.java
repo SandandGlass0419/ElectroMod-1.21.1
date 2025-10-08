@@ -2,6 +2,7 @@ package net.devs.electromod.block;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.TestBlock;
+import net.devs.electromod.block.custom.electro.Battery;
 import net.devs.electromod.block.custom.electro.CopperWire;
 import net.devs.electromod.block.custom.electro.GoldWire;
 import net.devs.electromod.block.custom.electro.Wire;
@@ -79,6 +80,13 @@ public class ModBlocks
                     .nonOpaque()
                     .requiresTool()));
 
+    public static final Block BATTERY = addBlock("battery",
+            new Battery(AbstractBlock.Settings.create()
+                    .strength(1f)
+                    .sounds(BlockSoundGroup.METAL)
+                    .nonOpaque()
+                    .requiresTool()));
+
     public static void registerModBlocks()
     {
         ElectroMod.LOGGER.info("Registering Mod Blocks (" + ElectroMod.MOD_ID + ")");
@@ -96,6 +104,7 @@ public class ModBlocks
             entries.add(COPPER_WIRE);
             entries.add(GOLDEN_WIRE);
             entries.add(WIRE);
+            entries.add(BATTERY);
         });
     }
 

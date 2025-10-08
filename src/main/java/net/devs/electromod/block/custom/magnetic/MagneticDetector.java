@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-public class MagneticDetector extends BlockWithEntity
+public class  MagneticDetector extends BlockWithEntity
 {
     public static final MapCodec<MagneticDetector> CODEC = MagneticDetector.createCodec(MagneticDetector::new);
     public static final EnumProperty<DetectState> DETECT_STATE = EnumProperty.of("detect_state", DetectState.class);

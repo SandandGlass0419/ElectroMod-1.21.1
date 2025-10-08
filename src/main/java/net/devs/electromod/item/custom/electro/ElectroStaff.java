@@ -29,12 +29,12 @@ public class ElectroStaff extends Item {
         if (world.isClient()) return ActionResult.FAIL;
         Block block = world.getBlockState(context.getBlockPos()).getBlock();
 
-        if(block.equals(ModBlocks.COPPER_WIRE))
+        if(block.equals(ModBlocks.COPPER_WIRE) || block.equals(ModBlocks.WIRE) || block.equals(ModBlocks.GOLDEN_WIRE))
         {
             WireBlockEntity wireEntity = (WireBlockEntity) world.getBlockEntity(context.getBlockPos());
             assert context.getPlayer() != null;
             assert wireEntity != null;
-            context.getPlayer().sendMessage(Text.literal("ELECTRICITY : " + wireEntity.getStoredValue()), true);
+            context.getPlayer().sendMessage(Text.literal("ELECTRICITY : " + wireEntity.getElectrocity()), true);
 
             return ActionResult.SUCCESS;
         }
