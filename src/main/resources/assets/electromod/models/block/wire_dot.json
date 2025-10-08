@@ -1,0 +1,22 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "electromod:block/wire",
+    "all": "electromod:block/wire_dot",
+    "other" : "electromod:block/wire"
+  },
+  "elements": [
+    {
+      "from": [5, 5, 5],
+      "to": [11, 11, 11],
+      "faces": {
+        "up":    { "texture": "#other" },
+        "down":  { "texture": "#other" },
+        "north": { "texture": "#other" },
+        "south": { "texture": "#all" },
+        "west":  { "texture": "#other" },
+        "east":  { "texture": "#other" }
+      }
+    }
+  ]
+}

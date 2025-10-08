@@ -8,12 +8,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class CopperWire extends WireBlock {
-    public static final MapCodec<CopperWire> CODEC = CopperWire.createCodec(CopperWire::new);
+public class Wire extends WireBlock {
+    public static final MapCodec<Wire> CODEC = Wire.createCodec(Wire::new);
 
-    public CopperWire(Settings settings) {
+    public Wire(Settings settings) {
         super(settings);
-        resistance = 1.01f;
+        resistance = 1.0f;
 
     }
 

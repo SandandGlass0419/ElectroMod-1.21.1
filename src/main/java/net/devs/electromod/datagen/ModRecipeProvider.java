@@ -93,6 +93,22 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .criterion(hasItem(Items.COPPER_INGOT), conditionsFromItem(Items.COPPER_INGOT))
                 .offerTo(recipeExporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.WIRE, 2)
+                .pattern("   ")
+                .pattern("===")
+                .pattern("   ")
+                .input('=', Items.IRON_INGOT)
+                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
+                .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.GOLDEN_WIRE, 2)
+                .pattern("   ")
+                .pattern("===")
+                .pattern("   ")
+                .input('=', Items.GOLD_INGOT)
+                .criterion(hasItem(Items.GOLD_INGOT), conditionsFromItem(Items.GOLD_INGOT))
+                .offerTo(recipeExporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.RUBBER_GLOVES, 1)
                 .pattern("***")
                 .pattern("*=*")

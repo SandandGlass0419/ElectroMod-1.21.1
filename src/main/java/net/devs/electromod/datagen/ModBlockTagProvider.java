@@ -25,6 +25,8 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider
                 .add(ModBlocks.COPPER_COIL)
                 .add(ModBlocks.MAGNET_BLOCK)
                 //electro
-                .add(ModBlocks.COPPER_WIRE);
+                .add(ModBlocks.COPPER_WIRE)
+                .add(ModBlocks.WIRE)
+                .add(ModBlocks.GOLDEN_WIRE);
     }
 }

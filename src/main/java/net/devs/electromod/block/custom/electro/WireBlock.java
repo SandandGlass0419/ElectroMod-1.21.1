@@ -62,12 +62,24 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+       float absElectrocity = 0f;
+
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+
+        if (blockEntity instanceof WireBlockEntity wireBlock) {
+             absElectrocity = Math.abs(wireBlock.getStoredValue());
+        }
+
+
         if (world.isClient()) return ActionResult.FAIL;
         Item stackItem = player.getMainHandStack().getItem();
         Item leftHandStackITem = player.getOffHandStack().getItem();
 
         if (stackItem instanceof DebugStickItem ||
-                stackItem.equals(ModBlocks.COPPER_WIRE.asItem())) return ActionResult.FAIL;
+                stackItem.equals(ModBlocks.COPPER_WIRE.asItem())||absElectrocity <=1f
+                ||stackItem.equals(ModBlocks.WIRE.asItem())
+                ||stackItem.equals(ModBlocks.GOLDEN_WIRE.asItem()))
+            return ActionResult.FAIL;
 
         if (!stackItem.equals(ModItems.RUBBER_GLOVES) && !leftHandStackITem.equals(ModItems.RUBBER_GLOVES)) {
             BlockPos blockpos = player.getBlockPos();
@@ -87,6 +99,14 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (world.isClient()) return;
 
+        float absElectrocity = 0f;
+
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+
+        if (blockEntity instanceof WireBlockEntity wireBlock) {
+            absElectrocity = Math.abs(wireBlock.getStoredValue());
+        }
+        if (absElectrocity <=1f) return;
         BlockPos blockpos = entity.getBlockPos();
 
         LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
@@ -142,7 +162,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
         westState = checkDirection(westState, value, WireBlock.NORTH, WireBlock.SOUTH, WireBlock.WEST, WireBlock.EAST);
         southState = checkDirection(southState, value, WireBlock.WEST, WireBlock.EAST, WireBlock.SOUTH, WireBlock.NORTH);
         northState = checkDirection(northState, value, WireBlock.EAST, WireBlock.WEST, WireBlock.NORTH, WireBlock.SOUTH);
-        selfstate =checkDirection(selfstate, value,WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH); //개시발좆같다
+        selfstate =checkDirection(selfstate, value,WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH); //설치한블록 방향설정
 
         world.setBlockState(pos, selfstate, Block.NOTIFY_ALL);
         world.setBlockState(pos.offset(Direction.EAST), eastState, Block.NOTIFY_ALL);
@@ -220,7 +240,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
                     BlockEntity targetBE = w.getBlockEntity(targetPos);
                     if (targetBE instanceof WireBlockEntity targetWireBE) {
                         float value = wireBE.getStoredValue();
-                        targetWireBE.setStoredValue(value);
+                        targetWireBE.setStoredValue(value/resistance);
                     }
                 }
             };

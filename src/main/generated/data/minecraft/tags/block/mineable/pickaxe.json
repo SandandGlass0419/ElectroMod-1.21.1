@@ -4,6 +4,8 @@
     "electromod:golden_coil",
     "electromod:copper_coil",
     "electromod:magnet_block",
-    "electromod:copper_wire"
+    "electromod:copper_wire",
+    "electromod:wire",
+    "electromod:gold_wire"
   ]
 }
