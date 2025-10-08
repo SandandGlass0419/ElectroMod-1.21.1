@@ -32,28 +32,4 @@ public class Battery extends Block {
     }
 
 
-
-    @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        super.onBlockAdded(state, world, pos, oldState, notify);
-
-        if (!world.isClient()) { // 서버 측에서만 실행
-            // Battery가 바라보는 방향
-            Direction facing = state.get(FACING);
-            BlockPos targetPos = pos.offset(facing); // Battery 앞쪽 위치
-            BlockState targetState = world.getBlockState(targetPos);
-            Block targetBlock = targetState.getBlock();
-
-            // WireBlock을 상속받았는지 확인
-            if (targetBlock instanceof WireBlock) {
-                // BlockEntity 가져오기
-                if (world.getBlockEntity(targetPos) instanceof WireBlockEntity wireEntity) {
-                    // Electrocity 설정
-                    wireEntity.setElectrocity(10);
-                }
-            }
-        }
-    }
-
-
 }

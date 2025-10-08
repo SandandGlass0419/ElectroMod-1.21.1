@@ -222,23 +222,42 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             return (w, pos, s, blockEntity) -> {
                 if (!(blockEntity instanceof WireBlockEntity wireBE)) return;
 
-                float value = wireBE.getElectrocity();
-
+                // 주변 6방향 확인
+                boolean batteryNearby = false;
                 for (Direction dir : Direction.values()) {
                     BlockPos targetPos = pos.offset(dir);
                     BlockState targetState = w.getBlockState(targetPos);
 
-                    if (targetState.getBlock() instanceof WireBlock) {
-                        BlockEntity targetBE = w.getBlockEntity(targetPos);
-                        if (targetBE instanceof WireBlockEntity targetWireBE) {
-                            targetWireBE.setElectrocity(value / resistance);
-                        }
+                    // Battery 확인
+                    if (targetState.getBlock() instanceof net.devs.electromod.block.custom.electro.Battery) {
+                        batteryNearby = true;
+                        break;
                     }
                 }
 
+                // Battery가 있으면 Electrocity를 10으로 설정
+                if (batteryNearby) {
+                    wireBE.setElectrocity(10);
+                } else {
+                    // 기존 전파 로직
+                    float value = wireBE.getElectrocity();
+
+                    for (Direction dir : Direction.values()) {
+                        BlockPos targetPos = pos.offset(dir);
+                        BlockState targetState = w.getBlockState(targetPos);
+
+                        if (targetState.getBlock() instanceof WireBlock) {
+                            BlockEntity targetBE = w.getBlockEntity(targetPos);
+                            if (targetBE instanceof WireBlockEntity targetWireBE) {
+                                targetWireBE.setElectrocity(value / resistance);
+                            }
+                        }
+                    }
+                }
             };
         }
         return null;
     }
+
 
 }
