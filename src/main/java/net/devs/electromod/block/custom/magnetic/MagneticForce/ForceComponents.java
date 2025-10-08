@@ -1,6 +1,6 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
-public class MagneticForceInteractor
+public record ForceComponents()
 {
 
 }

@@ -27,7 +27,7 @@ public class CoilBlockEntity extends BlockEntity
     {
         if (world.isClient()) return;
 
-        if (needsUpdate) // keep eye on
+        if (needsUpdate)
         {
             setRedstoneInput(CoilBlock.getRecievedRedstonePower(world, pos, state));
             needsUpdate = false;

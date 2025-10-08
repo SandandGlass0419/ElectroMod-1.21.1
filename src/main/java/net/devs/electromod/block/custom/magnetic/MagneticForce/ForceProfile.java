@@ -1,21 +1,49 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
-import net.minecraft.util.StringIdentifiable;
+import java.util.Set;
 
-public enum ForceProfile implements StringIdentifiable
+public record ForceProfile(Set<EVec3i> Core1, Set<EVec3i>[] Core1Profile1, Set<EVec3i>[] Core1Profile2,
+                           Set<EVec3i> Core2, Set<EVec3i>[] Core2Profile1, Set<EVec3i>[] Core2Profile2, Set<EVec3i>[] Core2Profile3,
+                           Set<EVec3i> Core3, Set<EVec3i>[] Core3Profile1)
 {
-    DISTANCE_ALL("all"),
-    DISTANCE_SIDE("side"),
-    DISTANCE_FRONT("front"),
-    DISTANCE_BACK("back");
 
-    private String name;
 
-    ForceProfile(String name) {
-        this.name = name;
-    }
 
-    @Override public String asString() {
-        return name;
-    }
+//    private static Set<EVec3i> createCore(int core, Direction forceDirection)
+//    {
+//
+//    }
+//
+//    // core1 profiles
+//    private static Set<EVec3i>[] createCore1Profile1(Direction forceDirection)
+//    {
+//
+//    }
+//
+//    private static Set<EVec3i>[] createCore1Profile2(Direction forceDirection)
+//    {
+//
+//    }
+//
+//    // core2 profiles
+//    private static Set<EVec3i>[] createCore2Profile1(Direction forceDirection)
+//    {
+//
+//    }
+//
+//    private static Set<EVec3i>[] createCore2Profile2(Direction forceDirection)
+//    {
+//
+//    }
+//
+//    private static Set<EVec3i>[] createCore2Profile3(Direction forceDirection)
+//    {
+//
+//    }
+//
+//    // core3 profile
+//    private static Set<EVec3i>[] createCore3Profile1(Direction forceDirection)
+//    {
+//
+//    }
 }

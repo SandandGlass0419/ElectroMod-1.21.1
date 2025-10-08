@@ -9,14 +9,16 @@ import net.minecraft.state.StateManager;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-public class MagnetBlock extends FacingBlock
+public class MagnetBlock extends FacingBlock //implements BlockWithMagneticForce
 {
     public static final MapCodec<MagnetBlock> CODEC = IronCoilBlock.createCodec(MagnetBlock::new);
 
     public MagnetBlock(Settings settings)
     {
         super(settings);
-        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.UP));
+        this.setDefaultState(this.stateManager.getDefaultState()
+                .with(FACING, Direction.UP));
+                //.with(MAGNETIC, true));
     }
 
     @Override protected MapCodec<? extends FacingBlock> getCodec() { return CODEC; }
@@ -26,4 +28,12 @@ public class MagnetBlock extends FacingBlock
     @Override public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite());
     }
+
+//    @Override
+//    public ForceComponents getForceComponents(BlockState state)
+//    {
+//        if (!(state.getBlock() instanceof MagnetBlock)) return null;
+//
+//        return new ForceComponents(15, state.get(FACING))
+//    }
 }
