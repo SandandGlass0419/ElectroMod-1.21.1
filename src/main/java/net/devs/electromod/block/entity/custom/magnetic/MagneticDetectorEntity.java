@@ -1,5 +1,6 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
+import net.devs.electromod.block.custom.magnetic.MagneticDetector;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class MagneticDetectorEntity extends BlockEntity
 {
     private int redstoneOutput = 0;
+    private boolean needsUpdate = true;
 
     public MagneticDetectorEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.DETECTOR_BE, pos, state);
@@ -23,6 +25,13 @@ public class MagneticDetectorEntity extends BlockEntity
     public void tick(World world, BlockPos pos, BlockState state)
     {
         if (world.isClient()) return;
+
+        if (needsUpdate)
+        {
+            setRedstoneOutput(MagneticDetector.defaultPowerFormula(state));
+            needsUpdate = false;
+        }
+
     }
 
     public void setRedstoneOutput(int power)
