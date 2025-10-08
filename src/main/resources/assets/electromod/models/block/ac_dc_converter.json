@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "electromod:block/ac_dc_converter"
+  },
+  "render_type": "cutout"
+}

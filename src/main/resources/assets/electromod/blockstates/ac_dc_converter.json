@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "electromod:block/ac_dc_converter"
+    }
+  }
+}

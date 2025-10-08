@@ -2,6 +2,7 @@ package net.devs.electromod.block.entity;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.ModBlocks;
+import net.devs.electromod.block.entity.custom.electro.AcDcConvertEntity;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
@@ -34,6 +35,14 @@ public class ModBlockEntities
                             ModBlocks.WIRE,
                             ModBlocks.GOLDEN_WIRE
                     ).build());
+
+    public static final BlockEntityType<AcDcConvertEntity> ACDC_BE =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "acdc_be"),
+                    BlockEntityType.Builder.create(AcDcConvertEntity::new,
+                            ModBlocks.ACDC_CONVERTER
+                    ).build());
+
+
 
 
 

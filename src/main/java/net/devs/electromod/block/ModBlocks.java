@@ -2,10 +2,7 @@ package net.devs.electromod.block;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.TestBlock;
-import net.devs.electromod.block.custom.electro.Battery;
-import net.devs.electromod.block.custom.electro.CopperWire;
-import net.devs.electromod.block.custom.electro.GoldWire;
-import net.devs.electromod.block.custom.electro.Wire;
+import net.devs.electromod.block.custom.electro.*;
 import net.devs.electromod.block.custom.magnetic.*;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
@@ -87,6 +84,14 @@ public class ModBlocks
                     .nonOpaque()
                     .requiresTool()));
 
+    public static final Block ACDC_CONVERTER = addBlock("ac_dc_converter",
+            new AcDcConverter(AbstractBlock.Settings.create()
+                    .strength(1f)
+                    .sounds(BlockSoundGroup.METAL)
+                    .nonOpaque()
+                    .luminance(state -> 15)
+                    .requiresTool()));
+
     public static void registerModBlocks()
     {
         ElectroMod.LOGGER.info("Registering Mod Blocks (" + ElectroMod.MOD_ID + ")");
@@ -105,6 +110,7 @@ public class ModBlocks
             entries.add(GOLDEN_WIRE);
             entries.add(WIRE);
             entries.add(BATTERY);
+            entries.add(ACDC_CONVERTER);
         });
     }
 
