@@ -1,5 +1,6 @@
 package net.devs.electromod.block.custom.electro;
 
+import com.mojang.serialization.MapCodec;
 import net.devs.electromod.block.ModBlocks;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
@@ -11,16 +12,20 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DebugStickItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -28,7 +33,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class WireBlock extends BlockWithEntity implements BlockEntityProvider {
+public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
 
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty NORTH = Properties.NORTH;
@@ -36,12 +41,13 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
     public static final BooleanProperty SOUTH = Properties.SOUTH;
     public static final BooleanProperty WEST = Properties.WEST;
 
-    protected static final VoxelShape CORE = Block.createCuboidShape(5, 5, 5, 11, 11, 11);
-    protected static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(5, 5, 0, 11, 11, 5);
-    protected static final VoxelShape SOUTH_SHAPE = Block.createCuboidShape(5, 5, 11, 11, 11, 16);
-    protected static final VoxelShape EAST_SHAPE  = Block.createCuboidShape(11, 5, 5, 16, 11, 11);
-    protected static final VoxelShape WEST_SHAPE  = Block.createCuboidShape(0, 5, 5, 5, 11, 11);
+    private static final VoxelShape CORE = Block.createCuboidShape(5, 5, 5, 11, 11, 11);
+    private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(5, 5, 0, 11, 11, 5);
+    private static final VoxelShape SOUTH_SHAPE = Block.createCuboidShape(5, 5, 11, 11, 11, 16);
+    private static final VoxelShape EAST_SHAPE  = Block.createCuboidShape(11, 5, 5, 16, 11, 11);
+    private static final VoxelShape WEST_SHAPE  = Block.createCuboidShape(0, 5, 5, 5, 11, 11);
 
+    public static final MapCodec<WireBlock> CODEC = WireBlock.createCodec(WireBlock::new);
     public float resistance = 1.0f;
 
     public WireBlock(Settings settings) {
@@ -54,21 +60,22 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
                 .with(WEST, false));
     }
 
-    // ⚡ 우클릭 감전 이벤트 (모든 WireBlock 기본)
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, net.minecraft.util.hit.BlockHitResult hit) {
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.isClient()) return ActionResult.FAIL;
+        Item stackItem = player.getMainHandStack().getItem();
+        Item leftHandStackITem = player.getOffHandStack().getItem();
 
-        Item mainHand = player.getMainHandStack().getItem();
-        Item offHand = player.getOffHandStack().getItem();
+        if (stackItem instanceof DebugStickItem ||
+                stackItem.equals(ModBlocks.COPPER_WIRE.asItem())) return ActionResult.FAIL;
 
-        // DebugStick이나 같은 WireBlock 아이템이면 무시
-        if (mainHand instanceof DebugStickItem ||
-                mainHand.equals(ModBlocks.COPPER_WIRE.asItem())) return ActionResult.FAIL;
+        if (!stackItem.equals(ModItems.RUBBER_GLOVES) && !leftHandStackITem.equals(ModItems.RUBBER_GLOVES)) {
+            BlockPos blockpos = player.getBlockPos();
 
-        // 장갑이 없으면 감전
-        if (!mainHand.equals(ModItems.RUBBER_GLOVES) && !offHand.equals(ModItems.RUBBER_GLOVES)) {
-            spawnLightningAtEntity(world, player);
+            LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
+            lightning.refreshPositionAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(), 0, 0);
+
+            world.spawnEntity(lightning);
             player.kill();
             player.sendMessage(Text.literal("Oops!"));
         }
@@ -76,19 +83,17 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
         return ActionResult.PASS;
     }
 
-    // ⚡ 밟았을 때 감전 이벤트
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (world.isClient()) return;
-        spawnLightningAtEntity(world, entity);
-        entity.kill();
-    }
 
-    protected void spawnLightningAtEntity(World world, Entity entity) {
-        BlockPos pos = entity.getBlockPos();
+        BlockPos blockpos = entity.getBlockPos();
+
         LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
-        lightning.refreshPositionAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0, 0);
+        lightning.refreshPositionAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(), 0, 0);
+
         world.spawnEntity(lightning);
+        entity.kill();
     }
 
     @Override
@@ -102,9 +107,21 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
     }
 
     @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+        if (!world.isClient()) {
+            // 한 틱 뒤에 연결 계산 예약
+            world.scheduleBlockTick(pos, this, 1);
+        }
+    }
+
+    @Override
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, net.minecraft.util.math.random.Random random) {
+        super.scheduledTick(state, world, pos, random);
         checkAndChange(world, pos, true);
     }
+
+
 
     @Override
     protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
@@ -113,52 +130,81 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
         super.onStateReplaced(state, world, pos, newState, moved);
     }
 
-    protected void checkAndChange(World world, BlockPos pos, boolean value) {
-        for (Direction dir : Direction.values()) {
-            if (dir.getAxis().isHorizontal()) {
-                BlockPos offsetPos = pos.offset(dir);
-                BlockState neighborState = world.getBlockState(offsetPos);
-                world.setBlockState(offsetPos, checkDirection(neighborState, value, dir), Block.NOTIFY_ALL);
-            }
-        }
+    private void checkAndChange(World world, BlockPos pos, boolean value) {
+        BlockState eastState = world.getBlockState(pos.offset(Direction.EAST));
+        BlockState westState = world.getBlockState(pos.offset(Direction.WEST));
+        BlockState southState = world.getBlockState(pos.offset(Direction.SOUTH));
+        BlockState northState = world.getBlockState(pos.offset(Direction.NORTH));
+        BlockState selfstate = world.getBlockState(pos);
+
+
+        eastState = checkDirection(eastState, value, WireBlock.SOUTH, WireBlock.NORTH, WireBlock.EAST, WireBlock.WEST);
+        westState = checkDirection(westState, value, WireBlock.NORTH, WireBlock.SOUTH, WireBlock.WEST, WireBlock.EAST);
+        southState = checkDirection(southState, value, WireBlock.WEST, WireBlock.EAST, WireBlock.SOUTH, WireBlock.NORTH);
+        northState = checkDirection(northState, value, WireBlock.EAST, WireBlock.WEST, WireBlock.NORTH, WireBlock.SOUTH);
+        selfstate =checkDirection(selfstate, value,WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH); //개시발좆같다
+
+        world.setBlockState(pos, selfstate, Block.NOTIFY_ALL);
+        world.setBlockState(pos.offset(Direction.EAST), eastState, Block.NOTIFY_ALL);
+        world.setBlockState(pos.offset(Direction.WEST), westState, Block.NOTIFY_ALL);
+        world.setBlockState(pos.offset(Direction.SOUTH), southState, Block.NOTIFY_ALL);
+        world.setBlockState(pos.offset(Direction.NORTH), northState, Block.NOTIFY_ALL);
     }
 
-    protected BlockState checkDirection(BlockState state, boolean value, Direction dir) {
+    private BlockState checkDirection(BlockState state, boolean value, BooleanProperty... hasDirection) {
         if (!(state.getBlock() instanceof WireBlock)) return state;
 
         Direction facing = state.get(FACING);
-        BooleanProperty[] props = switch (facing) {
-            case EAST -> new BooleanProperty[]{SOUTH, NORTH, EAST, WEST};
-            case WEST -> new BooleanProperty[]{NORTH, SOUTH, WEST, EAST};
-            case SOUTH -> new BooleanProperty[]{WEST, EAST, SOUTH, NORTH};
-            case NORTH -> new BooleanProperty[]{EAST, WEST, NORTH, SOUTH};
-            default -> new BooleanProperty[]{};
-        };
-
-        return switch (dir) {
-            case EAST -> state.with(props[0], value);
-            case WEST -> state.with(props[1], value);
-            case SOUTH -> state.with(props[2], value);
-            case NORTH -> state.with(props[3], value);
+        return switch (facing) {
+            case EAST -> state.with(hasDirection[0], value);
+            case WEST -> state.with(hasDirection[1], value);
+            case SOUTH -> state.with(hasDirection[2], value);
+            case NORTH -> state.with(hasDirection[3], value);
             default -> state;
         };
     }
 
     @Override
-    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, net.minecraft.block.ShapeContext context) {
+    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         VoxelShape shape = CORE;
-        if (state.get(NORTH)) shape = net.minecraft.util.shape.VoxelShapes.union(shape, NORTH_SHAPE);
-        if (state.get(SOUTH)) shape = net.minecraft.util.shape.VoxelShapes.union(shape, SOUTH_SHAPE);
-        if (state.get(EAST))  shape = net.minecraft.util.shape.VoxelShapes.union(shape, EAST_SHAPE);
-        if (state.get(WEST))  shape = net.minecraft.util.shape.VoxelShapes.union(shape, WEST_SHAPE);
+
+        Direction facing = state.get(FACING);
+        Direction back = facing.getOpposite();
+        Direction left = facing.getAxis().isHorizontal() ? facing.rotateYCounterclockwise() : null;
+        Direction right = facing.getAxis().isHorizontal() ? facing.rotateYClockwise() : null;
+
+        if (state.get(NORTH)) shape = net.minecraft.util.shape.VoxelShapes.union(shape, getShapeForDirection(facing));
+        if (state.get(SOUTH)) shape = net.minecraft.util.shape.VoxelShapes.union(shape, getShapeForDirection(back));
+        if (state.get(EAST)  && right != null) shape = net.minecraft.util.shape.VoxelShapes.union(shape, getShapeForDirection(right));
+        if (state.get(WEST)  && left != null)  shape = net.minecraft.util.shape.VoxelShapes.union(shape, getShapeForDirection(left));
+
         return shape;
     }
 
-    @Override
-    public abstract @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state);
+    private static VoxelShape getShapeForDirection(Direction dir) {
+        return switch (dir) {
+            case NORTH -> NORTH_SHAPE;
+            case SOUTH -> SOUTH_SHAPE;
+            case EAST  -> EAST_SHAPE;
+            case WEST  -> WEST_SHAPE;
+            default -> CORE;
+        };
+    }
 
     @Override
-    protected abstract BlockRenderType getRenderType(BlockState state);
+    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new WireBlockEntity(pos, state);
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
+
+    @Override
+    protected BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
+    }
 
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
@@ -166,27 +212,18 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
             return (w, pos, s, blockEntity) -> {
                 if (!(blockEntity instanceof WireBlockEntity wireBE)) return;
 
-                // FACING 방향 블록 위치
                 Direction facing = s.get(FACING);
                 BlockPos targetPos = pos.offset(facing);
                 BlockState targetState = w.getBlockState(targetPos);
 
-                // FACING 방향 블록이 CopperWire이면
-                if (targetState.getBlock() instanceof CopperWire) {
+                if (targetState.getBlock() instanceof WireBlock) {
                     BlockEntity targetBE = w.getBlockEntity(targetPos);
                     if (targetBE instanceof WireBlockEntity targetWireBE) {
-                        // 현재 WireBlockEntity의 값 가져와서 전달
                         float value = wireBE.getStoredValue();
-                        targetWireBE.setStoredValue(value/resistance);
+                        targetWireBE.setStoredValue(value);
                     }
                 }
             };
         return null;
     }
-
-    public void setResistance(float value)
-    {
-        resistance = value;
-    }
-
 }
