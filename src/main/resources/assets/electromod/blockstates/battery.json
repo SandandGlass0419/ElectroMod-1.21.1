@@ -5,6 +5,6 @@
     "facing=west":  { "model": "electromod:block/battery", "x": 90, "y": 270 },
     "facing=east":  { "model": "electromod:block/battery", "x": 90, "y": 90 },
     "facing=up" : {"model" :  "electromod:block/battery"},
-    "facing=down" : {"model" :  "electromod:block/battery"}
+    "facing=down" : {"model" :  "electromod:block/battery", "y": 180}
     }
 }

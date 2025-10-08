@@ -4,13 +4,11 @@ import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 public class Battery extends Block {
@@ -39,23 +37,23 @@ public class Battery extends Block {
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         super.onBlockAdded(state, world, pos, oldState, notify);
 
-        // 1틱 후 scheduledTick 호출
-        world.scheduleBlockTick(pos, this, 1);
-    }
+        if (!world.isClient()) { // 서버 측에서만 실행
+            // Battery가 바라보는 방향
+            Direction facing = state.get(FACING);
+            BlockPos targetPos = pos.offset(facing); // Battery 앞쪽 위치
+            BlockState targetState = world.getBlockState(targetPos);
+            Block targetBlock = targetState.getBlock();
 
-    // scheduledTick: FACING 방향에 WireBlock 있으면 전류 1로 설정
-    @Override
-    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        super.scheduledTick(state, world, pos, random);
-
-        Direction facing = state.get(FACING);
-        BlockPos targetPos = pos.offset(facing);
-        BlockState targetState = world.getBlockState(targetPos);
-
-        if (targetState.getBlock() instanceof net.devs.electromod.block.custom.electro.WireBlock) {
-            if (world.getBlockEntity(targetPos) instanceof WireBlockEntity wireBE) {
-                wireBE.setElectrocity(10f); // 전류 1로 설정
+            // WireBlock을 상속받았는지 확인
+            if (targetBlock instanceof WireBlock) {
+                // BlockEntity 가져오기
+                if (world.getBlockEntity(targetPos) instanceof WireBlockEntity wireEntity) {
+                    // Electrocity 설정
+                    wireEntity.setElectrocity(10);
+                }
             }
         }
     }
+
+
 }

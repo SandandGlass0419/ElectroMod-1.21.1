@@ -18,7 +18,6 @@ import net.minecraft.item.DebugStickItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
@@ -127,19 +126,11 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
-        if (!world.isClient()) {
-            // 한 틱 뒤에 연결 계산 예약
-            world.scheduleBlockTick(pos, this, 1);
-        }
-    }
-
-    @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, net.minecraft.util.math.random.Random random) {
-        super.scheduledTick(state, world, pos, random);
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity player, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, player, itemStack);
         checkAndChange(world, pos, true);
     }
+
 
 
 
@@ -155,12 +146,15 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
         BlockState westState = world.getBlockState(pos.offset(Direction.WEST));
         BlockState southState = world.getBlockState(pos.offset(Direction.SOUTH));
         BlockState northState = world.getBlockState(pos.offset(Direction.NORTH));
+        BlockState selfstate = world.getBlockState(pos);
 
         eastState = checkDirection(eastState, value, WireBlock.SOUTH, WireBlock.NORTH, WireBlock.EAST, WireBlock.WEST);
         westState = checkDirection(westState, value, WireBlock.NORTH, WireBlock.SOUTH, WireBlock.WEST, WireBlock.EAST);
         southState = checkDirection(southState, value, WireBlock.WEST, WireBlock.EAST, WireBlock.SOUTH, WireBlock.NORTH);
         northState = checkDirection(northState, value, WireBlock.EAST, WireBlock.WEST, WireBlock.NORTH, WireBlock.SOUTH);
+        selfstate = checkDirection(selfstate, value, WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH);
 
+        world.setBlockState(pos, selfstate, Block.NOTIFY_ALL);
         world.setBlockState(pos.offset(Direction.EAST), eastState, Block.NOTIFY_ALL);
         world.setBlockState(pos.offset(Direction.WEST), westState, Block.NOTIFY_ALL);
         world.setBlockState(pos.offset(Direction.SOUTH), southState, Block.NOTIFY_ALL);
@@ -241,6 +235,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
                         }
                     }
                 }
+
             };
         }
         return null;
