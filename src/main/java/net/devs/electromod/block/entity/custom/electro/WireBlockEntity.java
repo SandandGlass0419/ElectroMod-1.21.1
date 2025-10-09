@@ -17,14 +17,19 @@ public class WireBlockEntity extends BlockEntity {
 
 
     // 값 읽기/쓰기
-    public void setElectrocity(float value) {
-        this.Electrocity = value;
+    public void addElectrocity(float value) {
+        this.Electrocity += value;
         markDirty(); // 값 변경 후 월드에 반영
     }
 
     // 월드 저장용 NBT
     public float getElectrocity() {
         return Electrocity;
+    }
+
+    public void minusElectrocity(float value)
+    {
+        this.Electrocity -= value;
     }
 
 

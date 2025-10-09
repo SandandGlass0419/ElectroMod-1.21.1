@@ -12,12 +12,10 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DebugStickItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
@@ -126,52 +124,46 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity player, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, player, itemStack);
-        checkAndChange(world, pos, true);
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        if (world.isClient()) return;
+
+        boolean northHasWire = false;
+        boolean southHasWire = false;
+        boolean eastHasWire = false;
+        boolean westHasWire = false;
+
+        for (Direction dir : new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
+            BlockPos targetPos = pos.offset(dir);
+            BlockState targetState = world.getBlockState(targetPos);
+
+            if (targetState.getBlock() instanceof WireBlock) {
+                switch (dir) {
+                    case NORTH -> northHasWire = true;
+                    case SOUTH -> southHasWire = true;
+                    case EAST  -> eastHasWire = true;
+                    case WEST  -> westHasWire = true;
+                }
+            }
+        }
+
+        Direction dir = state.get(FACING);
+        switch (dir)
+        {
+            case NORTH-> state = setState(state, eastHasWire,westHasWire,northHasWire,southHasWire);
+            case SOUTH-> state = setState(state, westHasWire,eastHasWire,southHasWire,northHasWire);
+            case EAST-> state = setState(state, southHasWire,northHasWire,eastHasWire,westHasWire);
+            case WEST-> state = setState(state, northHasWire,southHasWire,westHasWire,eastHasWire);
+        }
+
+        world.setBlockState(pos, state, Block.NOTIFY_ALL);
     }
 
 
 
-
-    @Override
-    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (state.getBlock() == newState.getBlock()) return;
-        checkAndChange(world, pos, false);
-        super.onStateReplaced(state, world, pos, newState, moved);
-    }
-
-    private void checkAndChange(World world, BlockPos pos, boolean value) {
-        BlockState eastState = world.getBlockState(pos.offset(Direction.EAST));
-        BlockState westState = world.getBlockState(pos.offset(Direction.WEST));
-        BlockState southState = world.getBlockState(pos.offset(Direction.SOUTH));
-        BlockState northState = world.getBlockState(pos.offset(Direction.NORTH));
-        BlockState selfstate = world.getBlockState(pos);
-
-        eastState = checkDirection(eastState, value, WireBlock.SOUTH, WireBlock.NORTH, WireBlock.EAST, WireBlock.WEST);
-        westState = checkDirection(westState, value, WireBlock.NORTH, WireBlock.SOUTH, WireBlock.WEST, WireBlock.EAST);
-        southState = checkDirection(southState, value, WireBlock.WEST, WireBlock.EAST, WireBlock.SOUTH, WireBlock.NORTH);
-        northState = checkDirection(northState, value, WireBlock.EAST, WireBlock.WEST, WireBlock.NORTH, WireBlock.SOUTH);
-        selfstate = checkDirection(selfstate, value, WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH,WireBlock.SOUTH);
-
-        world.setBlockState(pos, selfstate, Block.NOTIFY_ALL);
-        world.setBlockState(pos.offset(Direction.EAST), eastState, Block.NOTIFY_ALL);
-        world.setBlockState(pos.offset(Direction.WEST), westState, Block.NOTIFY_ALL);
-        world.setBlockState(pos.offset(Direction.SOUTH), southState, Block.NOTIFY_ALL);
-        world.setBlockState(pos.offset(Direction.NORTH), northState, Block.NOTIFY_ALL);
-    }
-
-    private BlockState checkDirection(BlockState state, boolean value, BooleanProperty... hasDirection) {
-        if (!(state.getBlock() instanceof WireBlock)) return state;
-
-        Direction facing = state.get(FACING);
-        return switch (facing) {
-            case EAST -> state.with(hasDirection[0], value);
-            case WEST -> state.with(hasDirection[1], value);
-            case SOUTH -> state.with(hasDirection[2], value);
-            case NORTH -> state.with(hasDirection[3], value);
-            default -> state;
-        };
+    private BlockState setState(BlockState state, boolean... values)
+    {
+        return state.with(EAST, values[0]).with(WEST,values[1]).with(NORTH,values[2]).with(SOUTH,values[3]);
     }
 
     @Override
@@ -222,20 +214,31 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             return (w, pos, s, blockEntity) -> {
                 if (!(blockEntity instanceof WireBlockEntity wireBE)) return;
                     float value = wireBE.getElectrocity();
+                    int connectedCount = 0;
 
                     for (Direction dir : Direction.values()) {
                         BlockPos targetPos = pos.offset(dir);
                         BlockState targetState = w.getBlockState(targetPos);
 
                         if (targetState.getBlock() instanceof WireBlock) {
-                            BlockEntity targetBE = w.getBlockEntity(targetPos);
-                            if (targetBE instanceof WireBlockEntity targetWireBE) {
-                                targetWireBE.setElectrocity(value/resistance);
-                            }
+                            connectedCount++;
                         }
                     }
+
+                    for (Direction dir : Direction.values()) {
+                        BlockPos targetPos = pos.offset(dir);
+                        BlockState targetState = w.getBlockState(targetPos);
+
+                        if (targetState.getBlock() instanceof WireBlock) {
+                        BlockEntity targetBE = w.getBlockEntity(targetPos);
+                        if (targetBE instanceof WireBlockEntity targetWireBE) {
+                            targetWireBE.addElectrocity(value/resistance/connectedCount);
+                        }
+                        }
+                    }
+                    wireBE.minusElectrocity(value);
                 };
-            };
+            }
         return null;
     }
 
