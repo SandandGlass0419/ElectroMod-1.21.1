@@ -232,11 +232,11 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
                         if (targetState.getBlock() instanceof WireBlock) {
                         BlockEntity targetBE = w.getBlockEntity(targetPos);
                         if (targetBE instanceof WireBlockEntity targetWireBE) {
-                            targetWireBE.addElectrocity(value/resistance/connectedCount);
+                            targetWireBE.addElectrocity(value/resistance/(connectedCount+1));
                         }
                         }
                     }
-                    wireBE.minusElectrocity(value);
+                    wireBE.minusElectrocity(value/resistance/(connectedCount+1)*connectedCount);
                 };
             }
         return null;
