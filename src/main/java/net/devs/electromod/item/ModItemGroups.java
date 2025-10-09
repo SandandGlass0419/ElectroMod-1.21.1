@@ -46,6 +46,7 @@ public class ModItemGroups
                         entries.add(ModBlocks.COPPER_WIRE);
                         entries.add(ModBlocks.GOLDEN_WIRE);
                         entries.add(ModBlocks.WIRE);
+                        entries.add(ModBlocks.ACDC_CONVERTER);
 
                         entries.add(ModItems.RUBBER_GLOVES);
                         entries.add(ModItems.ELECTRO_STAFF);

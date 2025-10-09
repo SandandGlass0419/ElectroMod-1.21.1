@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "*": {
+      "item": "electromod:electro_item"
+    },
+    "=": {
+      "item": "minecraft:chain"
+    }
+  },
+  "pattern": [
+    " = ",
+    "=*=",
+    " = "
+  ],
+  "result": {
+    "count": 1,
+    "id": "electromod:ac_dc_converter"
+  }
+}

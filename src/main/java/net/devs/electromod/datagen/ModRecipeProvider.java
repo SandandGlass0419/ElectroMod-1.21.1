@@ -126,6 +126,14 @@ ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_STAFF, 1)
                 .input('*', ModItems.ELECTRO_ITEM)
                 .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.STICK))
                 .offerTo(recipeExporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ACDC_CONVERTER, 1)
+                .pattern(" = ")
+                .pattern("=*=")
+                .pattern(" = ")
+                .input('=', Items.CHAIN)
+                .input('*', ModItems.ELECTRO_ITEM)
+                .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.CHAIN))
+                .offerTo(recipeExporter);
 
 
     }
