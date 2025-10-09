@@ -39,6 +39,18 @@ public class MVec3i extends Vec3i
         return poses;
     }
 
+    public static Set<MVec3i> add(Set<MVec3i> deltas, Vec3i vec3i)
+    {
+        Set<MVec3i> poses = new HashSet<>();
+
+        for (MVec3i delta : deltas)
+        {
+            poses.add(new MVec3i(delta.add(vec3i), delta.getForceDirection()));
+        }
+
+        return poses;
+    }
+
     public MVec3i rotate90(Direction.Axis axis, int angleOrdinal)
     {
         Vector3f vectorAxis = toVector3f(axis);
