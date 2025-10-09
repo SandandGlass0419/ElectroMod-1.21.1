@@ -136,8 +136,10 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
         for (Direction dir : new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
             BlockPos targetPos = pos.offset(dir);
             BlockState targetState = world.getBlockState(targetPos);
+            Block targetBlock = targetState.getBlock();
 
-            if (targetState.getBlock() instanceof WireBlock) {
+            // WireBlock 또는 AcDcConverter 감지
+            if (targetBlock instanceof WireBlock || targetBlock == ModBlocks.ACDC_CONVERTER) {
                 switch (dir) {
                     case NORTH -> northHasWire = true;
                     case SOUTH -> southHasWire = true;
@@ -147,6 +149,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             }
         }
 
+
         Direction dir = state.get(FACING);
         switch (dir)
         {
@@ -154,6 +157,8 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             case SOUTH-> state = setState(state, westHasWire,eastHasWire,southHasWire,northHasWire);
             case EAST-> state = setState(state, southHasWire,northHasWire,eastHasWire,westHasWire);
             case WEST-> state = setState(state, northHasWire,southHasWire,westHasWire,eastHasWire);
+            case UP-> state = setState(state, eastHasWire,westHasWire,northHasWire,southHasWire);
+            case DOWN-> state = setState(state, westHasWire,eastHasWire,southHasWire,northHasWire);
         }
 
         world.setBlockState(pos, state, Block.NOTIFY_ALL);
@@ -241,6 +246,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             }
         return null;
     }
+
 
 
 }
