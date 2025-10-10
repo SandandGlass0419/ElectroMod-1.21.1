@@ -27,18 +27,6 @@ public class MVec3i extends Vec3i
 
     public Direction getForceDirection() { return forceDirection; }
 
-    public Set<MVec3i> add(Set<MVec3i> deltas)
-    {
-        Set<MVec3i> poses = new HashSet<>();
-        
-        for (MVec3i delta : deltas)
-        {
-            poses.add(new MVec3i(this.add(delta), this.forceDirection));
-        }
-        
-        return poses;
-    }
-
     public static Set<MVec3i> add(Set<MVec3i> deltas, Vec3i vec3i)
     {
         Set<MVec3i> poses = new HashSet<>();
@@ -46,6 +34,18 @@ public class MVec3i extends Vec3i
         for (MVec3i delta : deltas)
         {
             poses.add(new MVec3i(delta.add(vec3i), delta.getForceDirection()));
+        }
+
+        return poses;
+    }
+
+    public static Set<BlockPos> add(Set<MVec3i> deltas, BlockPos pos)
+    {
+        Set<BlockPos> poses = new HashSet<>();
+
+        for (MVec3i delta : deltas)
+        {
+            poses.add(pos.add(delta));
         }
 
         return poses;

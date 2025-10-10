@@ -1,6 +1,7 @@
 package net.devs.electromod;
 
 import net.devs.electromod.block.ModBlocks;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.MVec3i;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.components.ModDataComponentTypes;
@@ -26,12 +27,14 @@ public class ElectroMod implements ModInitializer
         ModItemGroups.registerModItemGroups();
         ModDataComponentTypes.registerModDataComponentTypes();
         ModBlockEntities.registerModBlockEntities();
+
+        ForceProfile.registerForceProfiles();
         //Test();
 	}
 
     private static void Test()
     {
-       testRotation();
+       //testRotation();
        testSetRotation();
     }
 
@@ -44,13 +47,17 @@ public class ElectroMod implements ModInitializer
 
     private static void testSetRotation()
     {
-        Set<MVec3i> set = Set.of(new MVec3i(-1, 0, 0, Direction.WEST),
-                                 new MVec3i(-1, 0, -1, Direction.NORTH),
-                                 new MVec3i(0, 0, -1, Direction.EAST),
-                                 new MVec3i(1, 0, -1, Direction.SOUTH),
-                                 new MVec3i(1, 0, 0, Direction.WEST));
+        Set<MVec3i> defaultElementleft = Set.of( // up left heading north
+                new MVec3i(-1, 1, -2, Direction.WEST),
+                new MVec3i(-2, 1, -2, Direction.WEST),
+                new MVec3i(-2, 1, -1, Direction.SOUTH),
+                new MVec3i(-2, 1, 0, Direction.SOUTH),
+                new MVec3i(-2, 1, 1, Direction.SOUTH),
+                new MVec3i(-2, 1, 2, Direction.EAST),
+                new MVec3i(-1, 1, 2, Direction.EAST)
+        );
 
-        var res = MVec3i.rotate90(set, Direction.Axis.Y, MVec3i.Angles.CLOCK_270.ordinal());
+        var res = MVec3i.rotate90(defaultElementleft, Direction.Axis.Z, MVec3i.Angles.CLOCK_180.ordinal());
 
         for (MVec3i vec : res)
         {

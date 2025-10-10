@@ -1,13 +1,13 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.components.ModDataComponentTypes;
+import net.devs.electromod.item.custom.electro.ElectroStaff;
 import net.devs.electromod.item.custom.magnetic.MagnetItem;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
@@ -48,6 +48,12 @@ public class IronCoilBlock extends CoilBlock implements BlockEntityProvider
             return ActionResult.SUCCESS;
         }
 
+        else if (stack.getItem() instanceof ElectroStaff)
+        {
+            testMagneticField(world, pos, state);
+            return ActionResult.SUCCESS;
+        }
+
         else // default action
         {
             BlockState newBlockState = state.cycle(DENSITY);
@@ -57,6 +63,28 @@ public class IronCoilBlock extends CoilBlock implements BlockEntityProvider
             world.playSound(null, pos, SoundEvents.BLOCK_CHAIN_HIT, SoundCategory.BLOCKS);
 
             return ActionResult.success(world.isClient);
+        }
+    }
+
+    private void testMagneticField(World world, BlockPos pos, BlockState state)
+    {
+        if (world.isClient()) return;
+
+        ForceProfile profile = new ForceProfile(ForceProfile.POWER2_NORTH_HEAD, ForceProfile.POWER2_NORTH_BODY, ForceProfile.POWER2_NORTH_TAIL);
+        var poses = MagneticForceInteractor.getAllPositions(pos, profile);
+
+        BlockState[] forceBlocks = {
+                Blocks.RED_STAINED_GLASS.getDefaultState(),
+                Blocks.CYAN_STAINED_GLASS.getDefaultState(),
+                Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState()
+        };
+
+        for (int i = 0; i < 3; i++)
+        {
+            for (BlockPos p : poses.get(i))
+            {
+                world.setBlockState(p, forceBlocks[i]);
+            }
         }
     }
 }
