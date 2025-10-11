@@ -16,6 +16,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class IronCoilBlock extends CoilBlock implements BlockEntityProvider
@@ -70,7 +71,11 @@ public class IronCoilBlock extends CoilBlock implements BlockEntityProvider
     {
         if (world.isClient()) return;
 
-        ForceProfile profile = new ForceProfile(ForceProfile.POWER2_NORTH_HEAD, ForceProfile.POWER2_NORTH_BODY, ForceProfile.POWER2_NORTH_TAIL);
+        int magneticForce = 15;
+        int powerCategory = ForceProfile.getPowerCategory(15);
+        Direction forceDirection = state.get(FACING);
+        ForceProfile profile = ForceProfile.getForceProfile(powerCategory, forceDirection);
+
         var poses = MagneticForceInteractor.getAllPositions(pos, profile);
 
         BlockState[] forceBlocks = {
