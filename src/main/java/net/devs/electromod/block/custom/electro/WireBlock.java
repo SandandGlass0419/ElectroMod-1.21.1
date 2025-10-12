@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
 
+    //아아 그래 그건 사실이야. 사실 FACING은 필요하지 않았어. 초기 구상이랑 달라졌거든. 사실 이거 빼면 연결 로직도 간단해져.
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty NORTH = Properties.NORTH;
     public static final BooleanProperty EAST = Properties.EAST;

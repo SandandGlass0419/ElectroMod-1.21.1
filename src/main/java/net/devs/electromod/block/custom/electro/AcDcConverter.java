@@ -44,6 +44,8 @@ public class AcDcConverter extends BlockWithEntity implements BlockEntityProvide
         return BlockRenderType.MODEL; // uses block model for entity
     }
 
+
+    //솔직히 ㅅㅂ 나도 왜 이 전류알고리즘이 작동하는지 모르겠다..
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 
