@@ -1,29 +1,37 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.DimensionTypes;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 public class MagneticForceInteractor
 {
-    public static Vector<Set<BlockPos>> getAllPositions(BlockPos pos, ForceProfile forceProfile)
+    private static Map<RegistryKey<DimensionType>, Set<BlockPos>> magneticBlockPos = new HashMap<>();
+
+    public static void subscribeBlock(RegistryKey<DimensionType> dimension, BlockPos pos)
     {
-        Vector<Set<BlockPos>> Positions = new Vector<>(Arrays.asList(new HashSet<>(), new HashSet<>(), new HashSet<>()));
+        magneticBlockPos.get(dimension).add(pos);
+        //ElectroMod.LOGGER.info("added on: " + pos);
+    }
 
-        for (int power = 0; power < 3; power++)
-        {
-            Set<MVec3i> deltas = new HashSet<>();
+    public static void unsubscribeBlock(RegistryKey<DimensionType> dimension, BlockPos pos)
+    {
+        magneticBlockPos.get(dimension).remove(pos);
+        //ElectroMod.LOGGER.info("removed on: " + pos);
+    }
 
-            deltas.addAll(forceProfile.headProfile().get(power));
-            deltas.addAll(forceProfile.bodyProfile().get(power));
-            deltas.addAll(forceProfile.tailProfile().get(power));
-
-            Positions.set(power, MVec3i.add(deltas, pos));
-        }
-
-        return Positions;
+    public static void initPosMap()
+    {
+        magneticBlockPos.clear();
+        magneticBlockPos.put(DimensionTypes.OVERWORLD, new HashSet<>());
+        magneticBlockPos.put(DimensionTypes.THE_NETHER, new HashSet<>());
+        magneticBlockPos.put(DimensionTypes.THE_END, new HashSet<>());
+        //ElectroMod.LOGGER.info("cleared!");
     }
 }

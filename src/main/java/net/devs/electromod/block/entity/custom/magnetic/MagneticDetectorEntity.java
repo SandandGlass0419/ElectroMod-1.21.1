@@ -31,7 +31,6 @@ public class MagneticDetectorEntity extends BlockEntity
             setRedstoneOutput(MagneticDetector.defaultPowerFormula(state));
             needsUpdate = false;
         }
-
     }
 
     public void setRedstoneOutput(int power)

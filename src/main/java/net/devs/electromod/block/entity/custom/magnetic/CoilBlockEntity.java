@@ -1,37 +1,23 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
-import net.devs.electromod.block.custom.magnetic.CoilBlock;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceBlockEntity;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class CoilBlockEntity extends BlockEntity
+public class CoilBlockEntity extends MagneticForceBlockEntity
 {
     private int redstoneInput = 0;
-    private boolean needsUpdate = true;
 
     public CoilBlockEntity(BlockPos pos, BlockState state)
     {
         super(ModBlockEntities.COIL_BE, pos, state);
-    }
-
-    public void tick(World world, BlockPos pos, BlockState state)
-    {
-        if (world.isClient()) return;
-
-        if (needsUpdate)
-        {
-            setRedstoneInput(CoilBlock.getRecievedRedstonePower(world, pos, state));
-            needsUpdate = false;
-        }
     }
 
     public void setRedstoneInput(int power)

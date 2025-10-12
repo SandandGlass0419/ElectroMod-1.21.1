@@ -1,5 +1,12 @@
 {
   "variants": {
+    "density=1,facing=up": { "model": "electromod:block/golden_coil_1" },
+    "density=1,facing=down": { "model": "electromod:block/golden_coil_1", "x": 180 },
+    "density=1,facing=north": { "model": "electromod:block/golden_coil_1", "x": 90 },
+    "density=1,facing=south": { "model": "electromod:block/golden_coil_1", "x": 270 },
+    "density=1,facing=east": { "model": "electromod:block/golden_coil_1", "x": 90, "y": 90 },
+    "density=1,facing=west": { "model": "electromod:block/golden_coil_1", "x": 90, "y": 270 },
+    
     "density=2,facing=up": { "model": "electromod:block/golden_coil_2" },
     "density=2,facing=down": { "model": "electromod:block/golden_coil_2", "x": 180 },
     "density=2,facing=north": { "model": "electromod:block/golden_coil_2", "x": 90 },
@@ -12,13 +19,6 @@
     "density=3,facing=north": { "model": "electromod:block/golden_coil_3", "x": 90 },
     "density=3,facing=south": { "model": "electromod:block/golden_coil_3", "x": 270 },
     "density=3,facing=east": { "model": "electromod:block/golden_coil_3", "x": 90, "y": 90 },
-    "density=3,facing=west": { "model": "electromod:block/golden_coil_3", "x": 90, "y": 270 },
-
-    "density=4,facing=up": { "model": "electromod:block/golden_coil_4" },
-    "density=4,facing=down": { "model": "electromod:block/golden_coil_4", "x": 180 },
-    "density=4,facing=north": { "model": "electromod:block/golden_coil_4", "x": 90 },
-    "density=4,facing=south": { "model": "electromod:block/golden_coil_4", "x": 270 },
-    "density=4,facing=east": { "model": "electromod:block/golden_coil_4", "x": 90, "y": 90 },
-    "density=4,facing=west": { "model": "electromod:block/golden_coil_4", "x": 90, "y": 270 }
+    "density=3,facing=west": { "model": "electromod:block/golden_coil_3", "x": 90, "y": 270 }
   }
 }

@@ -1,13 +1,17 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceCompound;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceBlock;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.custom.electro.ElectroStaff;
 import net.devs.electromod.item.custom.magnetic.MagnetItem;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
@@ -19,7 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class IronCoilBlock extends CoilBlock implements BlockEntityProvider
+public class IronCoilBlock extends CoilBlock
 {
     public static final MapCodec<IronCoilBlock> CODEC = IronCoilBlock.createCodec(IronCoilBlock::new);
 
@@ -51,19 +55,40 @@ public class IronCoilBlock extends CoilBlock implements BlockEntityProvider
 
         else if (stack.getItem() instanceof ElectroStaff)
         {
-            testMagneticField(world, pos, state);
+            if (world.isClient()) return ActionResult.FAIL;
+
+            testMagneticForce(world, pos, state, player);
+            //testMagneticField(world, pos, state);
+
             return ActionResult.SUCCESS;
         }
 
         else // default action
         {
             BlockState newBlockState = state.cycle(DENSITY);
-            int newDensity = newBlockState.get(DENSITY);
 
             world.setBlockState(pos, newBlockState, Block.NOTIFY_ALL);
             world.playSound(null, pos, SoundEvents.BLOCK_CHAIN_HIT, SoundCategory.BLOCKS);
 
             return ActionResult.success(world.isClient);
+        }
+    }
+
+    // magnetic force features
+    public static final int ironAdditiveFactor = 10;
+
+    @Override
+    public int defaultForceFormula(int redstonePower, int density)
+    {
+        return redstonePower == 0 ? 0 : redstonePower * density + ironAdditiveFactor;
+    }
+
+    private void testMagneticForce(World world, BlockPos pos, BlockState state, PlayerEntity player)
+    {
+        if (state.getBlock() instanceof MagneticForceBlock block)
+        {
+            int force =  block.getForceCompound(world, pos).magneticBlockPower();
+            player.sendMessage(Text.literal("force: " + force), true);
         }
     }
 
@@ -76,7 +101,7 @@ public class IronCoilBlock extends CoilBlock implements BlockEntityProvider
         Direction forceDirection = state.get(FACING);
         ForceProfile profile = ForceProfile.getForceProfile(powerCategory, forceDirection);
 
-        var poses = MagneticForceInteractor.getAllPositions(pos, profile);
+        var poses = ForceCompound.getAllPositions(pos, profile);
 
         BlockState[] forceBlocks = {
                 Blocks.RED_STAINED_GLASS.getDefaultState(),

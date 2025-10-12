@@ -1,11 +1,13 @@
 package net.devs.electromod.block.custom.magnetic;
 
-import net.devs.electromod.block.entity.ModBlockEntities;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceCompound;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceBlock;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -20,10 +22,10 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class CoilBlock extends BlockWithEntity implements BlockEntityProvider
+public abstract class CoilBlock extends MagneticForceBlock
 {
     public static final DirectionProperty FACING = Properties.FACING;
-    public static final IntProperty DENSITY = IntProperty.of("density", 2, 4); // coil n
+    public static final IntProperty DENSITY = IntProperty.of("density", 1, 3); // coil n
     public static final BooleanProperty POWERED = Properties.POWERED;
 
     private static final VoxelShape TOP = Block.createCuboidShape(0, 14, 0, 16, 16, 16);
@@ -42,7 +44,7 @@ public abstract class CoilBlock extends BlockWithEntity implements BlockEntityPr
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState()
                 .with(FACING, Direction.UP)
-                .with(DENSITY, 3)
+                .with(DENSITY, 2)
                 .with(POWERED, false));
     }
 
@@ -62,14 +64,6 @@ public abstract class CoilBlock extends BlockWithEntity implements BlockEntityPr
     @Override
     protected BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL; // uses block model for entity
-    }
-
-    @Override
-    @Nullable
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type)
-    {
-        return validateTicker(type, ModBlockEntities.COIL_BE,
-                (world1, pos, state1, blockEntity) -> blockEntity.tick(world1, pos, state1));
     }
 
     // voxel methods
@@ -101,9 +95,7 @@ public abstract class CoilBlock extends BlockWithEntity implements BlockEntityPr
     @Override
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
     {
-        if (world.getBlockEntity(pos) instanceof CoilBlockEntity coilBlockEntity) {
-            coilBlockEntity.setRedstoneInput(getRecievedRedstonePower(world, pos, state));
-        }
+        updatePower(world, pos, state);
 
         super.onBlockAdded(state, world, pos, oldState, notify);
     }
@@ -111,7 +103,8 @@ public abstract class CoilBlock extends BlockWithEntity implements BlockEntityPr
     @Override
     protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify)
     {
-        if (!world.isClient()) {
+        if (!world.isClient())
+        {
             updatePower(world, pos, state);
         }
 
@@ -151,10 +144,28 @@ public abstract class CoilBlock extends BlockWithEntity implements BlockEntityPr
     {
         int max = 0;
 
-        for (Direction dir : directions) {
+        for (Direction dir : directions)
+        {
             max = Math.max(world.getEmittedRedstonePower(pos.offset(dir), dir.getOpposite()), max);
+            max = Math.max(world.getEmittedRedstonePower(pos.offset(dir), dir.getOpposite(), true), max);
         }
 
         return max;
     }
+
+    // magnetic force features
+
+    @Override
+    public ForceCompound getForceCompound(World world, BlockPos pos)
+    {
+        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return null;
+        BlockState myState = world.getBlockState(pos);
+
+        int magneticPower = defaultForceFormula(coilBE.getRedstoneInput(), myState.get(DENSITY));
+        Direction direction = myState.get(FACING);
+
+        return new ForceCompound(magneticPower, getForceProfile(world, pos, direction, magneticPower));
+    }
+
+    public int defaultForceFormula(int redstonePower, int density) { return 0; }
 }

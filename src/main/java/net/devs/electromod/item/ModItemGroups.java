@@ -2,7 +2,6 @@ package net.devs.electromod.item;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.ModBlocks;
-import net.devs.electromod.item.custom.electro.ElectroStaff;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;

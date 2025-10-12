@@ -11,7 +11,7 @@ import java.util.Vector;
 
 public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> bodyProfile, Vector<Set<MVec3i>> tailProfile)
 {
-    public static final Vector<Set<MVec3i>> EMPTY = createEmpty();
+    private static final Vector<Set<MVec3i>> EMPTY = createEmpty();
 
     private static final Vector<Set<MVec3i>> POWER0_HEAD_NORTH = createPower0HeadNorth();
     private static final Vector<Set<MVec3i>> POWER0_BODY_NORTH = createPower0BodyNorth();
@@ -35,6 +35,11 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
         if (magneticPower < 0 || magneticPower > 15) return -1;
 
         return magneticPower > 2 ? 2 : magneticPower - 1;   // 0 returns -1 -> gets EMPTY
+    }
+
+    public static ForceProfile getEmptyProfile()
+    {
+        return new ForceProfile(EMPTY, EMPTY, EMPTY);
     }
 
     public static ForceProfile getForceProfile(int headPowerCategory, int bodyPowerCategory, int tailPowerCategory, Direction forceDirection)

@@ -5,7 +5,6 @@ import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.custom.magnetic.MagnetItem;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,7 +17,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class GoldenCoilBlock extends CoilBlock implements BlockEntityProvider
+public class GoldenCoilBlock extends CoilBlock
 {
     public static final MapCodec<GoldenCoilBlock> CODEC = GoldenCoilBlock.createCodec(GoldenCoilBlock::new);
 
@@ -58,5 +57,14 @@ public class GoldenCoilBlock extends CoilBlock implements BlockEntityProvider
 
             return ActionResult.success(world.isClient);
         }
+    }
+
+    // magnetic force features
+    public static final int goldAdditiveFactor = 45;
+
+    @Override
+    public int defaultForceFormula(int redstonePower, int density)
+    {
+        return redstonePower == 0 ? 0 : redstonePower * density + goldAdditiveFactor;
     }
 }
