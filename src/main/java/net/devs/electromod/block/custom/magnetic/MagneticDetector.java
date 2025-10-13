@@ -1,8 +1,11 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlock;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
+import net.devs.electromod.item.custom.electro.ElectroStaff;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -18,6 +21,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
@@ -32,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-public class  MagneticDetector extends BlockWithEntity
+public class  MagneticDetector extends AbstractDetectorBlock
 {
     public static final MapCodec<MagneticDetector> CODEC = MagneticDetector.createCodec(MagneticDetector::new);
     public static final EnumProperty<DetectState> DETECT_STATE = EnumProperty.of("detect_state", DetectState.class);
@@ -121,11 +125,18 @@ public class  MagneticDetector extends BlockWithEntity
 
     // blockstates
     @Override
+    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
+    {
+        updatePower(world, pos, state);
+        this.updateNeighbors(world, pos, state);
+    }
+
+    @Override
     protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved)
     {
         if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity)) return;
 
-        if (state.getBlock() == newState.getBlock()) // state change
+        if (state.isOf(newState.getBlock())) // state change
         {
             updatePower(world, pos, state);
         }
@@ -220,13 +231,6 @@ public class  MagneticDetector extends BlockWithEntity
         };
     }
 
-    @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
-    {
-        updatePower(world, pos, state);
-        this.updateNeighbors(world, pos, state);
-    }
-
     // block features
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
@@ -239,6 +243,11 @@ public class  MagneticDetector extends BlockWithEntity
         DetectState detect_state = state.get(DETECT_STATE);
 
         if (stack.getItem() instanceof DebugStickItem) return ActionResult.FAIL;
+
+        if (stack.getItem() instanceof ElectroStaff)
+        {
+            magneticTest(world, pos, player);
+        }
 
         if (detect_state != DetectState.EMPTY) // give item to player
         {
@@ -264,5 +273,12 @@ public class  MagneticDetector extends BlockWithEntity
         }
 
         return ActionResult.FAIL;
+    }
+
+    private void magneticTest(World world, BlockPos pos, PlayerEntity player)
+    {
+        if (world.isClient()) return;
+
+        player.sendMessage(Text.literal("" + MagneticForceInteractor.testPlacementCheck(world, pos)));
     }
 }

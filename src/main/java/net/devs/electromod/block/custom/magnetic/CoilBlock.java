@@ -121,6 +121,7 @@ public abstract class CoilBlock extends AbstractMagneticBlock
         else if (newPower != 0 && !state.get(POWERED)) { world.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL); }
 
         coilBlockEntity.setRedstoneInput(newPower);
+        coilBlockEntity.setMagneticForce(defaultForceFormula(newPower, state.get(DENSITY)));
     }
 
     public static int getRecievedRedstonePower(World world, BlockPos pos, BlockState state)
@@ -161,7 +162,7 @@ public abstract class CoilBlock extends AbstractMagneticBlock
         if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return null;
         BlockState myState = world.getBlockState(pos);
 
-        int magneticPower = defaultForceFormula(coilBE.getRedstoneInput(), myState.get(DENSITY));
+        int magneticPower = coilBE.getMagneticForce();
         Direction direction = myState.get(FACING);
 
         return new ForceCompound(magneticPower, getForceProfile(world, pos, direction, magneticPower));

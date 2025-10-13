@@ -25,6 +25,8 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
     private static final Vector<Set<MVec3i>> POWER2_BODY_NORTH = createPower2BodyNorth();
     private static final Vector<Set<MVec3i>> POWER2_TAIL_NORTH = createPower2TailNorth();
 
+    public static final int minmumDistance = 3;
+
     public static void registerForceProfiles()
     {
         ElectroMod.LOGGER.info("Registering ForceProfile");

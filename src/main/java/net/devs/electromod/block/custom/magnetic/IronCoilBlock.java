@@ -2,6 +2,7 @@ package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlockEntity;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceCompound;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
@@ -75,7 +76,7 @@ public class IronCoilBlock extends CoilBlock
     }
 
     // magnetic force features
-    public static final int ironAdditiveFactor = 10;
+    public static final int ironAdditiveFactor = 0;
 
     @Override
     public int defaultForceFormula(int redstonePower, int density)
@@ -85,10 +86,13 @@ public class IronCoilBlock extends CoilBlock
 
     private void testMagneticForce(World world, BlockPos pos, BlockState state, PlayerEntity player)
     {
-        if (state.getBlock() instanceof AbstractMagneticBlock block)
+        if (state.getBlock() instanceof AbstractMagneticBlock block &&
+            world.getBlockEntity(pos) instanceof AbstractMagneticBlockEntity magneticBE)
         {
-            int force =  block.getForceCompound(world, pos).magneticBlockPower();
-            player.sendMessage(Text.literal("force: " + force), true);
+            int compound_force =  block.getForceCompound(world, pos).magneticBlockPower();
+            int be_force = magneticBE.getMagneticForce();
+
+            player.sendMessage(Text.literal(be_force + " , " + compound_force));
         }
     }
 

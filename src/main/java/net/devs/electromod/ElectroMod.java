@@ -1,10 +1,7 @@
 package net.devs.electromod;
 
 import net.devs.electromod.block.ModBlocks;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlockEntity;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MVec3i;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.*;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.ModItemGroups;
@@ -40,32 +37,30 @@ public class ElectroMod implements ModInitializer
         (blockEntity, world) ->
         {
             if (world.isClient()) return;
-            if (!(blockEntity instanceof AbstractMagneticBlockEntity forceBE)) return;
 
-            forceBE.blockentityLoaded(world, forceBE);
+            if (blockEntity instanceof AbstractMagneticBlockEntity forceBE)
+            { forceBE.blockentityLoaded(world, forceBE); }
+
+            else if (blockEntity instanceof AbstractDetectorBlockEntity detectorBE)
+            { detectorBE.blockentityLoaded(world, detectorBE); }
+
         }));
 
         ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((
         (blockEntity, world) ->
         {
             if (world.isClient()) return;
-            if (!(blockEntity instanceof AbstractMagneticBlockEntity forceBE)) return;
 
-            forceBE.blockentityUnloaded(world, forceBE);
+            if (blockEntity instanceof AbstractMagneticBlockEntity forceBE)
+            { forceBE.blockentityUnloaded(world, forceBE); }
+
+            else if (blockEntity instanceof AbstractDetectorBlockEntity detectorBE)
+            { detectorBE.blockentityUnloaded(world, detectorBE); }
         }));
 
         // server load events
-        ServerWorldEvents.UNLOAD.register(
-        ((server, world) ->
-        {
-            MagneticForceInteractor.initPosMap();
-        }));
-
-        ServerWorldEvents.LOAD.register(
-        ((server, world) ->
-        {
-            MagneticForceInteractor.initPosMap();
-        }));
+        ServerWorldEvents.LOAD.register((MagneticForceInteractor::initPosMap));
+        ServerWorldEvents.UNLOAD.register((MagneticForceInteractor::initPosMap));
 
         //Test();
 	}

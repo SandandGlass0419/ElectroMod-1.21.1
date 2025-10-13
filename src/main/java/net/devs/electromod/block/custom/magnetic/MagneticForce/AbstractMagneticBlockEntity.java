@@ -3,13 +3,27 @@ package net.devs.electromod.block.custom.magnetic.MagneticForce;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 public abstract class AbstractMagneticBlockEntity extends BlockEntity
 {
+    private int magneticForce = 0;
+
+    public void setMagneticForce(int magneticForce)
+    {
+        if (this.magneticForce == magneticForce) return;
+
+        this.magneticForce = magneticForce;
+        markDirty();
+
+        // put updates
+    }
+
+    public int getMagneticForce() { return magneticForce; }
+
     public AbstractMagneticBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
@@ -17,17 +31,25 @@ public abstract class AbstractMagneticBlockEntity extends BlockEntity
 
     public void blockentityLoaded(World world, BlockEntity forceBE)
     {
-        MagneticForceInteractor.subscribeBlock(getDimensionKey(world), forceBE.getPos());
+        MagneticForceInteractor.subscribeMagneticBlock(world, forceBE.getPos());
     }
 
     public void blockentityUnloaded(World world, BlockEntity forceBE)
     {
-        MagneticForceInteractor.unsubscribeBlock(getDimensionKey(world), forceBE.getPos());
+        MagneticForceInteractor.unsubscribeMagneticBlock(world, forceBE.getPos());
     }
 
-    public RegistryKey<DimensionType> getDimensionKey(World world)
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup)
     {
-        var key = world.getDimensionEntry().getKey();
-        return key.orElse(null);
+        super.writeNbt(nbt, registryLookup);
+        nbt.putInt("magnetic_force", magneticForce);
+    }
+
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup)
+    {
+        super.readNbt(nbt, registryLookup);
+        nbt.getInt("magnetic_force");
     }
 }

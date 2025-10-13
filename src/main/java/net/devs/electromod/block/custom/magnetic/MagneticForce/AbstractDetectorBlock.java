@@ -1,6 +1,11 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
-public abstract class AbstractDetectorBlock
-{
+import net.minecraft.block.BlockWithEntity;
 
+public abstract class AbstractDetectorBlock extends BlockWithEntity
+{
+    protected AbstractDetectorBlock(Settings settings)
+    {
+        super(settings);
+    }
 }
