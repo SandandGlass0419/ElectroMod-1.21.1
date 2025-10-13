@@ -13,7 +13,7 @@ public class GoldWire extends WireBlock {
 
     public GoldWire(Settings settings) {
         super(settings);
-        resistance = 1.001f;
+        resistance = 1.5f;
 
     }
 

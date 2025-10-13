@@ -14,7 +14,7 @@ import static net.devs.electromod.block.custom.electro.WireBlock.ELECTRIFIED;
 
 public class WireBlockEntity extends BlockEntity {
 
-    private float Electrocity = 0; // 전류 값
+    public float Electrocity = 0; // 전류 값
     public  int tickCounter = 0;
 
     public WireBlockEntity(BlockPos pos, BlockState state) {
@@ -29,11 +29,8 @@ public class WireBlockEntity extends BlockEntity {
             if (block instanceof WireBlock wireBlock) {
                 if(!wireBlock.IsDidElectrified(state))
                 {
+                    w.setBlockState(pos, state.with(ELECTRIFIED, true), Block.NOTIFY_ALL);
                     wireBlock.onBlockElectrocityUpdated(w, pos, state, wireBE);
-                }
-                else
-                {
-                    state.with(ELECTRIFIED,false);
                 }
             }
         }

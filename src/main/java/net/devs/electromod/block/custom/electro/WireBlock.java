@@ -208,10 +208,8 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
     }
 
     public void onBlockElectrocityUpdated(World w, BlockPos pos, BlockState state, WireBlockEntity wireBE) {
-        float value = wireBE.getElectrocity();
-
-        // 필드 대신 블록 상태로 변경
-        w.setBlockState(pos, state.with(ELECTRIFIED, true), Block.NOTIFY_ALL);
+        float value = wireBE.getElectrocity()/resistance;
+        wireBE.Electrocity = value;
 
         for (Direction dir : Direction.values()) {
             BlockPos targetPos = pos.offset(dir);
@@ -220,7 +218,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             if (targetState.getBlock() instanceof WireBlock) {
                 BlockEntity targetBE = w.getBlockEntity(targetPos);
                 if (targetBE instanceof WireBlockEntity targetWireBE) {
-                    targetWireBE.setElectrocity(value / resistance, w, targetPos, targetState, targetWireBE);
+                    targetWireBE.setElectrocity(value, w, targetPos, targetState, targetWireBE);
                 }
             }
         }
@@ -237,7 +235,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
                 WireBlockEntity wireBE = (WireBlockEntity) blockEntity;
 
                 wireBE.tickCounter++;
-                if (wireBE.tickCounter >= 50) {
+                if (wireBE.tickCounter >= 20) {
                     wireBE.tickCounter = 0;
 
                     // 월드에 상태 적용

@@ -13,7 +13,7 @@ public class CopperWire extends WireBlock {
 
     public CopperWire(Settings settings) {
         super(settings);
-        resistance = 1.01f;
+        resistance = 2f;
 
     }
 
