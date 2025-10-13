@@ -141,7 +141,7 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .input('=', Items.NETHER_STAR)
                 .input('*', Items.BLAZE_POWDER)
                 .input('N', Items.NETHERITE_INGOT)
-                .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.CHAIN))
+                .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
                 .offerTo(recipeExporter);
 
 
