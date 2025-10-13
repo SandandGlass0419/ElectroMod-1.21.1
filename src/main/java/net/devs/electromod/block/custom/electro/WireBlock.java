@@ -13,10 +13,12 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DebugStickItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
@@ -245,6 +247,38 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
         }
 
         return null;
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+
+        if (world.isClient()) return; // 클라 쪽에서는 무시
+
+        BlockEntity selfBE = world.getBlockEntity(pos);
+        if (!(selfBE instanceof WireBlockEntity selfWireBE)) return;
+
+        float minElectrocity = Float.MAX_VALUE; // 최소 전기값 저장용
+        boolean foundNeighbor = false;
+
+        for (Direction dir : Direction.values()) {
+            BlockPos neighborPos = pos.offset(dir);
+            BlockEntity neighborBE = world.getBlockEntity(neighborPos);
+
+            if (neighborBE instanceof WireBlockEntity neighborWireBE) {
+                float neighborValue = neighborWireBE.getElectrocity();
+                if (neighborValue < minElectrocity) {
+                    minElectrocity = neighborValue;
+                    foundNeighbor = true;
+                }
+            }
+        }
+
+        // 인접 와이어가 하나라도 있었을 경우
+        if (foundNeighbor) {
+            float newValue = selfWireBE.getElectrocity() + minElectrocity;
+            selfWireBE.setElectrocity(newValue/resistance, world, pos, state, selfWireBE);
+        }
     }
 
 }
