@@ -241,7 +241,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
                     wireBE.tickCounter = 0;
 
                     // 월드에 상태 적용
-                    w.setBlockState(pos, s.with(ELECTRIFIED, true), Block.NOTIFY_ALL);
+                    w.setBlockState(pos, s.with(ELECTRIFIED, false), Block.NOTIFY_ALL);
                 }
             };
         }
