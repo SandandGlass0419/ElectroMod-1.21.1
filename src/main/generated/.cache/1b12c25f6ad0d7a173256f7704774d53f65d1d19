@@ -1,4 +1,4 @@
-// 1.21.1	2025-10-09T12:36:17.4201521	ElectroMod/Recipes
+// 1.21.1	2025-10-13T15:23:43.9858031	ElectroMod/Recipes
 f45f37c60915d6c9d0c11dba5bccdeb5bf8a0f73 data\electromod\recipe\magnet_item.json
 d64bfbda51146cc9e7c23a78f6d8fe915aca823d data\electromod\recipe\iron_coil.json
 1e894a81032a0ca2d6a530bbaccb7c1cd6027c76 data\electromod\recipe\magnet_block.json
@@ -13,6 +13,7 @@ afd0b81cd31b89b85b66fd10f4077af98a236955 data\electromod\advancement\recipes\mis
 ce0a9fc83f55efd1d60682bddefb61cf3c7579bb data\electromod\recipe\ac_dc_converter.json
 d4b19e55fa62c1672c944db810ee1aabad440ecb data\electromod\recipe\magnetic_detector.json
 8001b02f9233864f9e68046df3fcd91311aa00c0 data\electromod\advancement\recipes\redstone\iron_coil.json
+b63e2eb714ed6258ae36b768a6e4d3fa715a66bc data\electromod\recipe\electro_item.json
 e97634604b5b5dd2ee415eb4e37ec4fe86cc4eab data\electromod\advancement\recipes\redstone\magnet_block.json
 de1db12300dea9ce24f8c91cbecd18b564b1f6de data\electromod\advancement\recipes\redstone\magnetic_detector.json
 87f22d241b3d7af095cd7d632a42eaa9d921e86d data\electromod\advancement\recipes\redstone\copper_coil.json
@@ -22,4 +23,5 @@ daf0c74457671c65029440930e9d87c8874827be data\electromod\advancement\recipes\red
 5155bdc7b692b6a8a128d6c1c2a306583abf2c51 data\electromod\recipe\gold_wire.json
 8fe95bf10209db3d55f50ff3fa97616fd2af76a6 data\electromod\advancement\recipes\redstone\golden_coil.json
 260908e15f55bd5f012de7df3c2917a767fd1e3a data\electromod\recipe\rubber_gloves.json
+27fee62fab192a4de6bf86458d36f87f3da1c85e data\electromod\advancement\recipes\misc\electro_item.json
 1e0046d391652a930bd5e6557fb6456e710ad96f data\electromod\advancement\recipes\redstone\wire.json

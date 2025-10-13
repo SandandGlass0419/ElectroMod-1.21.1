@@ -16,12 +16,12 @@
   "block.electromod.gold_wire": "Golden Wire",
   "block.electromod.battery" : "Battery",
   "block.electromod.wire": "Wire",
-  "block.electromod.ac_dc_converter" : "AC DC CONVERTER",
+  "block.electromod.ac_dc_converter" : "Ac Dc Converter",
 
 
   "item.electromod.rubber_gloves" : "Rubber Gloves",
   "item.electromod.electro_staff" : "Electro Staff",
 
   "itemGroup.electromod.magnetic_items": "Magnetic Items",
-  "itemGroup.electromod.electro_items" : "Electro Items"
+  "itemGroup.electromod.electro_items" : "Pure Energy Of Electro"
 }

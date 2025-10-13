@@ -118,7 +118,7 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .criterion(hasItem(Items.REDSTONE), conditionsFromItem(Items.REDSTONE))
                 .offerTo(recipeExporter);
 
-ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_STAFF, 1)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_STAFF, 1)
                 .pattern(" * ")
                 .pattern(" = ")
                 .pattern(" = ")
@@ -132,6 +132,15 @@ ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_STAFF, 1)
                 .pattern(" = ")
                 .input('=', Items.CHAIN)
                 .input('*', ModItems.ELECTRO_ITEM)
+                .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.CHAIN))
+                .offerTo(recipeExporter);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_ITEM, 1)
+                .pattern("N=N")
+                .pattern("=*=")
+                .pattern("N=N")
+                .input('=', Items.NETHER_STAR)
+                .input('*', Items.BLAZE_POWDER)
+                .input('N', Items.NETHERITE_INGOT)
                 .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.CHAIN))
                 .offerTo(recipeExporter);
 
