@@ -1,6 +1,7 @@
 package net.devs.electromod.block.custom.electro;
 
 import com.mojang.serialization.MapCodec;
+import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.ModBlocks;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
@@ -32,12 +33,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
 
-    //아아 그래 그건 사실이야. 사실 FACING은 필요하지 않았어. 초기 구상이랑 달라졌거든. 사실 이거 빼면 연결 로직도 간단해져.
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty NORTH = Properties.NORTH;
     public static final BooleanProperty EAST = Properties.EAST;
     public static final BooleanProperty SOUTH = Properties.SOUTH;
     public static final BooleanProperty WEST = Properties.WEST;
+    public static final BooleanProperty ELECTRIFIED = BooleanProperty.of("electrified"); // 새로 추가
 
     private static final VoxelShape CORE = Block.createCuboidShape(5, 5, 5, 11, 11, 11);
     private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(5, 5, 0, 11, 11, 5);
@@ -55,33 +56,32 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
                 .with(NORTH, false)
                 .with(EAST, false)
                 .with(SOUTH, false)
-                .with(WEST, false));
+                .with(WEST, false)
+                .with(ELECTRIFIED, false)); // 기본값 false
     }
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-       float absElectrocity = 0f;
+        float absElectrocity = 0f;
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
-
         if (blockEntity instanceof WireBlockEntity wireBlock) {
-             absElectrocity = Math.abs(wireBlock.getElectrocity());
+            absElectrocity = Math.abs(wireBlock.getElectrocity());
         }
 
-
         if (world.isClient()) return ActionResult.FAIL;
+
         Item stackItem = player.getMainHandStack().getItem();
-        Item leftHandStackITem = player.getOffHandStack().getItem();
+        Item leftHandStackItem = player.getOffHandStack().getItem();
 
         if (stackItem instanceof DebugStickItem ||
-                stackItem.equals(ModBlocks.COPPER_WIRE.asItem())||absElectrocity <=1f
-                ||stackItem.equals(ModBlocks.WIRE.asItem())
-                ||stackItem.equals(ModBlocks.GOLDEN_WIRE.asItem()))
+                stackItem.equals(ModBlocks.COPPER_WIRE.asItem()) || absElectrocity <= 1f
+                || stackItem.equals(ModBlocks.WIRE.asItem())
+                || stackItem.equals(ModBlocks.GOLDEN_WIRE.asItem()))
             return ActionResult.FAIL;
 
-        if (!stackItem.equals(ModItems.RUBBER_GLOVES) && !leftHandStackITem.equals(ModItems.RUBBER_GLOVES)) {
+        if (!stackItem.equals(ModItems.RUBBER_GLOVES) && !leftHandStackItem.equals(ModItems.RUBBER_GLOVES)) {
             BlockPos blockpos = player.getBlockPos();
-
             LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
             lightning.refreshPositionAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(), 0, 0);
 
@@ -100,13 +100,12 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
         float absElectrocity = 0f;
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
-
         if (blockEntity instanceof WireBlockEntity wireBlock) {
             absElectrocity = Math.abs(wireBlock.getElectrocity());
         }
-        if (absElectrocity <=1f) return;
-        BlockPos blockpos = entity.getBlockPos();
+        if (absElectrocity <= 1f) return;
 
+        BlockPos blockpos = entity.getBlockPos();
         LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
         lightning.refreshPositionAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(), 0, 0);
 
@@ -116,7 +115,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, NORTH, EAST, SOUTH, WEST);
+        builder.add(FACING, NORTH, EAST, SOUTH, WEST, ELECTRIFIED);
     }
 
     @Override
@@ -139,7 +138,6 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             BlockState targetState = world.getBlockState(targetPos);
             Block targetBlock = targetState.getBlock();
 
-            // WireBlock 또는 AcDcConverter 감지
             if (targetBlock instanceof WireBlock || targetBlock == ModBlocks.ACDC_CONVERTER) {
                 switch (dir) {
                     case NORTH -> northHasWire = true;
@@ -150,26 +148,21 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             }
         }
 
-
         Direction dir = state.get(FACING);
-        switch (dir)
-        {
-            case NORTH-> state = setState(state, eastHasWire,westHasWire,northHasWire,southHasWire);
-            case SOUTH-> state = setState(state, westHasWire,eastHasWire,southHasWire,northHasWire);
-            case EAST-> state = setState(state, southHasWire,northHasWire,eastHasWire,westHasWire);
-            case WEST-> state = setState(state, northHasWire,southHasWire,westHasWire,eastHasWire);
-            case UP-> state = setState(state, eastHasWire,westHasWire,northHasWire,southHasWire);
-            case DOWN-> state = setState(state, westHasWire,eastHasWire,southHasWire,northHasWire);
+        switch (dir) {
+            case NORTH -> state = setState(state, eastHasWire, westHasWire, northHasWire, southHasWire);
+            case SOUTH -> state = setState(state, westHasWire, eastHasWire, southHasWire, northHasWire);
+            case EAST  -> state = setState(state, southHasWire, northHasWire, eastHasWire, westHasWire);
+            case WEST  -> state = setState(state, northHasWire, southHasWire, westHasWire, eastHasWire);
+            case UP    -> state = setState(state, eastHasWire, westHasWire, northHasWire, southHasWire);
+            case DOWN  -> state = setState(state, westHasWire, eastHasWire, southHasWire, northHasWire);
         }
 
         world.setBlockState(pos, state, Block.NOTIFY_ALL);
     }
 
-
-
-    private BlockState setState(BlockState state, boolean... values)
-    {
-        return state.with(EAST, values[0]).with(WEST,values[1]).with(NORTH,values[2]).with(SOUTH,values[3]);
+    private BlockState setState(BlockState state, boolean... values) {
+        return state.with(EAST, values[0]).with(WEST, values[1]).with(NORTH, values[2]).with(SOUTH, values[3]);
     }
 
     @Override
@@ -214,40 +207,46 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
         return BlockRenderType.MODEL;
     }
 
-    @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        if (!world.isClient() && type == ModBlockEntities.WIRE_BE) {
-            return (w, pos, s, blockEntity) -> {
-                if (!(blockEntity instanceof WireBlockEntity wireBE)) return;
-                    float value = wireBE.getElectrocity();
-                    int connectedCount = 0;
+    public void onBlockElectrocityUpdated(World w, BlockPos pos, BlockState state, WireBlockEntity wireBE) {
+        float value = wireBE.getElectrocity();
 
-                    for (Direction dir : Direction.values()) {
-                        BlockPos targetPos = pos.offset(dir);
-                        BlockState targetState = w.getBlockState(targetPos);
+        // 필드 대신 블록 상태로 변경
+        w.setBlockState(pos, state.with(ELECTRIFIED, true), Block.NOTIFY_ALL);
 
-                        if (targetState.getBlock() instanceof WireBlock) {
-                            connectedCount++;
-                        }
-                    }
+        for (Direction dir : Direction.values()) {
+            BlockPos targetPos = pos.offset(dir);
+            BlockState targetState = w.getBlockState(targetPos);
 
-                    for (Direction dir : Direction.values()) {
-                        BlockPos targetPos = pos.offset(dir);
-                        BlockState targetState = w.getBlockState(targetPos);
-
-                        if (targetState.getBlock() instanceof WireBlock) {
-                        BlockEntity targetBE = w.getBlockEntity(targetPos);
-                        if (targetBE instanceof WireBlockEntity targetWireBE) {
-                            targetWireBE.addElectrocity(value/resistance/(connectedCount+1));
-                        }
-                        }
-                    }
-                    wireBE.minusElectrocity(value/resistance/(connectedCount+1)*connectedCount);
-                };
+            if (targetState.getBlock() instanceof WireBlock) {
+                BlockEntity targetBE = w.getBlockEntity(targetPos);
+                if (targetBE instanceof WireBlockEntity targetWireBE) {
+                    targetWireBE.setElectrocity(value / resistance, w, targetPos, targetState, targetWireBE);
+                }
             }
-        return null;
+        }
     }
 
+    public boolean IsDidElectrified(BlockState state) {
+        return state.get(ELECTRIFIED);
+    }
 
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        if (type == ModBlockEntities.WIRE_BE) {
+            return (w, pos, s, blockEntity) -> {
+                WireBlockEntity wireBE = (WireBlockEntity) blockEntity;
+
+                wireBE.tickCounter++;
+                if (wireBE.tickCounter >= 50) {
+                    wireBE.tickCounter = 0;
+
+                    // 월드에 상태 적용
+                    w.setBlockState(pos, s.with(ELECTRIFIED, true), Block.NOTIFY_ALL);
+                }
+            };
+        }
+
+        return null;
+    }
 
 }

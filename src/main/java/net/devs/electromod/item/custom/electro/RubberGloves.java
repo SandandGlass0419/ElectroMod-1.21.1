@@ -3,11 +3,13 @@ package net.devs.electromod.item.custom.electro;
 import net.devs.electromod.block.custom.electro.WireBlock;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class RubberGloves extends Item {
@@ -22,17 +24,27 @@ public class RubberGloves extends Item {
             return ActionResult.PASS;
         }
 
+        BlockPos pos = context.getBlockPos();
+        BlockState state = context.getWorld().getBlockState(pos);
         World world = context.getWorld();
         if (world.isClient()) return ActionResult.FAIL;
 
-        Block block = world.getBlockState(context.getBlockPos()).getBlock();
-        BlockEntity be = world.getBlockEntity(context.getBlockPos());
+        Block block = state.getBlock();
+        BlockEntity be = world.getBlockEntity(pos);
 
         if (block instanceof WireBlock && be instanceof WireBlockEntity wireEntity) {
-            wireEntity.addElectrocity(100); // 전류 100으로 설정
-            if (context.getPlayer() != null) {
-                context.getPlayer().sendMessage(Text.literal("ELECTRICITY SET TO 100!"), true);
+
+            // Shift 눌림 여부 체크
+            if (context.getPlayer() != null && context.getPlayer().isSneaking()) {
+                wireEntity.setElectrocity(0, world, pos, state, wireEntity); // 전류 0으로 초기화
+                context.getPlayer().sendMessage(Text.literal("ELECTRICITY RESET TO 0!"), true);
+            } else {
+                wireEntity.setElectrocity(100, world, pos, state, wireEntity); // 전류 100으로 설정
+                if (context.getPlayer() != null) {
+                    context.getPlayer().sendMessage(Text.literal("ELECTRICITY SET TO 100!"), true);
+                }
             }
+
             return ActionResult.SUCCESS;
         }
 
