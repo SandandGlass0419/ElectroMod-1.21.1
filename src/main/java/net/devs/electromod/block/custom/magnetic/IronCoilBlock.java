@@ -1,9 +1,9 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceCompound;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceBlock;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.custom.electro.ElectroStaff;
@@ -85,7 +85,7 @@ public class IronCoilBlock extends CoilBlock
 
     private void testMagneticForce(World world, BlockPos pos, BlockState state, PlayerEntity player)
     {
-        if (state.getBlock() instanceof MagneticForceBlock block)
+        if (state.getBlock() instanceof AbstractMagneticBlock block)
         {
             int force =  block.getForceCompound(world, pos).magneticBlockPower();
             player.sendMessage(Text.literal("force: " + force), true);

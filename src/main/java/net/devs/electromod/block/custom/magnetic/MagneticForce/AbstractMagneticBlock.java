@@ -12,9 +12,9 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MagneticForceBlock extends BlockWithEntity implements BlockEntityProvider
+public abstract class AbstractMagneticBlock extends BlockWithEntity implements BlockEntityProvider
 {
-    public MagneticForceBlock(Settings settings) {
+    public AbstractMagneticBlock(Settings settings) {
         super(settings);
     }
 

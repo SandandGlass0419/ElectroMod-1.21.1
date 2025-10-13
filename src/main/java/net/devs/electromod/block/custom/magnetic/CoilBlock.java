@@ -1,7 +1,7 @@
 package net.devs.electromod.block.custom.magnetic;
 
+import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceCompound;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceBlock;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -22,7 +22,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class CoilBlock extends MagneticForceBlock
+public abstract class CoilBlock extends AbstractMagneticBlock
 {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final IntProperty DENSITY = IntProperty.of("density", 1, 3); // coil n

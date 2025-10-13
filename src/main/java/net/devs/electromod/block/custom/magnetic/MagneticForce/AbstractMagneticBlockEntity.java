@@ -8,9 +8,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
-public abstract class MagneticForceBlockEntity extends BlockEntity
+public abstract class AbstractMagneticBlockEntity extends BlockEntity
 {
-    public MagneticForceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state)
+    public AbstractMagneticBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
     }

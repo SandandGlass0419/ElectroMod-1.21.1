@@ -1,6 +1,6 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceBlockEntity;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlockEntity;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
@@ -11,7 +11,7 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-public class CoilBlockEntity extends MagneticForceBlockEntity
+public class CoilBlockEntity extends AbstractMagneticBlockEntity
 {
     private int redstoneInput = 0;
 
