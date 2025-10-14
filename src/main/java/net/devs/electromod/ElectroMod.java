@@ -39,10 +39,10 @@ public class ElectroMod implements ModInitializer
             if (world.isClient()) return;
 
             if (blockEntity instanceof AbstractMagneticBlockEntity forceBE)
-            { forceBE.blockentityLoaded(world, forceBE); }
+            { forceBE.blockentityLoaded(world); }
 
             else if (blockEntity instanceof AbstractDetectorBlockEntity detectorBE)
-            { detectorBE.blockentityLoaded(world, detectorBE); }
+            { detectorBE.blockentityLoaded(world); }
 
         }));
 
@@ -52,10 +52,10 @@ public class ElectroMod implements ModInitializer
             if (world.isClient()) return;
 
             if (blockEntity instanceof AbstractMagneticBlockEntity forceBE)
-            { forceBE.blockentityUnloaded(world, forceBE); }
+            { forceBE.blockentityUnloaded(world); }
 
             else if (blockEntity instanceof AbstractDetectorBlockEntity detectorBE)
-            { detectorBE.blockentityUnloaded(world, detectorBE); }
+            { detectorBE.blockentityUnloaded(world); }
         }));
 
         // server load events

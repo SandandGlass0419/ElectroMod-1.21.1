@@ -1,7 +1,6 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceCompound;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -155,18 +154,6 @@ public abstract class CoilBlock extends AbstractMagneticBlock
     }
 
     // magnetic force features
-
-    @Override
-    public ForceCompound getForceCompound(World world, BlockPos pos)
-    {
-        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return null;
-        BlockState myState = world.getBlockState(pos);
-
-        int magneticPower = coilBE.getMagneticForce();
-        Direction direction = myState.get(FACING);
-
-        return new ForceCompound(magneticPower, getForceProfile(world, pos, direction, magneticPower));
-    }
 
     public int defaultForceFormula(int redstonePower, int density) { return 0; }
 }

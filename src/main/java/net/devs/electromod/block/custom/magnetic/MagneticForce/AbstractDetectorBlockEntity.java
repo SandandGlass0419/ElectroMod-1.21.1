@@ -15,14 +15,14 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
         super(type, pos, state);
     }
 
-    public void blockentityLoaded(World world, BlockEntity detectorBE)
+    public void blockentityLoaded(World world)
     {
-        Set<BlockPos> validPoses = MagneticForceInteractor.detectorPlacementCheck(world, detectorBE.getPos());
-        MagneticForceInteractor.subscribeDetectorBlock(world, detectorBE.getPos(), validPoses);
+        Set<BlockPos> validPoses = MagneticForceInteractor.detectorPlacementCheck(world, this.getPos());
+        MagneticForceInteractor.subscribeDetectorBlock(world, this.getPos(), validPoses);
     }
 
-    public void blockentityUnloaded(World world, BlockEntity detectorBE)
+    public void blockentityUnloaded(World world)
     {
-        MagneticForceInteractor.unsubscribeDetectorBlock(world, detectorBE.getPos());
+        MagneticForceInteractor.unsubscribeDetectorBlock(world, this.getPos());
     }
 }

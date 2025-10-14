@@ -1,10 +1,8 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlockEntity;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceCompound;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.custom.electro.ElectroStaff;
@@ -58,7 +56,6 @@ public class IronCoilBlock extends CoilBlock
         {
             if (world.isClient()) return ActionResult.FAIL;
 
-            testMagneticForce(world, pos, state, player);
             //testMagneticField(world, pos, state);
 
             return ActionResult.SUCCESS;
@@ -84,18 +81,6 @@ public class IronCoilBlock extends CoilBlock
         return redstonePower == 0 ? 0 : redstonePower * density + ironAdditiveFactor;
     }
 
-    private void testMagneticForce(World world, BlockPos pos, BlockState state, PlayerEntity player)
-    {
-        if (state.getBlock() instanceof AbstractMagneticBlock block &&
-            world.getBlockEntity(pos) instanceof AbstractMagneticBlockEntity magneticBE)
-        {
-            int compound_force =  block.getForceCompound(world, pos).magneticBlockPower();
-            int be_force = magneticBE.getMagneticForce();
-
-            player.sendMessage(Text.literal(be_force + " , " + compound_force));
-        }
-    }
-
     private void testMagneticField(World world, BlockPos pos, BlockState state)
     {
         if (world.isClient()) return;
@@ -103,9 +88,9 @@ public class IronCoilBlock extends CoilBlock
         int magneticForce = 15;
         int powerCategory = ForceProfile.getPowerCategory(15);
         Direction forceDirection = state.get(FACING);
-        ForceProfile profile = ForceProfile.getForceProfile(powerCategory, forceDirection);
+        ForceProfile profile = ForceProfile.createForceProfile(powerCategory, forceDirection);
 
-        var poses = ForceCompound.getAllPositions(pos, profile);
+        var poses = MagneticForceInteractor.getAllPositions(pos, profile);
 
         BlockState[] forceBlocks = {
                 Blocks.RED_STAINED_GLASS.getDefaultState(),

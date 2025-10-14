@@ -29,14 +29,14 @@ public abstract class AbstractMagneticBlockEntity extends BlockEntity
         super(type, pos, state);
     }
 
-    public void blockentityLoaded(World world, BlockEntity forceBE)
+    public void blockentityLoaded(World world)
     {
-        MagneticForceInteractor.subscribeMagneticBlock(world, forceBE.getPos());
+        MagneticForceInteractor.subscribeMagneticBlock(world, this.getPos(), magneticForce);
     }
 
-    public void blockentityUnloaded(World world, BlockEntity forceBE)
+    public void blockentityUnloaded(World world)
     {
-        MagneticForceInteractor.unsubscribeMagneticBlock(world, forceBE.getPos());
+        MagneticForceInteractor.unsubscribeMagneticBlock(world, this.getPos());
     }
 
     @Override

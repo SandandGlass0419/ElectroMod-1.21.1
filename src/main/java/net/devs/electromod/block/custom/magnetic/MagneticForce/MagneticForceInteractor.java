@@ -1,5 +1,6 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
+import net.devs.electromod.ElectroMod;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
@@ -8,48 +9,45 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MagneticForceInteractor
 {
-    private static Map<RegistryKey<DimensionType>, Set<BlockPos>> magneticBlockPos = new HashMap<>();
+    private static final Map<RegistryKey<DimensionType>, Map<BlockPos, Integer>> magneticBlockPos = new HashMap<>();
 
-    public static void subscribeMagneticBlock(World world, BlockPos pos)
+    public static void subscribeMagneticBlock(World world, BlockPos pos, int redstonePower)
     {
-        magneticBlockPos.get(getDimensionKey(world)).add(pos);
-        //ElectroMod.LOGGER.info("added on: " + pos);
+        magneticBlockPos.get(getDimensionKey(world)).put(pos, redstonePower);
+        ElectroMod.LOGGER.info("added on: " + pos + ", power: " + redstonePower);
     }
 
     public static void unsubscribeMagneticBlock(World world, BlockPos pos)
     {
         magneticBlockPos.get(getDimensionKey(world)).remove(pos);
-        //ElectroMod.LOGGER.info("removed on: " + pos);
+        ElectroMod.LOGGER.info("removed on (magnetic): " + pos);
     }
 
     private static void initMagneticMap()
     {
         magneticBlockPos.clear();
-        magneticBlockPos.put(DimensionTypes.OVERWORLD, new HashSet<>());
-        magneticBlockPos.put(DimensionTypes.THE_NETHER, new HashSet<>());
-        magneticBlockPos.put(DimensionTypes.THE_END, new HashSet<>());
+        magneticBlockPos.put(DimensionTypes.OVERWORLD, new HashMap<>());
+        magneticBlockPos.put(DimensionTypes.THE_NETHER, new HashMap<>());
+        magneticBlockPos.put(DimensionTypes.THE_END, new HashMap<>());
         //ElectroMod.LOGGER.info("cleared!");
     }
 
-    private static Map<RegistryKey<DimensionType>, Map<BlockPos, Set<BlockPos>>> detectorBlockPos = new HashMap<>();
+    private static final Map<RegistryKey<DimensionType>, Map<BlockPos, Set<BlockPos>>> detectorBlockPos = new HashMap<>();
 
     public static void subscribeDetectorBlock(World world, BlockPos detectorPos, Set<BlockPos> magneticPoses)
     {
         detectorBlockPos.get(getDimensionKey(world)).put(detectorPos, magneticPoses);
-        //ElectroMod.LOGGER.info("added on: " + pos);
+        ElectroMod.LOGGER.info("added on(detector): " + detectorPos);
     }
 
     public static void unsubscribeDetectorBlock(World world, BlockPos detectorPos)
     {
         detectorBlockPos.get(getDimensionKey(world)).remove(detectorPos);
-        //ElectroMod.LOGGER.info("removed on: " + pos);
+        ElectroMod.LOGGER.info("removed on(detector): " + detectorPos);
     }
 
     private static void initDetectorMap()
@@ -76,7 +74,7 @@ public class MagneticForceInteractor
     {
         Set<BlockPos> passedPoses = new HashSet<>();
 
-        for (BlockPos magneticPos : magneticBlockPos.get(getDimensionKey(world)))
+        for (BlockPos magneticPos : magneticBlockPos.get(getDimensionKey(world)).keySet())
         {
             if (!RelativeDistanceCondition(detectorPos, magneticPos)) continue;
 
@@ -103,5 +101,23 @@ public class MagneticForceInteractor
         if (!(world.getBlockEntity(magneticPos) instanceof AbstractMagneticBlockEntity magneticBE)) return false;
 
         return magneticBE.getMagneticForce() != 0;
+    }
+
+    public static Vector<Set<BlockPos>> getAllPositions(BlockPos pos, ForceProfile forceProfile)
+    {
+        Vector<Set<BlockPos>> Positions = new Vector<>(Arrays.asList(new HashSet<>(), new HashSet<>(), new HashSet<>()));
+
+        for (int power = 0; power < 3; power++)
+        {
+            Set<MVec3i> deltas = new HashSet<>();
+
+            deltas.addAll(forceProfile.headProfile().get(power));
+            deltas.addAll(forceProfile.bodyProfile().get(power));
+            deltas.addAll(forceProfile.tailProfile().get(power));
+
+            Positions.set(power, MVec3i.add(deltas, pos));
+        }
+
+        return Positions;
     }
 }

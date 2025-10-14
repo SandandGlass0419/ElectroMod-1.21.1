@@ -23,7 +23,7 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
         return new BlockState[] { world.getBlockState(pos.offset(direction)), world.getBlockState(pos.offset(direction.getOpposite())) };
     }
 
-    protected ForceProfile getForceProfile(World world, BlockPos pos, Direction direction, int magneticPower)
+    public ForceProfile getForceProfile(World world, BlockPos pos, Direction direction, int magneticPower)
     {
         Boolean[] res = needsProfileElements(getNeighborState(world, pos, direction), direction);
 
@@ -31,7 +31,7 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
         int bodyPowerCategory = ForceProfile.getPowerCategory(magneticPower);
         int tailPowerCategory = ForceProfile.getPowerCategory(res[1] ? magneticPower : 0);
 
-        return ForceProfile.getForceProfile(headPowerCategory, bodyPowerCategory, tailPowerCategory, direction);
+        return ForceProfile.createForceProfile(headPowerCategory, bodyPowerCategory, tailPowerCategory, direction);
     }
 
     protected Boolean[] needsProfileElements(BlockState[] neighborStates, Direction direction)
@@ -47,10 +47,5 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
         }
 
         return result.toArray(Boolean[]::new);
-    }
-
-    public ForceCompound getForceCompound(World world, BlockPos pos)
-    {
-        return new ForceCompound(0, ForceProfile.getEmptyProfile());
     }
 }

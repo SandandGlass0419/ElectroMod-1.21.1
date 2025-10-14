@@ -44,7 +44,7 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
         return new ForceProfile(EMPTY, EMPTY, EMPTY);
     }
 
-    public static ForceProfile getForceProfile(int headPowerCategory, int bodyPowerCategory, int tailPowerCategory, Direction forceDirection)
+    public static ForceProfile createForceProfile(int headPowerCategory, int bodyPowerCategory, int tailPowerCategory, Direction forceDirection)
     {
         return new ForceProfile(
                 getHead(headPowerCategory, forceDirection),
@@ -53,7 +53,7 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
         );
     }
 
-    public static ForceProfile getForceProfile(int powerCategory, Direction forceDirection)
+    public static ForceProfile createForceProfile(int powerCategory, Direction forceDirection)
     {
         return new ForceProfile(
                 getHead(powerCategory, forceDirection),
