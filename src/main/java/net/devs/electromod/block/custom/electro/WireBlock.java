@@ -1,7 +1,6 @@
 package net.devs.electromod.block.custom.electro;
 
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.ModBlocks;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
@@ -10,15 +9,9 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DebugStickItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
@@ -99,13 +92,12 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (world.isClient()) return;
 
-        float absElectrocity = 0f;
-
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof WireBlockEntity wireBlock) {
-            absElectrocity = Math.abs(wireBlock.getElectrocity());
-        }
-        if (absElectrocity <= 1f) return;
+        if (blockEntity instanceof WireBlockEntity wireBlock &&
+            Math.abs(wireBlock.getElectrocity()) <= 1f) return;
+
+        if (entity instanceof LivingEntity living &&
+            living.getEquippedStack(EquipmentSlot.FEET).isOf(Items.LEATHER_BOOTS)) return;
 
         BlockPos blockpos = entity.getBlockPos();
         LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
