@@ -9,5 +9,7 @@ public class ElectroModClient implements ClientModInitializer
     @Override public void onInitializeClient()
     {
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.ACDC_CONVERTER, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.ELECTRO_DECTOR, RenderLayer.getCutout());
+
     }
 }

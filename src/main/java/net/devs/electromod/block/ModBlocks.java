@@ -92,6 +92,13 @@ public class ModBlocks
                     .luminance(state -> 15)
                     .requiresTool()));
 
+    public static final Block ELECTRO_DECTOR = addBlock("electro_dector",
+            new ElectroDector(AbstractBlock.Settings.create()
+                    .strength(1f)
+                    .sounds(BlockSoundGroup.METAL)
+                    .nonOpaque()
+                    .requiresTool()));
+
     public static void registerModBlocks()
     {
         ElectroMod.LOGGER.info("Registering Mod Blocks (" + ElectroMod.MOD_ID + ")");
@@ -111,6 +118,7 @@ public class ModBlocks
             entries.add(WIRE);
             entries.add(BATTERY);
             entries.add(ACDC_CONVERTER);
+            entries.add(ELECTRO_DECTOR);
         });
     }
 

@@ -17,6 +17,7 @@
   "block.electromod.battery" : "Battery",
   "block.electromod.wire": "Wire",
   "block.electromod.ac_dc_converter" : "Ac Dc Converter",
+  "block.eletromod.electro_dector" : "Electro Detector",
 
 
   "item.electromod.rubber_gloves" : "Rubber Gloves",

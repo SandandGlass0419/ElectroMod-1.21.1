@@ -94,10 +94,10 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof WireBlockEntity wireBlock &&
-            Math.abs(wireBlock.getElectrocity()) <= 1f) return;
+                Math.abs(wireBlock.getElectrocity()) <= 1f) return;
 
         if (entity instanceof LivingEntity living &&
-            living.getEquippedStack(EquipmentSlot.FEET).isOf(Items.LEATHER_BOOTS)) return;
+                living.getEquippedStack(EquipmentSlot.FEET).isOf(Items.LEATHER_BOOTS)) return;
 
         BlockPos blockpos = entity.getBlockPos();
         LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
