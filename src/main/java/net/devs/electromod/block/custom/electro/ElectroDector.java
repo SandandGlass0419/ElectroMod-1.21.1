@@ -44,7 +44,7 @@ public class ElectroDector extends Block {
             double maxElectrocity = Double.NEGATIVE_INFINITY;
             BlockPos.Mutable mutablePos = new BlockPos.Mutable();
 
-            int range = 5; // 탐색 범위 반경 5블록
+            int range = 1; // 탐색 범위 반경 5블록
 
             for (int x = -range; x <= range; x++) {
                 for (int y = -range; y <= range; y++) {
