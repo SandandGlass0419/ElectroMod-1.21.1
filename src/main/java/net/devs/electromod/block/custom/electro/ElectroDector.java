@@ -11,7 +11,6 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -35,7 +34,7 @@ public class ElectroDector extends Block {
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite());
+        return this.getDefaultState().with(FACING, ctx.getSide());
     }
 
     @Override
@@ -44,7 +43,7 @@ public class ElectroDector extends Block {
             double maxElectrocity = Double.NEGATIVE_INFINITY;
             BlockPos.Mutable mutablePos = new BlockPos.Mutable();
 
-            int range = 1; // 탐색 범위 반경 5블록
+            int range = 1; // 탐색 범위 반경 1블록
 
             for (int x = -range; x <= range; x++) {
                 for (int y = -range; y <= range; y++) {

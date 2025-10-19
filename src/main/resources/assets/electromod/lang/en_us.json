@@ -16,8 +16,8 @@
   "block.electromod.gold_wire": "Golden Wire",
   "block.electromod.battery" : "Battery",
   "block.electromod.wire": "Wire",
-  "block.electromod.ac_dc_converter" : "Ac Dc Converter",
-  "block.eletromod.electro_dector" : "Electro Detector",
+  "block.electromod.ac_dc_converter" : "AC/DC Converter",
+  "block.electromod.electro_dector" : "Electro Detector",
 
 
   "item.electromod.rubber_gloves" : "Rubber Gloves",
