@@ -1,10 +1,10 @@
 {
   "variants": {
-    "facing=up": { "model": "electromod:block/electro_dector" },
-    "facing=down": { "model": "electromod:block/electro_dector", "x": 180 },
-    "facing=north": { "model": "electromod:block/electro_dector", "x": 90 },
-    "facing=south": { "model": "electromod:block/electro_dector", "x": 270 },
-    "facing=east": { "model": "electromod:block/electro_dector", "x": 90, "y": 90 },
-    "facing=west": { "model": "electromod:block/electro_dector", "x": 90, "y": 270 }
+    "facing=up":   { "model": "electromod:block/electro_dector" },
+    "facing=down": { "model": "electromod:block/electro_dector" },
+    "facing=north": { "model": "electromod:block/electro_dector", "y" : 90},
+    "facing=south": { "model": "electromod:block/electro_dector", "y": 270 },
+    "facing=east":  { "model": "electromod:block/electro_dector", "y": 180 },
+    "facing=west":  { "model": "electromod:block/electro_dector" }
   }
 }

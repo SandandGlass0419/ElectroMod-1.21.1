@@ -68,4 +68,46 @@ public class ElectroDector extends Block {
         return ActionResult.SUCCESS;
     }
 
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+
+        if (world.isClient) return;
+
+        float maxElectrocity = 0f;
+        boolean found = false;
+        BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+        Direction[] horizontals = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+
+        // 주변 Wire 최대 전류 찾기
+        for (Direction dir : horizontals) {
+            mutablePos.set(pos.offset(dir));
+            BlockEntity be = world.getBlockEntity(mutablePos);
+            if (be instanceof WireBlockEntity wire) {
+                float e = wire.getElectrocity();
+                if (!found || e > maxElectrocity) {
+                    maxElectrocity = e;
+                    found = true;
+                }
+            }
+        }
+
+        if (found) {
+            // 주변 Wire에 최대 전류 설정 (setElectrocity 사용)
+            for (Direction dir : horizontals) {
+                mutablePos.set(pos.offset(dir));
+                BlockEntity be = world.getBlockEntity(mutablePos);
+                if (be instanceof WireBlockEntity wire) {
+                    // state는 현재 BlockState
+                    BlockState wireState = world.getBlockState(mutablePos);
+                    wire.setElectrocity(maxElectrocity, world, mutablePos, wireState, wire);
+                }
+            }
+        }
+    }
+
+
+
+
+
 }

@@ -54,4 +54,9 @@ public class WireBlockEntity extends BlockEntity {
         super.writeNbt(nbt, registryLookup);
         nbt.putFloat("Electrocity", Electrocity);
     }
+
+    public void setElectrocity(float value)
+    {
+        this.Electrocity = value;
+    }
 }
