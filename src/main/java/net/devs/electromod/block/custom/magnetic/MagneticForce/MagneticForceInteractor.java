@@ -39,6 +39,7 @@ public class MagneticForceInteractor
         removeValidPos(world, pos);
     }
 
+    @Nullable
     public static MagneticField getField(World world, BlockPos magneticPos)
     {
         return magneticBlockPosMap.get(getDimensionKey(world)).get(magneticPos);
@@ -66,6 +67,12 @@ public class MagneticForceInteractor
     {
         detectorBlockPosMap.get(getDimensionKey(world)).remove(detectorPos);
         ElectroMod.LOGGER.info("removed on(detector): {}", detectorPos);
+    }
+
+    @Nullable
+    public static BlockField getBlockField(World world, BlockPos detectorPos)
+    {
+        return detectorBlockPosMap.get(getDimensionKey(world)).get(detectorPos);
     }
 
     private static void initDetectorMap()
@@ -116,6 +123,7 @@ public class MagneticForceInteractor
             if (field == null) { ElectroMod.LOGGER.info("not met update"); continue; }
 
             detectorBlockPosMap.get(dimensionKey).get(detectorPos).putField(updatedMagneticPos, field);    // add + edit
+            UpdateWatchCallBack.UPDATED.invoker().Broadcast(detectorPos, updatedMagneticPos);
         }
     }
 
@@ -126,6 +134,7 @@ public class MagneticForceInteractor
         for (BlockPos detectorPos : detectorBlockPosMap.get(dimensionKey).keySet())
         {
             detectorBlockPosMap.get(dimensionKey).get(detectorPos).removeField(removedMagneticPos); // method has condition to check existance
+            UpdateWatchCallBack.REMOVED.invoker().Broadcast(detectorPos, removedMagneticPos);
         }
     }
 
@@ -136,7 +145,7 @@ public class MagneticForceInteractor
 
         if (!RelativeDistanceCondition(detectorPos, magneticPos)) return null;
 
-        MagneticField field = FindMVec(world, detectorPos, magneticPos);
+        MagneticField field = FindMagneticField(world, detectorPos, magneticPos);
         if (field == null) { ElectroMod.LOGGER.info("vec not found"); return null; } // is there field?
 
         if (field.getMagneticPower() <= 0)  // is field force positive
@@ -153,7 +162,7 @@ public class MagneticForceInteractor
     }
 
     @Nullable
-    public static MagneticField FindMVec(World world, BlockPos detectorPos, BlockPos magneticPos)
+    public static MagneticField FindMagneticField(World world, BlockPos detectorPos, BlockPos magneticPos)
     {
         ElectroMod.LOGGER.info("FindMVec start");
 

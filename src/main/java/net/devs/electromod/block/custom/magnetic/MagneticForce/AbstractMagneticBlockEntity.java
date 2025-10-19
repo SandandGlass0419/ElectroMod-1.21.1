@@ -36,6 +36,7 @@ public abstract class AbstractMagneticBlockEntity extends BlockEntity
     public AbstractMagneticBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
+
         this.facingID = state.get(Properties.FACING).getId();
         markDirty();
     }

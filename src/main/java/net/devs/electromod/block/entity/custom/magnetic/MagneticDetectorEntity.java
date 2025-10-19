@@ -1,6 +1,8 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
+import net.devs.electromod.block.custom.magnetic.MagneticDetector;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlockEntity;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticField;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
@@ -14,9 +16,14 @@ import org.jetbrains.annotations.Nullable;
 public class MagneticDetectorEntity extends AbstractDetectorBlockEntity
 {
     private int redstoneOutput = 0;
+    private int detectionAxisID;
 
-    public MagneticDetectorEntity(BlockPos pos, BlockState state) {
+    public MagneticDetectorEntity(BlockPos pos, BlockState state)
+    {
         super(ModBlockEntities.DETECTOR_BE, pos, state);
+
+        this.detectionAxisID = MagneticDetector.getDetectionAxis(state).ordinal();
+        markDirty();
     }
 
     public void setRedstoneOutput(int power) {
@@ -32,10 +39,19 @@ public class MagneticDetectorEntity extends AbstractDetectorBlockEntity
     public int getRedstoneOutput() { return this.redstoneOutput; }
 
     @Override
+    public boolean additionalConditions(MagneticField field)
+    {
+        if (!super.additionalConditions(field)) return false;
+
+        return this.detectionAxisID == field.getForceDirection().getAxis().ordinal();
+    }
+
+    @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup)
     {
         super.writeNbt(nbt, registryLookup);
-        nbt.putInt("redstone_output", redstoneOutput);
+        nbt.putInt("redstone_output", this.redstoneOutput);
+        nbt.putInt("facing_id", this.detectionAxisID);
     }
 
     @Override
@@ -43,6 +59,7 @@ public class MagneticDetectorEntity extends AbstractDetectorBlockEntity
     {
         super.readNbt(nbt, registryLookup);
         this.redstoneOutput = nbt.getInt("redstone_output");
+        this.detectionAxisID = nbt.getInt("facing_id");
     }
 
     @Override

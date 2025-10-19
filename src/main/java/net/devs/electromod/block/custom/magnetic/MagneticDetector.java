@@ -1,8 +1,8 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlock;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlockEntity;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
@@ -224,22 +224,25 @@ public class  MagneticDetector extends AbstractDetectorBlock
         };
     }
 
-    private boolean first = true;
+    public static Direction.Axis getDetectionAxis(BlockState state)
+    {
+        if (state.get(FACING).getAxis() != Direction.Axis.Y) return Direction.Axis.Y;
+
+        return state.get(HORIZONTAL_AXIS);
+    }
 
     // magnetic features
     @Nullable
-    @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type)
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type)
     {
-        return validateTicker(type, ModBlockEntities.DETECTOR_BE,
-                ((world1, pos, state1, blockEntity) ->
-                {
-                    if (first)
-                    {
-                        ElectroMod.LOGGER.info("i started ticking");
-                        ElectroMod.LOGGER.info(world1.getBlockState(pos.offset(Direction.NORTH)).getBlock().toString());
-                        first = false;
-                    }
-                }));
+        return validateTicker(type, ModBlockEntities.DETECTOR_BE, this::tick);
+    }
+
+    @Override
+    public void watchIntick(World world1, BlockPos pos, BlockState state1, AbstractDetectorBlockEntity detectorBE)
+    {
+
     }
 
     // block features

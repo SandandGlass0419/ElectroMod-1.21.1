@@ -1,25 +1,88 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
+import net.devs.electromod.ElectroMod;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public abstract class AbstractDetectorBlockEntity extends BlockEntity
 {
+    private boolean startWatch = false;
+    private final Map<BlockPos, Set<BlockPos>> Watch = new HashMap<>();
+
+    public boolean getStartWatch() { return this.startWatch; }
+
     public AbstractDetectorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
+
+        UpdateWatchCallBack.UPDATED.register(this::updateWatchElement);
+        UpdateWatchCallBack.REMOVED.register(this::removeWatchElement);
     }
 
     public void blockentityLoaded()
     {
-        BlockField validPoses = MagneticForceInteractor.detectorPlacementCheck(this.world, this.pos);
-        MagneticForceInteractor.subscribeDetectorBlock(this.world, this.pos, validPoses);
+        BlockField blockField = MagneticForceInteractor.detectorPlacementCheck(this.world, this.pos);
+        MagneticForceInteractor.subscribeDetectorBlock(this.world, this.pos, blockField);
+
+        setupWatch();
     }
 
     public void blockentityUnloaded()
     {
-        MagneticForceInteractor.unsubscribeDetectorBlock(this.world, this.getPos());
+        MagneticForceInteractor.unsubscribeDetectorBlock(this.world, this.pos);
+    }
+
+    public void setupWatch()
+    {
+        BlockField field = MagneticForceInteractor.getBlockField(this.world, this.pos);
+        if (field == null) return;
+
+        for (var magneticPos : field.getFields().keySet())
+        {
+            updateHelper(this.pos, magneticPos, field.getFields().get(magneticPos));
+        }
+
+        this.startWatch = true;
+    }
+
+    public void updateWatchElement(BlockPos detectorPos, BlockPos magneticPos)
+    {
+        if (!this.pos.equals(detectorPos)) return;
+
+        BlockField field = MagneticForceInteractor.getBlockField(this.world, this.pos);
+        if (field == null) return;
+
+        updateHelper(detectorPos, magneticPos, field.getFields().get(magneticPos));
+    }
+
+    public void removeWatchElement(BlockPos detectorPos, BlockPos magneticPos)
+    {
+        if (!this.pos.equals(detectorPos)) return;
+
+        this.Watch.remove(magneticPos);
+        ElectroMod.LOGGER.info("removed watch: {}, {}", detectorPos, magneticPos);
+    }
+
+    private void updateHelper(BlockPos detectorPos, BlockPos magneticPos, MagneticField detectorField)
+    {
+        if(!additionalConditions(detectorField)) return;
+
+        ForceProfile profile = MagneticForceInteractor.getForceProfile(MagneticForceInteractor.getField(this.world, magneticPos));
+        Integer index = profile.getIndex(magneticPos, this.pos);
+        if (index == null) return;
+
+        this.Watch.put(magneticPos, profile.getWatch(index));
+        ElectroMod.LOGGER.info("updated watch: {}, {}", detectorPos, magneticPos);
+    }
+
+    public boolean additionalConditions(MagneticField field)
+    {
+        return field != null;
     }
 }

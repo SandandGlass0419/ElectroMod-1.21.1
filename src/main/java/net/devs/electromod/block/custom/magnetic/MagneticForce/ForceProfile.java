@@ -56,25 +56,25 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
     }
 
     @Nullable
-    public static Integer getIndex(BlockPos magneticPos, ForceProfile profile, BlockPos targetPos)
+    public Integer getIndex(BlockPos magneticPos, BlockPos targetPos)
     {
         int index = 0;
 
-        for (var deltas : profile.headProfile())
+        for (var deltas : this.headProfile())
         {
             if (deployPos(magneticPos, deltas).contains(targetPos)) return index;
             index++;
         }
 
         index = 0;
-        for (var deltas : profile.bodyProfile())
+        for (var deltas : this.bodyProfile())
         {
             if (deployPos(magneticPos, deltas).contains(targetPos)) return index;
             index++;
         }
 
         index = 0;
-        for (var deltas : profile.tailProfile())
+        for (var deltas : this.tailProfile())
         {
             if (deployPos(magneticPos, deltas).contains(targetPos)) return index;
             index++;
@@ -83,18 +83,18 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
         return null;
     }
 
-    public static Set<BlockPos> getWatch(int index, ForceProfile forceProfile)  // remove static?
+    public Set<BlockPos> getWatch(int index)
     {
         Set<BlockPos> watch = new HashSet<>();
 
-        if (forceProfile.headProfile().size() > index)
-        { watch.addAll(MVec3i.toBlockPos(forceProfile.headProfile().get(index))); }
+        if (this.headProfile().size() > index)
+        { watch.addAll(MVec3i.toBlockPos(this.headProfile().get(index))); }
 
-        if (forceProfile.bodyProfile().size() > index)
-        { watch.addAll(MVec3i.toBlockPos(forceProfile.bodyProfile().get(index))); }
+        if (this.bodyProfile().size() > index)
+        { watch.addAll(MVec3i.toBlockPos(this.bodyProfile().get(index))); }
 
-        if (forceProfile.tailProfile().size() > index)
-        { watch.addAll(MVec3i.toBlockPos(forceProfile.tailProfile().get(index))); }
+        if (this.tailProfile().size() > index)
+        { watch.addAll(MVec3i.toBlockPos(this.tailProfile().get(index))); }
 
         return watch;
     }
