@@ -1,16 +1,11 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
-import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.components.ModDataComponentTypes;
-import net.devs.electromod.item.custom.electro.ElectroStaff;
 import net.devs.electromod.item.custom.magnetic.MagnetItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
@@ -19,7 +14,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class IronCoilBlock extends CoilBlock
@@ -40,7 +34,9 @@ public class IronCoilBlock extends CoilBlock
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
     {
-        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity)) return ActionResult.FAIL;
+        var returned = super.onUse(state, world, pos, player, hit);
+        if (returned != ActionResult.PASS) return returned;
+
         if (!player.getAbilities().allowModifyWorld) return ActionResult.PASS;
         ItemStack stack = player.getMainHandStack();
 
@@ -48,15 +44,6 @@ public class IronCoilBlock extends CoilBlock
         {
             int magnet_force = stack.getOrDefault(ModDataComponentTypes.MAGNET_FORCE, ModDataComponentTypes.min_force);
             player.sendMessage(Text.literal("Current force: " + magnet_force), true);
-
-            return ActionResult.SUCCESS;
-        }
-
-        else if (stack.getItem() instanceof ElectroStaff)
-        {
-            if (world.isClient()) return ActionResult.FAIL;
-
-            //testMagneticField(world, pos, state);
 
             return ActionResult.SUCCESS;
         }
@@ -79,31 +66,5 @@ public class IronCoilBlock extends CoilBlock
     public int defaultForceFormula(int redstonePower, int density)
     {
         return redstonePower == 0 ? 0 : redstonePower * density + ironAdditiveFactor;
-    }
-
-    private void testMagneticField(World world, BlockPos pos, BlockState state)
-    {
-        if (world.isClient()) return;
-
-        int magneticForce = 15;
-        int powerCategory = ForceProfile.getPowerCategory(15);
-        Direction forceDirection = state.get(FACING);
-        ForceProfile profile = ForceProfile.createForceProfile(powerCategory, forceDirection);
-
-        var poses = MagneticForceInteractor.getAllPositions(pos, profile);
-
-        BlockState[] forceBlocks = {
-                Blocks.RED_STAINED_GLASS.getDefaultState(),
-                Blocks.CYAN_STAINED_GLASS.getDefaultState(),
-                Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState()
-        };
-
-        for (int i = 0; i < 3; i++)
-        {
-            for (BlockPos p : poses.get(i))
-            {
-                world.setBlockState(p, forceBlocks[i]);
-            }
-        }
     }
 }

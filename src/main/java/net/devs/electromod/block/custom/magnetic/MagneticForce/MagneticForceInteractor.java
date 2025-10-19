@@ -1,6 +1,9 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
 import net.devs.electromod.ElectroMod;
+import net.devs.electromod.block.custom.magnetic.CopperCoilBlock;
+import net.devs.electromod.block.custom.magnetic.GoldenCoilBlock;
+import net.devs.electromod.block.custom.magnetic.IronCoilBlock;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
@@ -8,54 +11,69 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class MagneticForceInteractor
 {
-    private static final Map<RegistryKey<DimensionType>, Map<BlockPos, Integer>> magneticBlockPos = new HashMap<>();
+    private static final Map<RegistryKey<DimensionType>, Map<BlockPos, MagneticField>> magneticBlockPosMap = new HashMap<>();
 
-    public static void subscribeMagneticBlock(World world, BlockPos pos, int redstonePower)
+    public static void subscribeMagneticBlock(World world, BlockPos pos, MagneticField field)
     {
-        magneticBlockPos.get(getDimensionKey(world)).put(pos, redstonePower);
-        ElectroMod.LOGGER.info("added on: " + pos + ", power: " + redstonePower);
+        magneticBlockPosMap.get(getDimensionKey(world)).put(pos, field);   // add + edit
+
+        ElectroMod.LOGGER.info("added on: {}, power: {}, direction: {}", pos, field.getMagneticPower(), field.getForceDirection().toString());
+
+        updateValidPos(world, pos);
     }
 
     public static void unsubscribeMagneticBlock(World world, BlockPos pos)
     {
-        magneticBlockPos.get(getDimensionKey(world)).remove(pos);
-        ElectroMod.LOGGER.info("removed on (magnetic): " + pos);
+        magneticBlockPosMap.get(getDimensionKey(world)).remove(pos);
+
+        ElectroMod.LOGGER.info("removed on (magnetic): {}", pos);
+
+        removeValidPos(world, pos);
+    }
+
+    public static MagneticField getField(World world, BlockPos magneticPos)
+    {
+        return magneticBlockPosMap.get(getDimensionKey(world)).get(magneticPos);
     }
 
     private static void initMagneticMap()
     {
-        magneticBlockPos.clear();
-        magneticBlockPos.put(DimensionTypes.OVERWORLD, new HashMap<>());
-        magneticBlockPos.put(DimensionTypes.THE_NETHER, new HashMap<>());
-        magneticBlockPos.put(DimensionTypes.THE_END, new HashMap<>());
+        magneticBlockPosMap.clear();
+        magneticBlockPosMap.put(DimensionTypes.OVERWORLD, new HashMap<>());
+        magneticBlockPosMap.put(DimensionTypes.THE_NETHER, new HashMap<>());
+        magneticBlockPosMap.put(DimensionTypes.THE_END, new HashMap<>());
         //ElectroMod.LOGGER.info("cleared!");
     }
+                                                          // detector, fields
+    private static final Map<RegistryKey<DimensionType>, Map<BlockPos, BlockField>> detectorBlockPosMap = new HashMap<>();
 
-    private static final Map<RegistryKey<DimensionType>, Map<BlockPos, Set<BlockPos>>> detectorBlockPos = new HashMap<>();
-
-    public static void subscribeDetectorBlock(World world, BlockPos detectorPos, Set<BlockPos> magneticPoses)
+    public static void subscribeDetectorBlock(World world, BlockPos detectorPos, BlockField blockField)
     {
-        detectorBlockPos.get(getDimensionKey(world)).put(detectorPos, magneticPoses);
-        ElectroMod.LOGGER.info("added on(detector): " + detectorPos);
+        ElectroMod.LOGGER.info("subscribeDetectorBlock");
+        detectorBlockPosMap.get(getDimensionKey(world)).put(detectorPos, blockField);
+        ElectroMod.LOGGER.info("added on(detector): {}", detectorPos);
     }
 
     public static void unsubscribeDetectorBlock(World world, BlockPos detectorPos)
     {
-        detectorBlockPos.get(getDimensionKey(world)).remove(detectorPos);
-        ElectroMod.LOGGER.info("removed on(detector): " + detectorPos);
+        detectorBlockPosMap.get(getDimensionKey(world)).remove(detectorPos);
+        ElectroMod.LOGGER.info("removed on(detector): {}", detectorPos);
     }
 
     private static void initDetectorMap()
     {
-        detectorBlockPos.clear();
-        detectorBlockPos.put(DimensionTypes.OVERWORLD, new HashMap<>());
-        detectorBlockPos.put(DimensionTypes.THE_NETHER, new HashMap<>());
-        detectorBlockPos.put(DimensionTypes.THE_END, new HashMap<>());
+        detectorBlockPosMap.clear();
+        detectorBlockPosMap.put(DimensionTypes.OVERWORLD, new HashMap<>());
+        detectorBlockPosMap.put(DimensionTypes.THE_NETHER, new HashMap<>());
+        detectorBlockPosMap.put(DimensionTypes.THE_END, new HashMap<>());
     }
 
     public static void initPosMap(MinecraftServer server, ServerWorld world)
@@ -66,27 +84,65 @@ public class MagneticForceInteractor
 
     public static RegistryKey<DimensionType> getDimensionKey(World world)
     {
-        var key = world.getDimensionEntry().getKey();
-        return key.orElse(null);
+        return world.getDimensionEntry().getKey().orElse(null);
     }
 
-    public static Set<BlockPos> detectorPlacementCheck(World world, BlockPos detectorPos)
+    public static BlockField detectorPlacementCheck(World world, BlockPos detectorPos)
     {
-        Set<BlockPos> passedPoses = new HashSet<>();
+        ElectroMod.LOGGER.info("detectorPlacementCheck");
+        BlockField passedPoses = new BlockField();
+        MagneticField field;
 
-        for (BlockPos magneticPos : magneticBlockPos.get(getDimensionKey(world)).keySet())
+        for (BlockPos magneticPos : magneticBlockPosMap.get(getDimensionKey(world)).keySet())
         {
-            if (!RelativeDistanceCondition(detectorPos, magneticPos)) continue;
+            field = applyConditions(world, detectorPos, magneticPos);
+            if (field == null) {
+                ElectroMod.LOGGER.info("not met placement: {}", magneticPos); continue; }
 
-            passedPoses.add(magneticPos);
+            passedPoses.putField(magneticPos, field);
         }
 
         return passedPoses;
     }
 
-    public static Set<BlockPos> testPlacementCheck(World world, BlockPos pos)
+    public static void updateValidPos(World world, BlockPos updatedMagneticPos)
     {
-        return detectorBlockPos.get(getDimensionKey(world)).get(pos);
+        var dimensionKey = getDimensionKey(world);
+        MagneticField field;
+
+        for (BlockPos detectorPos : detectorBlockPosMap.get(dimensionKey).keySet())
+        {
+            field = applyConditions(world, detectorPos, updatedMagneticPos);
+            if (field == null) { ElectroMod.LOGGER.info("not met update"); continue; }
+
+            detectorBlockPosMap.get(dimensionKey).get(detectorPos).putField(updatedMagneticPos, field);    // add + edit
+        }
+    }
+
+    public static void removeValidPos(World world, BlockPos removedMagneticPos)
+    {
+        var dimensionKey = getDimensionKey(world);
+
+        for (BlockPos detectorPos : detectorBlockPosMap.get(dimensionKey).keySet())
+        {
+            detectorBlockPosMap.get(dimensionKey).get(detectorPos).removeField(removedMagneticPos); // method has condition to check existance
+        }
+    }
+
+    @Nullable
+    public static MagneticField applyConditions(World world, BlockPos detectorPos, BlockPos magneticPos)
+    {
+        ElectroMod.LOGGER.info("applyCondition");
+
+        if (!RelativeDistanceCondition(detectorPos, magneticPos)) return null;
+
+        MagneticField field = FindMVec(world, detectorPos, magneticPos);
+        if (field == null) { ElectroMod.LOGGER.info("vec not found"); return null; } // is there field?
+
+        if (field.getMagneticPower() <= 0)  // is field force positive
+        { ElectroMod.LOGGER.info("field force under 0"); return null; }
+
+        return field;
     }
 
     public static boolean RelativeDistanceCondition(BlockPos detectorPos, BlockPos magneticPos)
@@ -96,28 +152,41 @@ public class MagneticForceInteractor
                 Math.abs(detectorPos.getZ() - magneticPos.getZ()) <= ForceProfile.minmumDistance;
     }
 
-    public static boolean hasPowerCondition(World world, BlockPos magneticPos)
+    @Nullable
+    public static MagneticField FindMVec(World world, BlockPos detectorPos, BlockPos magneticPos)
     {
-        if (!(world.getBlockEntity(magneticPos) instanceof AbstractMagneticBlockEntity magneticBE)) return false;
+        ElectroMod.LOGGER.info("FindMVec start");
 
-        return magneticBE.getMagneticForce() != 0;
+        ForceProfile profile = getForceProfile(getField(world, magneticPos));
+
+        var foundMVec = profile.find(magneticPos, detectorPos);
+
+        return foundMVec == null ? null :
+               foundMVec.toMagneticField(getField(world, magneticPos).getMagneticPower());
     }
 
-    public static Vector<Set<BlockPos>> getAllPositions(BlockPos pos, ForceProfile forceProfile)
+    public static ForceProfile getForceProfile(MagneticField field)
     {
-        Vector<Set<BlockPos>> Positions = new Vector<>(Arrays.asList(new HashSet<>(), new HashSet<>(), new HashSet<>()));
+        ElectroMod.LOGGER.info("getForceProfile");
+        ElectroMod.LOGGER.info(field.getForceDirection().toString());
 
-        for (int power = 0; power < 3; power++)
-        {
-            Set<MVec3i> deltas = new HashSet<>();
+        return ForceProfile.createForceProfile(getPowerCategory(field.getMagneticPower()), field.getForceDirection());
+    }
 
-            deltas.addAll(forceProfile.headProfile().get(power));
-            deltas.addAll(forceProfile.bodyProfile().get(power));
-            deltas.addAll(forceProfile.tailProfile().get(power));
+    @Nullable
+    public static ForceProfile.powerCategory getPowerCategory(int magneticPower)
+    {
+        ElectroMod.LOGGER.info("powercat inp: {}", magneticPower);
 
-            Positions.set(power, MVec3i.add(deltas, pos));
-        }
+        if (magneticPower > CopperCoilBlock.copperAdditiveFactor) return ForceProfile.powerCategory.COPPER;
+        else if (magneticPower > GoldenCoilBlock.goldAdditiveFactor) return ForceProfile.powerCategory.GOLD;
+        else if (magneticPower > IronCoilBlock.ironAdditiveFactor) return ForceProfile.powerCategory.IRON;
 
-        return Positions;
+        return null;    // magneticPower = 0
+    }
+
+    public static Set<BlockPos> testPlacementCheck(World world, BlockPos pos)
+    {
+        return detectorBlockPosMap.get(getDimensionKey(world)).get(pos).getFields().keySet();
     }
 }

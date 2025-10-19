@@ -1,51 +1,84 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
-import net.devs.electromod.block.custom.magnetic.CoilBlock;
+import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DebugStickItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractMagneticBlock extends BlockWithEntity implements BlockEntityProvider
 {
+    public static final DirectionProperty FACING = Properties.FACING;
+
     public AbstractMagneticBlock(Settings settings) {
         super(settings);
     }
 
-    protected BlockState[] getNeighborState(World world, BlockPos pos, Direction direction)
+    @Override
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
     {
-        return new BlockState[] { world.getBlockState(pos.offset(direction)), world.getBlockState(pos.offset(direction.getOpposite())) };
-    }
+        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity)) return ActionResult.FAIL;
 
-    public ForceProfile getForceProfile(World world, BlockPos pos, Direction direction, int magneticPower)
-    {
-        Boolean[] res = needsProfileElements(getNeighborState(world, pos, direction), direction);
+        ItemStack stack = player.getMainHandStack();
 
-        int headPowerCategory = ForceProfile.getPowerCategory(res[0] ? magneticPower : 0);
-        int bodyPowerCategory = ForceProfile.getPowerCategory(magneticPower);
-        int tailPowerCategory = ForceProfile.getPowerCategory(res[1] ? magneticPower : 0);
-
-        return ForceProfile.createForceProfile(headPowerCategory, bodyPowerCategory, tailPowerCategory, direction);
-    }
-
-    protected Boolean[] needsProfileElements(BlockState[] neighborStates, Direction direction)
-    {
-        List<Boolean> result = new ArrayList<>();
-
-        for (BlockState state : neighborStates)
+        if (stack.getItem() instanceof DebugStickItem)
         {
-            if (state.getBlock() instanceof CoilBlock && state.get(Properties.FACING) == direction)
-            { result.add(true); }
+            if (world.isClient()) return ActionResult.FAIL;
 
-            else { result.add(false); }
+            testMagneticPower(world, pos, player);
+            testMagneticField(world, pos, state);
+
+            return ActionResult.SUCCESS;
         }
 
-        return result.toArray(Boolean[]::new);
+        return ActionResult.PASS;
+    }
+
+    private void testMagneticPower(World world, BlockPos pos, PlayerEntity player)
+    {
+        if (world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)
+        {
+            player.sendMessage(Text.literal(coilBE.getMagneticPower() + "," + coilBE.getRedstoneInput() + "," + coilBE.getFacing().toString()));
+        }
+    }
+
+    private void testMagneticField(World world, BlockPos pos, BlockState state)
+    {
+        if (world.isClient()) return;
+
+        if (!(world.getBlockEntity(pos) instanceof AbstractMagneticBlockEntity be)) return;
+
+        ForceProfile profile = MagneticForceInteractor.getForceProfile(MagneticForceInteractor.getField(world, pos));
+
+        var poses = ForceProfile.deployPos(pos, profile);
+
+        BlockState[] forceBlocks = {
+                Blocks.RED_STAINED_GLASS.getDefaultState(),
+                Blocks.CYAN_STAINED_GLASS.getDefaultState(),
+                Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState()
+        };
+
+        for (var p : poses)
+        {
+            world.setBlockState(p, forceBlocks[2]);
+        }
+
+//        for (int i = 0; i < 3; i++)
+//        {
+//            for (BlockPos p : poses.get(i))
+//            {
+//                world.setBlockState(p, forceBlocks[i]);
+//            }
+//        }
     }
 }

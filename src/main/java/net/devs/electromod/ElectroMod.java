@@ -1,7 +1,10 @@
 package net.devs.electromod;
 
 import net.devs.electromod.block.ModBlocks;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.*;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlockEntity;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlockEntity;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.ModItemGroups;
@@ -9,11 +12,8 @@ import net.devs.electromod.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.minecraft.util.math.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
 
 public class ElectroMod implements ModInitializer
 {
@@ -38,11 +38,11 @@ public class ElectroMod implements ModInitializer
         {
             if (world.isClient()) return;
 
-            if (blockEntity instanceof AbstractMagneticBlockEntity forceBE)
-            { forceBE.blockentityLoaded(world); }
+            if (blockEntity instanceof AbstractMagneticBlockEntity magneticBE)
+            { magneticBE.blockentityLoaded(); }
 
             else if (blockEntity instanceof AbstractDetectorBlockEntity detectorBE)
-            { detectorBE.blockentityLoaded(world); }
+            { detectorBE.blockentityLoaded(); }
 
         }));
 
@@ -52,10 +52,10 @@ public class ElectroMod implements ModInitializer
             if (world.isClient()) return;
 
             if (blockEntity instanceof AbstractMagneticBlockEntity forceBE)
-            { forceBE.blockentityUnloaded(world); }
+            { forceBE.blockentityUnloaded(); }
 
             else if (blockEntity instanceof AbstractDetectorBlockEntity detectorBE)
-            { detectorBE.blockentityUnloaded(world); }
+            { detectorBE.blockentityUnloaded(); }
         }));
 
         // server load events
@@ -67,34 +67,6 @@ public class ElectroMod implements ModInitializer
 
     private static void Test()
     {
-       //testRotation();
-       testSetRotation();
-    }
 
-    private static void testRotation()
-    {
-        MVec3i mVec3i = new MVec3i(1, -1, 2, Direction.UP);
-        var res = mVec3i.rotate90(Direction.Axis.Z, MVec3i.Angles.CLOCK_270.ordinal());
-        ElectroMod.LOGGER.info("result: " + res.getX() + res.getY() + res.getZ() + res.getForceDirection().toString());
-    }
-
-    private static void testSetRotation()
-    {
-        Set<MVec3i> defaultElementleft = Set.of( // up left heading north
-                new MVec3i(-1, 1, -2, Direction.WEST),
-                new MVec3i(-2, 1, -2, Direction.WEST),
-                new MVec3i(-2, 1, -1, Direction.SOUTH),
-                new MVec3i(-2, 1, 0, Direction.SOUTH),
-                new MVec3i(-2, 1, 1, Direction.SOUTH),
-                new MVec3i(-2, 1, 2, Direction.EAST),
-                new MVec3i(-1, 1, 2, Direction.EAST)
-        );
-
-        var res = MVec3i.rotate90(defaultElementleft, Direction.Axis.Z, MVec3i.Angles.CLOCK_180.ordinal());
-
-        for (MVec3i vec : res)
-        {
-            ElectroMod.LOGGER.info("result: " + vec.getX() + vec.getY() + vec.getZ() + vec.getForceDirection().toString());
-        }
     }
 }

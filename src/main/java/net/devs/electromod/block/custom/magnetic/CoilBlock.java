@@ -7,12 +7,14 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -23,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class CoilBlock extends AbstractMagneticBlock
 {
-    public static final DirectionProperty FACING = Properties.FACING;
     public static final IntProperty DENSITY = IntProperty.of("density", 1, 3); // coil n
     public static final BooleanProperty POWERED = Properties.POWERED;
 
@@ -90,11 +91,22 @@ public abstract class CoilBlock extends AbstractMagneticBlock
 
     // used to have custom neighbor updater
 
+    // custom features
+
+    @Override
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
+    {
+        return super.onUse(state, world, pos, player, hit);
+    }
+
     // redstone
     @Override
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
     {
-        updatePower(world, pos, state);
+        if (!world.isClient())
+        {
+            updatePower(world, pos, state);
+        }
 
         super.onBlockAdded(state, world, pos, oldState, notify);
     }
@@ -120,7 +132,7 @@ public abstract class CoilBlock extends AbstractMagneticBlock
         else if (newPower != 0 && !state.get(POWERED)) { world.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL); }
 
         coilBlockEntity.setRedstoneInput(newPower);
-        coilBlockEntity.setMagneticForce(defaultForceFormula(newPower, state.get(DENSITY)));
+        coilBlockEntity.setMagneticPower(defaultForceFormula(newPower, state.get(DENSITY)));
     }
 
     public static int getRecievedRedstonePower(World world, BlockPos pos, BlockState state)

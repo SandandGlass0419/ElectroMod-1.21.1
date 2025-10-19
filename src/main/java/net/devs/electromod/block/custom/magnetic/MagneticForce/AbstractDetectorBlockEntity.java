@@ -4,9 +4,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import java.util.Set;
 
 public abstract class AbstractDetectorBlockEntity extends BlockEntity
 {
@@ -15,14 +12,14 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
         super(type, pos, state);
     }
 
-    public void blockentityLoaded(World world)
+    public void blockentityLoaded()
     {
-        Set<BlockPos> validPoses = MagneticForceInteractor.detectorPlacementCheck(world, this.getPos());
-        MagneticForceInteractor.subscribeDetectorBlock(world, this.getPos(), validPoses);
+        BlockField validPoses = MagneticForceInteractor.detectorPlacementCheck(this.world, this.pos);
+        MagneticForceInteractor.subscribeDetectorBlock(this.world, this.pos, validPoses);
     }
 
-    public void blockentityUnloaded(World world)
+    public void blockentityUnloaded()
     {
-        MagneticForceInteractor.unsubscribeDetectorBlock(world, this.getPos());
+        MagneticForceInteractor.unsubscribeDetectorBlock(this.world, this.getPos());
     }
 }

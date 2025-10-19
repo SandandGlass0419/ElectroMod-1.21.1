@@ -1,7 +1,6 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.custom.magnetic.MagnetItem;
 import net.minecraft.block.Block;
@@ -35,7 +34,9 @@ public class CopperCoilBlock extends CoilBlock
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
     {
-        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity)) return ActionResult.FAIL;
+        var returned = super.onUse(state, world, pos, player, hit);
+        if (returned != ActionResult.PASS) return returned;
+
         if (!player.getAbilities().allowModifyWorld) return ActionResult.PASS;
         ItemStack stack = player.getMainHandStack();
 
@@ -50,7 +51,6 @@ public class CopperCoilBlock extends CoilBlock
         else // default action
         {
             BlockState newBlockState = state.cycle(DENSITY);
-            int newDensity = newBlockState.get(DENSITY);
 
             world.setBlockState(pos, newBlockState, Block.NOTIFY_ALL);
             world.playSound(null, pos, SoundEvents.BLOCK_COPPER_GRATE_HIT, SoundCategory.BLOCKS);

@@ -3,13 +3,10 @@ package net.devs.electromod.block.custom.magnetic;
 import com.mojang.serialization.MapCodec;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlock;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
-import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
 import net.devs.electromod.item.custom.electro.ElectroStaff;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DebugStickItem;
 import net.minecraft.item.ItemPlacementContext;
@@ -74,14 +71,6 @@ public class  MagneticDetector extends AbstractDetectorBlock
     @Nullable
     @Override public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new MagneticDetectorEntity(pos, state);
-    }
-
-    @Override
-    @Nullable
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type)
-    {
-        return validateTicker(type, ModBlockEntities.DETECTOR_BE,
-                (world1, pos, state1, blockEntity) -> blockEntity.tick(world1, pos, state1));
     }
 
     @Override protected BlockRenderType getRenderType(BlockState state) { return BlockRenderType.MODEL; }
