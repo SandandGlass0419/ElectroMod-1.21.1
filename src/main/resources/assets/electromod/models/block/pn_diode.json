@@ -1,0 +1,22 @@
+{
+	"format_version": "1.21.1",
+	"textures": {
+		"0": "electromod:block/pndiod",
+		"particle": "electromod:block/pndiod"
+	},
+	"elements": [
+		{
+			"from": [5, 5, 0],
+			"to": [10, 10, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 5, 0]},
+			"faces": {
+				"north": {"uv": [5, 6, 7, 10], "texture": "#0"},
+				"east": {"uv": [16, 4.5, 0, 12], "texture": "#0"},
+				"south": {"uv": [10, 4.5, 14.5, 6], "texture": "#0"},
+				"west": {"uv": [0, 4.5, 16, 12], "texture": "#0"},
+				"up": {"uv": [6, 7.5, 10, 11.5], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [10, 5.5, 6, 10.5], "rotation": 90, "texture": "#0"}
+			}
+		}
+	]
+}

@@ -6,19 +6,16 @@
       "item": "minecraft:nether_star"
     },
     "=": {
-      "item": "minecraft:blaze_powder"
-    },
-    "N": {
-      "item": "minecraft:netherite_ingot"
+      "item": "electromod:electro_item"
     }
   },
   "pattern": [
-    "N=N",
+    "   ",
     "=*=",
-    "N=N"
+    "   "
   ],
   "result": {
     "count": 1,
-    "id": "electromod:electro_item"
+    "id": "electromod:pn_diode"
   }
 }

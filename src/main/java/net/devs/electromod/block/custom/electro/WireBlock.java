@@ -132,7 +132,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             BlockState targetState = world.getBlockState(targetPos);
             Block targetBlock = targetState.getBlock();
 
-            if (targetBlock instanceof WireBlock || targetBlock == ModBlocks.ACDC_CONVERTER || targetBlock == ModBlocks.ELECTRO_DECTOR) {
+            if (targetBlock instanceof WireBlock || targetBlock == ModBlocks.ACDC_CONVERTER || targetBlock == ModBlocks.ELECTRO_DECTOR || targetBlock == ModBlocks.PN_DIODE) {
                 switch (dir) {
                     case NORTH -> northHasWire = true;
                     case SOUTH -> southHasWire = true;

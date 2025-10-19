@@ -3,22 +3,22 @@
   "category": "misc",
   "key": {
     "*": {
-      "item": "electromod:electro_item"
+      "item": "minecraft:nether_star"
     },
     "=": {
-      "item": "minecraft:chain"
+      "item": "electromod:electro_item"
     },
-    "P": {
-      "item": "electromod:pn_diode"
+    "N": {
+      "item": "minecraft:iron_ingot"
     }
   },
   "pattern": [
-    "P=P",
+    "N=N",
     "=*=",
-    "P=P"
+    "N=N"
   ],
   "result": {
     "count": 1,
-    "id": "electromod:ac_dc_converter"
+    "id": "electromod:electro_dector"
   }
 }

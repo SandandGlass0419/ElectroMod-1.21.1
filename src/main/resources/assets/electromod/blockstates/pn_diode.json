@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=up":    { "model": "electromod:block/pn_diode" },
+    "facing=down":  { "model": "electromod:block/pn_diode" },
+    "facing=north": { "model": "electromod:block/pn_diode", "y": 90 },
+    "facing=south": { "model": "electromod:block/pn_diode", "y": 270 },
+    "facing=east":  { "model": "electromod:block/pn_diode", "y": 180 },
+    "facing=west":  { "model": "electromod:block/pn_diode" }
+  }
+}

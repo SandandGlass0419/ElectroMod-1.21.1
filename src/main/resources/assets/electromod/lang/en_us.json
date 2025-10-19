@@ -18,6 +18,7 @@
   "block.electromod.wire": "Wire",
   "block.electromod.ac_dc_converter" : "AC/DC Converter",
   "block.electromod.electro_dector" : "Electro Detector",
+  "block.electromod.pn_diode" : "PN Diode",
 
 
   "item.electromod.rubber_gloves" : "Rubber Gloves",

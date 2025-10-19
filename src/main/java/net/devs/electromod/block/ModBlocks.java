@@ -99,6 +99,14 @@ public class ModBlocks
                     .nonOpaque()
                     .requiresTool()));
 
+    public static final Block PN_DIODE = addBlock("pn_diode",
+            new PNDiode(AbstractBlock.Settings.create()
+                    .strength(1f)
+                    .sounds(BlockSoundGroup.METAL)
+                    .nonOpaque()
+                    .requiresTool()));
+
+
     public static void registerModBlocks()
     {
         ElectroMod.LOGGER.info("Registering Mod Blocks (" + ElectroMod.MOD_ID + ")");
@@ -119,6 +127,7 @@ public class ModBlocks
             entries.add(BATTERY);
             entries.add(ACDC_CONVERTER);
             entries.add(ELECTRO_DECTOR);
+            entries.add(PN_DIODE);
         });
     }
 

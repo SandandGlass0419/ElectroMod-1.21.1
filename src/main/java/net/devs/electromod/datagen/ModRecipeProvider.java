@@ -1,6 +1,7 @@
 package net.devs.electromod.datagen;
 
 import net.devs.electromod.block.ModBlocks;
+import net.devs.electromod.item.ModItemGroups;
 import net.devs.electromod.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
@@ -126,23 +127,47 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .input('*', ModItems.ELECTRO_ITEM)
                 .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.STICK))
                 .offerTo(recipeExporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ACDC_CONVERTER, 1)
-                .pattern(" = ")
+                .pattern("P=P")
                 .pattern("=*=")
-                .pattern(" = ")
+                .pattern("P=P")
                 .input('=', Items.CHAIN)
                 .input('*', ModItems.ELECTRO_ITEM)
+                .input('P', ModBlocks.PN_DIODE)
                 .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.CHAIN))
                 .offerTo(recipeExporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_ITEM, 1)
                 .pattern("N=N")
                 .pattern("=*=")
                 .pattern("N=N")
-                .input('=', Items.NETHER_STAR)
-                .input('*', Items.BLAZE_POWDER)
+                .input('*', Items.NETHER_STAR)
+                .input('=', Items.BLAZE_POWDER)
                 .input('N', Items.NETHERITE_INGOT)
                 .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
                 .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ELECTRO_DECTOR, 1)
+                .pattern("N=N")
+                .pattern("=*=")
+                .pattern("N=N")
+                .input('*', Items.NETHER_STAR)
+                .input('=', ModItems.ELECTRO_ITEM)
+                .input('N', Items.IRON_INGOT)
+                .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
+                .offerTo(recipeExporter);
+
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.PN_DIODE, 1)
+                .pattern("   ")
+                .pattern("=*=")
+                .pattern("   ")
+                .input('*', Items.NETHER_STAR)
+                .input('=', ModItems.ELECTRO_ITEM)
+                .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
+                .offerTo(recipeExporter);
+
 
 
     }

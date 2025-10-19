@@ -32,6 +32,8 @@ public class ModModelProvider extends FabricModelProvider
         // wire (custom json)
         // battery (custom json)
         // acdc converter(custom json)
+        // electro dector(custom json)
+        // pn diode(custom json)
     }
 
     // generates item model json files. please add ALL items using method
