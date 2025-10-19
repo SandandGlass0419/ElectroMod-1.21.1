@@ -3,6 +3,7 @@ package net.devs.electromod.block.custom.electro;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -11,15 +12,25 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.util.hit.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class ElectroDector extends Block {
 
     public static final DirectionProperty FACING = Properties.FACING;
+
+    // VoxelShape 정의 (JSON 모델 기준)
+    private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
+    private static final VoxelShape SOUTH_SHAPE = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
+    private static final VoxelShape EAST_SHAPE  = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
+    private static final VoxelShape WEST_SHAPE  = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
+    private static final VoxelShape UP_SHAPE    = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
+    private static final VoxelShape DOWN_SHAPE  = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
 
     public ElectroDector(Settings settings) {
         super(settings);
@@ -35,6 +46,19 @@ public class ElectroDector extends Block {
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState().with(FACING, ctx.getSide());
+    }
+
+
+    @Override
+    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return switch (state.get(FACING)) {
+            case NORTH -> NORTH_SHAPE;
+            case SOUTH -> SOUTH_SHAPE;
+            case EAST  -> EAST_SHAPE;
+            case WEST  -> WEST_SHAPE;
+            case UP    -> UP_SHAPE;
+            case DOWN  -> DOWN_SHAPE;
+        };
     }
 
     @Override
@@ -78,35 +102,51 @@ public class ElectroDector extends Block {
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
         Direction[] horizontals = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 
-        // 주변 Wire 최대 전류 찾기
+        // 최대 전류 탐색
         for (Direction dir : horizontals) {
             mutablePos.set(pos.offset(dir));
-            BlockEntity be = world.getBlockEntity(mutablePos);
-            if (be instanceof WireBlockEntity wire) {
-                float e = wire.getElectrocity();
-                if (!found || e > maxElectrocity) {
-                    maxElectrocity = e;
-                    found = true;
+
+            while (true) {
+                BlockEntity be = world.getBlockEntity(mutablePos);
+                Block block = world.getBlockState(mutablePos).getBlock();
+
+                if (be instanceof WireBlockEntity wire) {
+                    float e = wire.getElectrocity();
+                    if (!found || e > maxElectrocity) {
+                        maxElectrocity = e;
+                        found = true;
+                    }
+                    break; // Wire 찾으면 루프 종료
+                } else if (block instanceof PNDiode || block instanceof ElectroDector) {
+                    mutablePos.move(dir); // 1칸 더 이동
+                } else {
+                    break; // Wire, PNDiode, ElectroDector 없으면 종료
                 }
             }
         }
 
         if (found) {
-            // 주변 Wire에 최대 전류 설정 (setElectrocity 사용)
+            // 최대 전류를 주변 블록에 적용
             for (Direction dir : horizontals) {
                 mutablePos.set(pos.offset(dir));
-                BlockEntity be = world.getBlockEntity(mutablePos);
-                if (be instanceof WireBlockEntity wire) {
-                    // state는 현재 BlockState
-                    BlockState wireState = world.getBlockState(mutablePos);
-                    wire.setElectrocity(maxElectrocity, world, mutablePos, wireState, wire);
+
+                while (true) {
+                    BlockEntity be = world.getBlockEntity(mutablePos);
+                    Block block = world.getBlockState(mutablePos).getBlock();
+
+                    if (be instanceof WireBlockEntity wire) {
+                        BlockState wireState = world.getBlockState(mutablePos);
+                        wire.setElectrocity(maxElectrocity, world, mutablePos, wireState, wire);
+                        break; // 적용 후 종료
+                    } else if (block instanceof PNDiode || block instanceof ElectroDector) {
+                        mutablePos.move(dir); // 1칸 더 이동
+                    } else {
+                        break; // Wire, PNDiode, ElectroDector 없으면 종료
+                    }
                 }
             }
         }
     }
-
-
-
 
 
 }
