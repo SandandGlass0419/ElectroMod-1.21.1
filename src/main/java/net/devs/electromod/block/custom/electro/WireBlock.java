@@ -202,10 +202,16 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
     }
 
     public void onBlockElectrocityUpdated(World w, BlockPos pos, BlockState state, WireBlockEntity wireBE) {
-        float value = wireBE.getElectrocity()/resistance;
+        float value = wireBE.getElectrocity() / resistance;
         wireBE.Electrocity = value;
 
         for (Direction dir : Direction.values()) {
+            // 위/아래 방향일 때 FACING 체크
+            if ((dir == Direction.UP || dir == Direction.DOWN) &&
+                    (state.get(FACING) != Direction.UP && state.get(FACING) != Direction.DOWN)) {
+                continue; // 위/아래 전도 불가, 스킵
+            }
+
             BlockPos targetPos = pos.offset(dir);
             BlockState targetState = w.getBlockState(targetPos);
 
@@ -217,6 +223,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             }
         }
     }
+
 
     public boolean IsDidElectrified(BlockState state) {
         return state.get(ELECTRIFIED);

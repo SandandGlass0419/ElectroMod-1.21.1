@@ -1,5 +1,6 @@
 {
 	"format_version": "1.21.1",
+	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "electromod:block/electro_dector_downside",
 		"1": "electromod:block/electro_dector_pointer",
@@ -21,8 +22,8 @@
 			}
 		},
 		{
-			"from": [7, 5, 0],
-			"to": [16, 8, 16],
+			"from": [7, 5, 0.001],
+			"to": [15.99999, 8, 15.991],
 			"rotation": {"angle": 22.5, "axis": "z", "origin": [14, 5, 0]},
 			"faces": {
 				"north": {"uv": [0, 0, 16, 3], "texture": "#0"},
