@@ -135,16 +135,12 @@ public class ElectroDector extends Block {
 
                     if (be instanceof WireBlockEntity wire) {
                         BlockState wireState = world.getBlockState(currentPos);
-
-                        // ELECTRIFIED 체크
-                        if (!wireState.get(WireBlock.ELECTRIFIED)) {
-                            wire.setElectrocity(maxElectrocity, world, currentPos, wireState, wire);
-                        }
-                        break;
+                        wire.setElectrocity(maxElectrocity, world, currentPos, wireState, wire);
+                        break; // 적용 후 종료
                     } else if (block instanceof PNDiode || block instanceof ElectroDector) {
                         currentPos = currentPos.offset(dir); // 같은 방향으로 계속 이동
                     } else {
-                        break;
+                        break; // Wire, PNDiode, ElectroDector 없으면 종료
                     }
                 }
             }
@@ -154,4 +150,4 @@ public class ElectroDector extends Block {
 
 
 
-    }
+}

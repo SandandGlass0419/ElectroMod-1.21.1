@@ -20,8 +20,6 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import static net.devs.electromod.block.custom.electro.WireBlock.ELECTRIFIED;
-
 public class PNDiode extends Block {
 
     public static final DirectionProperty FACING = Properties.FACING;
@@ -88,25 +86,11 @@ public class PNDiode extends Block {
         Direction sendDir;
 
         switch (facing) {
-            case SOUTH -> {
-                checkDir = Direction.EAST;
-                sendDir = Direction.WEST;
-            }
-            case WEST -> {
-                checkDir = Direction.SOUTH;
-                sendDir = Direction.NORTH;
-            }
-            case NORTH -> {
-                checkDir = Direction.WEST;
-                sendDir = Direction.EAST;
-            }
-            case EAST -> {
-                checkDir = Direction.NORTH;
-                sendDir = Direction.SOUTH;
-            }
-            default -> {
-                return;
-            }
+            case SOUTH -> { checkDir = Direction.EAST; sendDir = Direction.WEST; }
+            case WEST  -> { checkDir = Direction.SOUTH; sendDir = Direction.NORTH; }
+            case NORTH -> { checkDir = Direction.WEST; sendDir = Direction.EAST; }
+            case EAST  -> { checkDir = Direction.NORTH; sendDir = Direction.SOUTH; }
+            default -> { return; }
         }
 
         BlockPos.Mutable checkPos = new BlockPos.Mutable();
@@ -161,21 +145,17 @@ public class PNDiode extends Block {
         }
 
         if (targetWire != null) {
-            BlockState targetState = world.getBlockState(sendPos);
-
-            // ELECTRIFIED가 false일 때만 전도
-            if (!targetState.get(ELECTRIFIED)) {
-                float value = sourceWire.getElectrocity();
-                if (value > 0f) {
-                    targetWire.setElectrocity(value, world, sendPos, targetState, targetWire);
-                }
+            float value = sourceWire.getElectrocity();
+            if (value > 0f) {
+                BlockState targetState = world.getBlockState(sendPos);
+                targetWire.setElectrocity(value, world, sendPos, targetState, targetWire);
             }
         }
     }
 
 
 
-        // 클릭 시 FACING 반전 후 상태 갱신
+    // 클릭 시 FACING 반전 후 상태 갱신
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
