@@ -60,7 +60,7 @@ public class GoldenCoilBlock extends CoilBlock
     }
 
     // magnetic force features
-    public static final int goldAdditiveFactor = 45;
+    public static final int goldAdditiveFactor = 1 * 15 * DENSITY_MAX;
 
     @Override
     public int defaultForceFormula(int redstonePower, int density)

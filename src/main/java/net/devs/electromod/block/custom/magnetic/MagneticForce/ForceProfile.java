@@ -83,19 +83,20 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
         return null;
     }
 
-    public Set<BlockPos> getWatch(int index)
+    public Set<BlockPos> getWatch(int index, BlockPos magneticPos)
     {
         Set<BlockPos> watch = new HashSet<>();
 
         if (this.headProfile().size() > index)
-        { watch.addAll(MVec3i.toBlockPos(this.headProfile().get(index))); }
+        { watch.addAll(MVec3i.add(this.headProfile().get(index), magneticPos)); }
 
         if (this.bodyProfile().size() > index)
-        { watch.addAll(MVec3i.toBlockPos(this.bodyProfile().get(index))); }
+        { watch.addAll(MVec3i.add(this.bodyProfile().get(index), magneticPos)); }
 
         if (this.tailProfile().size() > index)
-        { watch.addAll(MVec3i.toBlockPos(this.tailProfile().get(index))); }
+        { watch.addAll(MVec3i.add(this.tailProfile().get(index), magneticPos)); }
 
+        watch.addAll(MVec3i.add(this.headProfile().getFirst(), magneticPos));
         return watch;
     }
 
@@ -159,7 +160,7 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
             case ForceProfile.powerCategory.IRON -> rotateNorthProfile(IRON_HEAD_NORTH, forceDirection);
             case ForceProfile.powerCategory.GOLD -> rotateNorthProfile(GOLD_HEAD_NORTH, forceDirection);
             case ForceProfile.powerCategory.COPPER -> rotateNorthProfile(COPPER_HEAD_NORTH, forceDirection);
-            case null -> EMPTY;
+            default -> EMPTY;
         };
     }
 
@@ -170,7 +171,7 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
             case ForceProfile.powerCategory.IRON -> rotateNorthProfile(IRON_BODY_NORTH, forceDirection);
             case ForceProfile.powerCategory.GOLD -> rotateNorthProfile(GOLD_BODY_NORTH, forceDirection);
             case ForceProfile.powerCategory.COPPER -> rotateNorthProfile(COPPER_BODY_NORTH, forceDirection);
-            case null -> EMPTY;
+            default -> EMPTY;
         };
     }
 
@@ -181,7 +182,7 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
             case ForceProfile.powerCategory.IRON -> rotateNorthProfile(IRON_TAIL_NORTH, forceDirection);
             case ForceProfile.powerCategory.GOLD -> rotateNorthProfile(GOLD_TAIL_NORTH, forceDirection);
             case ForceProfile.powerCategory.COPPER -> rotateNorthProfile(COPPER_TAIL_NORTH, forceDirection);
-            case null -> EMPTY;
+            default -> EMPTY;
         };
     }
 
@@ -220,8 +221,8 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
 
         northProfile.add(Set.of(new MVec3i(0, 1, 0, Direction.SOUTH, powerCategory.IRON.get())));   // up
         northProfile.add(Set.of(new MVec3i(0, -1, 0, Direction.SOUTH, powerCategory.IRON.get())));  // down
-        northProfile.add(Set.of(new MVec3i(1, 0, 0, Direction.SOUTH, powerCategory.IRON.get())));   // left
-        northProfile.add(Set.of(new MVec3i(-1, 0, 0, Direction.SOUTH, powerCategory.IRON.get())));  // right
+        northProfile.add(Set.of(new MVec3i(-1, 0, 0, Direction.SOUTH, powerCategory.IRON.get())));   // left
+        northProfile.add(Set.of(new MVec3i(1, 0, 0, Direction.SOUTH, powerCategory.IRON.get())));  // right
 
         return northProfile;
     }
@@ -456,7 +457,8 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
     {
         IRON(0),
         GOLD(-1),
-        COPPER(-2);
+        COPPER(-2),
+        GENERIC(1);
 
         private final int forceDelta;
 

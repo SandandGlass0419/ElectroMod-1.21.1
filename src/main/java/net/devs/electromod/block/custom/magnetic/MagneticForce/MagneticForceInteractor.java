@@ -185,13 +185,24 @@ public class MagneticForceInteractor
     @Nullable
     public static ForceProfile.powerCategory getPowerCategory(int magneticPower)
     {
-        ElectroMod.LOGGER.info("powercat inp: {}", magneticPower);
-
-        if (magneticPower > CopperCoilBlock.copperAdditiveFactor) return ForceProfile.powerCategory.COPPER;
-        else if (magneticPower > GoldenCoilBlock.goldAdditiveFactor) return ForceProfile.powerCategory.GOLD;
+        if (magneticPower >= CopperCoilBlock.copperAdditiveFactor) return ForceProfile.powerCategory.COPPER;
+        else if (magneticPower >= GoldenCoilBlock.goldAdditiveFactor) return ForceProfile.powerCategory.GOLD;
         else if (magneticPower > IronCoilBlock.ironAdditiveFactor) return ForceProfile.powerCategory.IRON;
 
         return null;    // magneticPower = 0
+    }
+
+    @Nullable
+    public static Integer getAdditiveFactor(ForceProfile.powerCategory category)
+    {
+        return switch (category)
+        {
+            case IRON -> IronCoilBlock.ironAdditiveFactor;
+            case GOLD -> GoldenCoilBlock.goldAdditiveFactor;
+            case COPPER -> CopperCoilBlock.copperAdditiveFactor;
+            case GENERIC -> 100;    // change
+            case null -> null;
+        };
     }
 
     public static Set<BlockPos> testPlacementCheck(World world, BlockPos pos)

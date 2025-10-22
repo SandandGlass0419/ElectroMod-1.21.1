@@ -26,13 +26,15 @@ public class MagneticDetectorEntity extends AbstractDetectorBlockEntity
         markDirty();
     }
 
-    public void setRedstoneOutput(int power) {
-        if (world == null || world.isClient()) return;
+    public void setRedstoneOutput(int power)
+    {
+        if (this.world == null || this.world.isClient()) return;
 
-        if (redstoneOutput != power) {
+        if (this.redstoneOutput != power)
+        {
             this.redstoneOutput = power;
             markDirty();
-            world.updateNeighborsAlways(pos, getCachedState().getBlock());
+            this.world.updateNeighborsAlways(this.pos, getCachedState().getBlock());
         }
     }
 
@@ -51,7 +53,7 @@ public class MagneticDetectorEntity extends AbstractDetectorBlockEntity
     {
         super.writeNbt(nbt, registryLookup);
         nbt.putInt("redstone_output", this.redstoneOutput);
-        nbt.putInt("facing_id", this.detectionAxisID);
+        nbt.putInt("axis_id", this.detectionAxisID);
     }
 
     @Override
@@ -59,7 +61,7 @@ public class MagneticDetectorEntity extends AbstractDetectorBlockEntity
     {
         super.readNbt(nbt, registryLookup);
         this.redstoneOutput = nbt.getInt("redstone_output");
-        this.detectionAxisID = nbt.getInt("facing_id");
+        this.detectionAxisID = nbt.getInt("axis_id");
     }
 
     @Override

@@ -16,13 +16,11 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
     private final Map<BlockPos, Set<BlockPos>> Watch = new HashMap<>();
 
     public boolean getStartWatch() { return this.startWatch; }
+    public Map<BlockPos, Set<BlockPos>> getWatch() { return this.Watch; }
 
     public AbstractDetectorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state)
     {
         super(type, pos, state);
-
-        UpdateWatchCallBack.UPDATED.register(this::updateWatchElement);
-        UpdateWatchCallBack.REMOVED.register(this::removeWatchElement);
     }
 
     public void blockentityLoaded()
@@ -31,6 +29,9 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
         MagneticForceInteractor.subscribeDetectorBlock(this.world, this.pos, blockField);
 
         setupWatch();
+
+        UpdateWatchCallBack.UPDATED.register(this::updateWatchElement);
+        UpdateWatchCallBack.REMOVED.register(this::removeWatchElement);
     }
 
     public void blockentityUnloaded()
@@ -45,9 +46,10 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
 
         for (var magneticPos : field.getFields().keySet())
         {
-            updateHelper(this.pos, magneticPos, field.getFields().get(magneticPos));
+            updateHelper(this.pos, magneticPos, field.get(magneticPos));
         }
 
+        onWatchUpdate();
         this.startWatch = true;
     }
 
@@ -58,7 +60,8 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
         BlockField field = MagneticForceInteractor.getBlockField(this.world, this.pos);
         if (field == null) return;
 
-        updateHelper(detectorPos, magneticPos, field.getFields().get(magneticPos));
+        updateHelper(detectorPos, magneticPos, field.get(magneticPos));
+        onWatchUpdate();
     }
 
     public void removeWatchElement(BlockPos detectorPos, BlockPos magneticPos)
@@ -66,6 +69,8 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
         if (!this.pos.equals(detectorPos)) return;
 
         this.Watch.remove(magneticPos);
+        onWatchUpdate();
+
         ElectroMod.LOGGER.info("removed watch: {}, {}", detectorPos, magneticPos);
     }
 
@@ -77,12 +82,15 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
         Integer index = profile.getIndex(magneticPos, this.pos);
         if (index == null) return;
 
-        this.Watch.put(magneticPos, profile.getWatch(index));
+        this.Watch.put(magneticPos, profile.getWatch(index, magneticPos));
         ElectroMod.LOGGER.info("updated watch: {}, {}", detectorPos, magneticPos);
+        ElectroMod.LOGGER.info("added: {}", profile.getWatch(index , magneticPos));
     }
 
     public boolean additionalConditions(MagneticField field)
     {
         return field != null;
     }
+
+    public void onWatchUpdate() { }
 }

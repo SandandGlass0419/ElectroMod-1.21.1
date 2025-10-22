@@ -25,7 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class CoilBlock extends AbstractMagneticBlock
 {
-    public static final IntProperty DENSITY = IntProperty.of("density", 1, 3); // coil n
+    public static final int DENSITY_MIN = 1; public static final int DENSITY_MAX = 3;
+    public static final IntProperty DENSITY = IntProperty.of("density", DENSITY_MIN, DENSITY_MAX); // coil n
     public static final BooleanProperty POWERED = Properties.POWERED;
 
     private static final VoxelShape TOP = Block.createCuboidShape(0, 14, 0, 16, 16, 16);
@@ -86,10 +87,6 @@ public abstract class CoilBlock extends AbstractMagneticBlock
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite());
     }
-
-    // blockstates
-
-    // used to have custom neighbor updater
 
     // custom features
 

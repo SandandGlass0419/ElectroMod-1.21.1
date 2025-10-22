@@ -60,25 +60,37 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
 
         ForceProfile profile = MagneticForceInteractor.getForceProfile(MagneticForceInteractor.getField(world, pos));
 
-        var poses = ForceProfile.deployPos(pos, profile);
-
         BlockState[] forceBlocks = {
                 Blocks.RED_STAINED_GLASS.getDefaultState(),
                 Blocks.CYAN_STAINED_GLASS.getDefaultState(),
                 Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState()
         };
 
-        for (var p : poses)
+        for (var headSet : profile.headProfile())
         {
-            world.setBlockState(p, forceBlocks[2]);
+            for (var mvec : headSet)
+            {
+                world.setBlockState((BlockPos) mvec.add(pos),
+                        forceBlocks[Math.abs(mvec.getPowerDelta())]);
+            }
         }
 
-//        for (int i = 0; i < 3; i++)
-//        {
-//            for (BlockPos p : poses.get(i))
-//            {
-//                world.setBlockState(p, forceBlocks[i]);
-//            }
-//        }
+        for (var bodySet : profile.bodyProfile())
+        {
+            for (var mvec : bodySet)
+            {
+                world.setBlockState((BlockPos) mvec.add(pos),
+                        forceBlocks[Math.abs(mvec.getPowerDelta())]);
+            }
+        }
+
+        for (var headSet : profile.headProfile())
+        {
+            for (var mvec : headSet)
+            {
+                world.setBlockState((BlockPos) mvec.add(pos),
+                        forceBlocks[Math.abs(mvec.getPowerDelta())]);
+            }
+        }
     }
 }

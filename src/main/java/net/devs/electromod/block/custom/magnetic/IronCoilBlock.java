@@ -60,7 +60,7 @@ public class IronCoilBlock extends CoilBlock
     }
 
     // magnetic force features
-    public static final int ironAdditiveFactor = 0;
+    public static final int ironAdditiveFactor = 0 * 15 * DENSITY_MAX;
 
     @Override
     public int defaultForceFormula(int redstonePower, int density)

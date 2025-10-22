@@ -60,7 +60,7 @@ public class CopperCoilBlock extends CoilBlock
     }
 
     // magnetic force features
-    public static final int copperAdditiveFactor = 90;
+    public static final int copperAdditiveFactor = 2 * 15 * DENSITY_MAX;
 
     @Override
     public int defaultForceFormula(int redstonePower, int density)

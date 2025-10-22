@@ -1,12 +1,11 @@
 package net.devs.electromod.block.custom.magnetic;
 
+import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlock;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlockEntity;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
+import net.devs.electromod.ElectroMod;
+import net.devs.electromod.block.custom.magnetic.MagneticForce.*;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
-import net.devs.electromod.item.custom.electro.ElectroStaff;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -15,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DebugStickItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
@@ -35,7 +35,9 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class  MagneticDetector extends AbstractDetectorBlock
 {
@@ -116,11 +118,22 @@ public class  MagneticDetector extends AbstractDetectorBlock
                 .with(HORIZONTAL_AXIS, ctx.getHorizontalPlayerFacing().getAxis());
     }
 
+    public static Direction.Axis getDetectionAxis(BlockState state)
+    {
+        if (state.get(FACING).getAxis() != Direction.Axis.Y) return Direction.Axis.Y;
+
+        return state.get(HORIZONTAL_AXIS);
+    }
+
     // blockstates
     @Override
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify)
     {
-        updatePower(world, pos, state);
+        if (world.isClient()) return;
+        if (state.getBlock() == oldState.getBlock()) return;
+
+        ElectroMod.LOGGER.info("onBlockAdded ran updatePower");
+        updatePower(world, pos, state, 0);
         this.updateNeighbors(world, pos, state);
     }
 
@@ -128,13 +141,9 @@ public class  MagneticDetector extends AbstractDetectorBlock
     protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved)
     {
         if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity)) return;
+        if (world.isClient()) return;
 
-        if (state.isOf(newState.getBlock())) // state change
-        {
-            updatePower(world, pos, state);
-        }
-
-        else // block break
+        if (!(newState.getBlock() instanceof MagneticDetector)) // block broken
         {
             ItemStack stack = state.get(DETECT_STATE).getStoredItem();
             ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), stack);
@@ -174,7 +183,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
     {
         if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return 0;
 
-        return Arrays.asList(getRedstoneDirections(state, false)).contains(direction) && state.get(POWERED) ?
+        return getRedstoneDirections(state, false).contains(direction) && state.get(POWERED) ?
                 detectorEntity.getRedstoneOutput() : 0;
     }
 
@@ -183,15 +192,29 @@ public class  MagneticDetector extends AbstractDetectorBlock
     {
         if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return 0;
 
-        return Arrays.asList(getRedstoneDirections(state, true)).contains(direction) && state.get(POWERED) ?
+        return getRedstoneDirections(state, true).contains(direction) && state.get(POWERED) ?
                 detectorEntity.getRedstoneOutput() : 0;
     }
 
-    private void updatePower(World world, BlockPos pos, BlockState state)
+    public static Set<Direction> getRedstoneDirections(BlockState state, boolean isstrong)
+    {
+        Direction facing = state.get(FACING);
+        if (isstrong || facing.getAxis() != Direction.Axis.Y) return Set.of(facing);
+
+        return switch (state.get(HORIZONTAL_AXIS))
+        {
+            case X -> Set.of(Direction.NORTH, Direction.SOUTH);
+            case Z -> Set.of(Direction.EAST, Direction.WEST);
+            default -> Set.of();
+        };
+    }
+
+    private void updatePower(World world, BlockPos pos, BlockState state, int magenticPower)
     {
         if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return;
 
-        int newPower = defaultPowerFormula(state);
+        int newPower = defaultPowerConverter(state, magenticPower);
+        ElectroMod.LOGGER.info("newPower: {}", newPower);
 
         if (newPower == 0 && state.get(POWERED))       { world.setBlockState(pos, state.with(POWERED, false), Block.NOTIFY_ALL); }
         else if (newPower != 0 && !state.get(POWERED)) { world.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL); }
@@ -200,35 +223,14 @@ public class  MagneticDetector extends AbstractDetectorBlock
         detectorEntity.setRedstoneOutput(newPower);
     }
 
-    public static int defaultPowerFormula(BlockState state)
+    public static int defaultPowerConverter(BlockState state, int magneticPower)
     {
-        return switch (state.get(DETECT_STATE))
+        if (state.get(DETECT_STATE) == DetectState.EMPTY)
         {
-            case IRON_COIL -> 1;
-            case GOLDEN_COIL -> 2;
-            case COPPER_COIL -> 3;
-            default -> 0;
-        };
-    }
+            // code for generic
+        }
 
-    public static Direction[] getRedstoneDirections(BlockState state, boolean isstrong)
-    {
-        Direction facing = state.get(FACING);
-        if (isstrong || facing.getAxis() != Direction.Axis.Y) return new Direction[] { facing };
-
-        return switch (state.get(HORIZONTAL_AXIS))
-        {
-            case X -> new Direction[] { Direction.NORTH, Direction.SOUTH };
-            case Z -> new Direction[] { Direction.EAST, Direction.WEST };
-            default -> new Direction[] {};
-        };
-    }
-
-    public static Direction.Axis getDetectionAxis(BlockState state)
-    {
-        if (state.get(FACING).getAxis() != Direction.Axis.Y) return Direction.Axis.Y;
-
-        return state.get(HORIZONTAL_AXIS);
+        return Math.min(magneticPower / CoilBlock.DENSITY_MAX, 15);
     }
 
     // magnetic features
@@ -240,9 +242,96 @@ public class  MagneticDetector extends AbstractDetectorBlock
     }
 
     @Override
-    public void watchIntick(World world1, BlockPos pos, BlockState state1, AbstractDetectorBlockEntity detectorBE)
+    public void watchIntick(World world1, BlockPos pos, BlockState state1, AbstractDetectorBlockEntity abstractBE)
     {
+        if (world1.isClient()) return;
+        if (!(abstractBE instanceof MagneticDetectorEntity detectorBE)) return;
 
+        BlockField blockField = MagneticForceInteractor.getBlockField(world1, pos); if (blockField == null) return;
+        Direction.Axis detectionAxis = getDetectionAxis(state1);
+        ForceProfile.powerCategory powerCategory = getPowerCategory(state1.get(DETECT_STATE));
+        Integer normalizer = MagneticForceInteractor.getAdditiveFactor(powerCategory); if (normalizer == null) return;
+
+        Set<BlockPos> excludedPos = new HashSet<>();
+
+        excludeFilled(excludedPos, world1, detectorBE);
+        excludeUnaligned(excludedPos, blockField, detectionAxis);
+        excludeWrongCategory(excludedPos, blockField, powerCategory);
+
+        int power = BlockField.normalize(blockField.getPureAdditive(excludedPos), normalizer);
+        ElectroMod.LOGGER.info("magneticPower: {}", power);
+
+        updatePower(world1, pos, state1, power);
+    }
+
+    public static void excludeFilled(Set<BlockPos> excludedPos, World world, MagneticDetectorEntity detectorBE)
+    {
+        for (var magneticPos : detectorBE.getWatch().keySet())
+        {
+            if (excludedPos.contains(magneticPos)) continue;
+
+            for (var fieldPos : detectorBE.getWatch().get(magneticPos))
+            {
+                if (isFilled(world.getBlockState(fieldPos)))
+                {
+                    excludedPos.add(magneticPos);
+                    ElectroMod.LOGGER.info("excluded: {}, {}", magneticPos, world.getBlockState(fieldPos).toString());
+                }
+            }
+        }
+    }
+
+    public static boolean isFilled(BlockState state)
+    {
+        if (state.emitsRedstonePower()) return false;
+
+        if (state.isIn(BlockTags.AIR) ||
+            state.isIn(BlockTags.FIRE)) return false;
+
+        if (notFilled.get().contains(state.getBlock())) return false;
+
+        return true;
+    }
+
+    public static final Supplier<Set<Block>> notFilled = Suppliers.memoize(() -> Set.of(
+            Blocks.LIGHT,
+            Blocks.LAVA,
+            Blocks.WATER
+    ));
+
+    public static void excludeUnaligned(Set<BlockPos> excludedPos, BlockField blockField, Direction.Axis detectionAxis)
+    {
+        for (var magneticPos : blockField.getFields().keySet())
+        {
+            if (excludedPos.contains(magneticPos)) continue;
+
+            var debug = blockField.get(magneticPos).getForceDirection().getAxis();
+            if (debug != detectionAxis)
+            { ElectroMod.LOGGER.info("axis: {}, {}", debug.asString(), detectionAxis.asString()); excludedPos.add(magneticPos); }
+        }
+    }
+
+    public static void excludeWrongCategory(Set<BlockPos> excludedPos, BlockField blockField, ForceProfile.powerCategory stateCat)
+    {
+        for (var magneticPos : blockField.getFields().keySet())
+        {
+            if (excludedPos.contains(magneticPos)) continue;
+
+            var debug = MagneticForceInteractor.getPowerCategory(blockField.get(magneticPos).getMagneticPower());
+            if (debug != stateCat)
+            { ElectroMod.LOGGER.info("cat: {}, {}", debug, stateCat); excludedPos.add(magneticPos); }
+        }
+    }
+
+    private static ForceProfile.powerCategory getPowerCategory(DetectState detectState)
+    {
+        return switch (detectState)
+        {
+            case IRON_COIL -> ForceProfile.powerCategory.IRON;
+            case GOLDEN_COIL -> ForceProfile.powerCategory.GOLD;
+            case COPPER_COIL -> ForceProfile.powerCategory.COPPER;
+            case EMPTY -> ForceProfile.powerCategory.GENERIC;
+        };
     }
 
     // block features
@@ -256,11 +345,12 @@ public class  MagneticDetector extends AbstractDetectorBlock
         ItemStack stack = player.getMainHandStack();
         DetectState detect_state = state.get(DETECT_STATE);
 
-        if (stack.getItem() instanceof DebugStickItem) return ActionResult.FAIL;
-
-        if (stack.getItem() instanceof ElectroStaff)
+        if (stack.getItem() instanceof DebugStickItem)
         {
+            if (world.isClient()) return ActionResult.FAIL;
+
             magneticTest(world, pos, player);
+            return ActionResult.SUCCESS;
         }
 
         if (detect_state != DetectState.EMPTY) // give item to player
@@ -291,8 +381,6 @@ public class  MagneticDetector extends AbstractDetectorBlock
 
     private void magneticTest(World world, BlockPos pos, PlayerEntity player)
     {
-        if (world.isClient()) return;
-
-        player.sendMessage(Text.literal("" + MagneticForceInteractor.testPlacementCheck(world, pos)));
+        player.sendMessage(Text.literal(MagneticForceInteractor.testPlacementCheck(world, pos).toString()), true);
     }
 }
