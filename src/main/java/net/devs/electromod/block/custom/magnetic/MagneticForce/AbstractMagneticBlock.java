@@ -36,7 +36,7 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
             if (world.isClient()) return ActionResult.FAIL;
 
             testMagneticPower(world, pos, player);
-            testMagneticField(world, pos, state);
+            testMagneticField(world, pos);
 
             return ActionResult.SUCCESS;
         }
@@ -48,15 +48,14 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
     {
         if (world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)
         {
-            player.sendMessage(Text.literal(coilBE.getMagneticPower() + "," + coilBE.getRedstoneInput() + "," + coilBE.getFacing().toString()));
+            player.sendMessage(Text.literal(coilBE.getMagneticPower() + "," + coilBE.getRedstoneInput() + "," + coilBE.getFacing().toString()), true);
         }
     }
 
-    private void testMagneticField(World world, BlockPos pos, BlockState state)
+    private void testMagneticField(World world, BlockPos pos)
     {
         if (world.isClient()) return;
-
-        if (!(world.getBlockEntity(pos) instanceof AbstractMagneticBlockEntity be)) return;
+        if (!(world.getBlockEntity(pos) instanceof AbstractMagneticBlockEntity)) return;
 
         ForceProfile profile = MagneticForceInteractor.getForceProfile(MagneticForceInteractor.getField(world, pos));
 
@@ -70,7 +69,7 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
         {
             for (var mvec : headSet)
             {
-                world.setBlockState((BlockPos) mvec.add(pos),
+                world.setBlockState(new BlockPos(mvec.add(pos)),
                         forceBlocks[Math.abs(mvec.getPowerDelta())]);
             }
         }
@@ -79,16 +78,16 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
         {
             for (var mvec : bodySet)
             {
-                world.setBlockState((BlockPos) mvec.add(pos),
+                world.setBlockState(new BlockPos(mvec.add(pos)),
                         forceBlocks[Math.abs(mvec.getPowerDelta())]);
             }
         }
 
-        for (var headSet : profile.headProfile())
+        for (var tailSet : profile.tailProfile())
         {
-            for (var mvec : headSet)
+            for (var mvec : tailSet)
             {
-                world.setBlockState((BlockPos) mvec.add(pos),
+                world.setBlockState(new BlockPos(mvec.add(pos)),
                         forceBlocks[Math.abs(mvec.getPowerDelta())]);
             }
         }

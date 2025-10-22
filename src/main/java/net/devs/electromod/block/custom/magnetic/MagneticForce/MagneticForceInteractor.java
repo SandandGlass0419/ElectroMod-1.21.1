@@ -185,8 +185,8 @@ public class MagneticForceInteractor
     @Nullable
     public static ForceProfile.powerCategory getPowerCategory(int magneticPower)
     {
-        if (magneticPower >= CopperCoilBlock.copperAdditiveFactor) return ForceProfile.powerCategory.COPPER;
-        else if (magneticPower >= GoldenCoilBlock.goldAdditiveFactor) return ForceProfile.powerCategory.GOLD;
+        if (magneticPower > CopperCoilBlock.copperAdditiveFactor) return ForceProfile.powerCategory.COPPER;
+        else if (magneticPower > GoldenCoilBlock.goldAdditiveFactor) return ForceProfile.powerCategory.GOLD;
         else if (magneticPower > IronCoilBlock.ironAdditiveFactor) return ForceProfile.powerCategory.IRON;
 
         return null;    // magneticPower = 0
