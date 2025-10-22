@@ -3,6 +3,7 @@ package net.devs.electromod.block.entity;
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.ModBlocks;
 import net.devs.electromod.block.entity.custom.electro.AcDcConvertEntity;
+import net.devs.electromod.block.entity.custom.electro.PNDiodeEntity;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
@@ -40,6 +41,12 @@ public class ModBlockEntities
             Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "acdc_be"),
                     BlockEntityType.Builder.create(AcDcConvertEntity::new,
                             ModBlocks.ACDC_CONVERTER
+                    ).build());
+
+ public static final BlockEntityType<PNDiodeEntity> PN_BE =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "pn_be"),
+                    BlockEntityType.Builder.create(PNDiodeEntity::new,
+                            ModBlocks.PN_DIODE
                     ).build());
 
 
