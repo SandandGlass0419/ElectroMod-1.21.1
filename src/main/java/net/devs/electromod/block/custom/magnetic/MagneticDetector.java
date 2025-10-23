@@ -3,6 +3,7 @@ package net.devs.electromod.block.custom.magnetic;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
 import net.devs.electromod.ElectroMod;
+import net.devs.electromod.block.ModBlocks;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.*;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
@@ -256,7 +257,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
 
         excludeFilled(excludedPos, world1, detectorBE);
         excludeUnaligned(excludedPos, blockField, detectionAxis);
-        excludeWrongCategory(excludedPos, blockField, powerCategory);
+        excludeWrongCategory(excludedPos, world1, blockField, powerCategory);
 
         int power = BlockField.normalize(blockField.getPureAdditive(excludedPos), normalizer);
         ElectroMod.LOGGER.info("magneticPower: {}", power);
@@ -296,7 +297,11 @@ public class  MagneticDetector extends AbstractDetectorBlock
     public static final Supplier<Set<Block>> notFilled = Suppliers.memoize(() -> Set.of(
             Blocks.LIGHT,
             Blocks.LAVA,
-            Blocks.WATER
+            Blocks.WATER,
+            ModBlocks.IRON_COIL,
+            ModBlocks.GOLDEN_COIL,
+            ModBlocks.COPPER_COIL,
+            ModBlocks.MAGNET_BLOCK
     ));
 
     public static void excludeUnaligned(Set<BlockPos> excludedPos, BlockField blockField, Direction.Axis detectionAxis)
@@ -311,15 +316,18 @@ public class  MagneticDetector extends AbstractDetectorBlock
         }
     }
 
-    public static void excludeWrongCategory(Set<BlockPos> excludedPos, BlockField blockField, ForceProfile.powerCategory stateCat)
+    public static void excludeWrongCategory(Set<BlockPos> excludedPos, World world, BlockField blockField, ForceProfile.powerCategory stateCat)
     {
+        int magneticBlockPower;
+
         for (var magneticPos : blockField.getFields().keySet())
         {
             if (excludedPos.contains(magneticPos)) continue;
 
-            var debug = MagneticForceInteractor.getPowerCategory(blockField.get(magneticPos).getMagneticPower());
-            if (debug != stateCat)
-            { ElectroMod.LOGGER.info("cat: {}, {}", debug, stateCat); excludedPos.add(magneticPos); }
+            magneticBlockPower = MagneticForceInteractor.getField(world, magneticPos).getMagneticPower();
+
+            if (MagneticForceInteractor.getPowerCategory(magneticBlockPower) != stateCat)
+            { ElectroMod.LOGGER.info("cat: {}, {}", MagneticForceInteractor.getPowerCategory(magneticBlockPower), stateCat); excludedPos.add(magneticPos); }
         }
     }
 

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class CoilBlock extends AbstractMagneticBlock
 {
-    public static final int DENSITY_MIN = 1; public static final int DENSITY_MAX = 3;
+    public static final int DENSITY_MIN = 1; public static final int DENSITY_MAX = 4;
     public static final IntProperty DENSITY = IntProperty.of("density", DENSITY_MIN, DENSITY_MAX); // coil n
     public static final BooleanProperty POWERED = Properties.POWERED;
 

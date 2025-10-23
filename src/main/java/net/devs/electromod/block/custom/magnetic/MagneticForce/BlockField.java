@@ -36,7 +36,7 @@ public class BlockField
         ElectroMod.LOGGER.info("size: {}", this.Fields.size());
         for (var magneticPos : this.Fields.keySet())
         {
-            if (excludedPos.contains(magneticPos)) { ElectroMod.LOGGER.info("passed: {}", magneticPos); continue; }
+            if (excludedPos.contains(magneticPos)) continue;
 
             switch (this.Fields.get(magneticPos).getForceDirection().getDirection())
             {
