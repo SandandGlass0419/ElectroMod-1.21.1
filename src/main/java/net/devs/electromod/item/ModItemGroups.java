@@ -48,6 +48,7 @@ public class ModItemGroups
                         entries.add(ModBlocks.ACDC_CONVERTER);
                         entries.add(ModBlocks.ELECTRO_DECTOR);
                         entries.add(ModBlocks.PN_DIODE);
+                        entries.add(ModBlocks.BATTERY);
 
                         entries.add(ModItems.RUBBER_GLOVES);
                         entries.add(ModItems.ELECTRO_STAFF);

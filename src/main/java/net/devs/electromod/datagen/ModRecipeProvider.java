@@ -5,6 +5,8 @@ import net.devs.electromod.item.ModItemGroups;
 import net.devs.electromod.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.item.Items;
@@ -165,6 +167,17 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .pattern("   ")
                 .input('*', Items.NETHER_STAR)
                 .input('=', ModItems.ELECTRO_ITEM)
+                .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
+                .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.BATTERY, 1)
+                .pattern("NNN")
+                .pattern("=*=")
+                .pattern("WWW")
+                .input('*', ModItems.ELECTRO_ITEM)
+                .input('=', Items.NETHER_STAR)
+                .input('W', Blocks.IRON_BLOCK)
+                .input('N', Blocks.NETHERITE_BLOCK)
                 .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
                 .offerTo(recipeExporter);
 

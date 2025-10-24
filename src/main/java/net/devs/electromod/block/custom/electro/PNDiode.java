@@ -80,19 +80,28 @@ public class PNDiode extends BlockWithEntity {
         if (!world.isClient) {
             Direction current = state.get(FACING);
             Direction opposite = current.getOpposite();
+
+            // 방향 전환
             world.setBlockState(pos, state.with(FACING, opposite), Block.NOTIFY_ALL);
 
             BlockEntity be = world.getBlockEntity(pos);
             if (be instanceof PNDiodeEntity diodeEntity) {
-                // 클릭 시 신호 초기화 (한 번만)
+                // 클릭 시 신호 초기화
                 if (diodeEntity.getRedstonePower() != 0) {
                     diodeEntity.setRedstonePower(0);
-                    world.updateNeighborsAlways(pos, this);
                 }
+
+                // ✅ 방향 전환 후 즉시 전력 재검사
+                BlockState newState = world.getBlockState(pos);
+                neighborUpdate(newState, world, pos, this, pos, true);
+
+                // ✅ 주변 블록들도 갱신되도록
+                world.updateNeighborsAlways(pos, this);
             }
         }
         return ActionResult.SUCCESS;
     }
+
 
     @Override
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {

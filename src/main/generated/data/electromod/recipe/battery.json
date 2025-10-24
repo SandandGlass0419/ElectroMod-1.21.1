@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "*": {
+      "item": "electromod:electro_item"
+    },
+    "=": {
+      "item": "minecraft:nether_star"
+    },
+    "N": {
+      "item": "minecraft:netherite_block"
+    },
+    "W": {
+      "item": "minecraft:iron_block"
+    }
+  },
+  "pattern": [
+    "NNN",
+    "=*=",
+    "WWW"
+  ],
+  "result": {
+    "count": 1,
+    "id": "electromod:battery"
+  }
+}
