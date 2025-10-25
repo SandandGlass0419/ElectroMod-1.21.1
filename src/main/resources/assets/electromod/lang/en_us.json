@@ -15,7 +15,7 @@
   "block.electromod.copper_wire": "Copper Wire",
   "block.electromod.gold_wire": "Golden Wire",
   "block.electromod.battery" : "Battery",
-  "block.electromod.wire": "Wire",
+  "block.electromod.wire": "Iron Wire",
   "block.electromod.ac_dc_converter" : "AC/DC Converter",
   "block.electromod.electro_dector" : "Electro Detector",
   "block.electromod.pn_diode" : "PN Diode",

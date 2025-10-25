@@ -4,6 +4,7 @@ import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
@@ -35,18 +36,15 @@ public class Battery extends Block {
     }
 
     // ⚡ 공통 처리 로직 (onPlaced와 neighborUpdate 둘 다에서 사용)
-    private void electrifyNearbyWires(World world, BlockPos pos) {
+    private void electrifyNearbyWires(World world, BlockPos pos, float value) {
         if (world.isClient) return;
-
-        Direction[] directions = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN};
-
-        for (Direction dir : directions) {
+        for (Direction dir : Direction.values()) {
             BlockPos neighborPos = pos.offset(dir);
             BlockState neighborState = world.getBlockState(neighborPos);
 
             if (neighborState.getBlock() instanceof WireBlock) {
                 if (world.getBlockEntity(neighborPos) instanceof WireBlockEntity wireBE) {
-                    wireBE.setElectrocity(15f, world, neighborPos, neighborState, wireBE);
+                    wireBE.updateElectricity(value);
                 }
             }
         }
@@ -56,7 +54,7 @@ public class Battery extends Block {
     public void onPlaced(World world, BlockPos pos, BlockState state,
                          @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
-        electrifyNearbyWires(world, pos);
+        electrifyNearbyWires(world, pos, 15f);
     }
 
     // 🔹 주변 블록 변경 시에도 전기 공급 유지
@@ -64,6 +62,13 @@ public class Battery extends Block {
     public void neighborUpdate(BlockState state, World world, BlockPos pos,
                                Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
-        electrifyNearbyWires(world, pos);
+        electrifyNearbyWires(world, pos, 15f);
     }
+
+    @Override
+    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        super.onStateReplaced(state, world, pos, newState, moved);
+        electrifyNearbyWires(world, pos, 0f);
+    }
+
 }
