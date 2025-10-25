@@ -34,21 +34,33 @@ public class RubberGloves extends Item {
 
         if (block instanceof WireBlock && be instanceof WireBlockEntity wireEntity) {
 
-            // Shift 눌림 여부 체크
-            if (context.getPlayer() != null && context.getPlayer().isSneaking()) {
-                wireEntity.updateElectricity(0); // 전류 0으로 초기화
-                context.getPlayer().sendMessage(Text.literal("ELECTRICITY RESET TO 0!"), true);
-            } else {
-                wireEntity.updateElectricity(100); // 전류 100으로 설정
-                if (context.getPlayer() != null) {
+            if (context.getPlayer() != null) {
+                // 플레이어 게임모드 확인
+                boolean isCreative = context.getPlayer().getAbilities().creativeMode;
+                boolean isSurvival = !context.getPlayer().getAbilities().creativeMode && !context.getPlayer().isSpectator();
+
+                if (!isCreative && !isSurvival) {
+                    // 어드벤처, 스펙테이터 등에서는 작동하지 않음
+                    context.getPlayer().sendMessage(Text.literal("Cannot modify electricity in this game mode!"), true);
+                    return ActionResult.FAIL;
+                }
+
+                // Shift 눌림 여부 체크
+                if (context.getPlayer().isSneaking()) {
+                    wireEntity.updateElectricity(0); // 전류 0으로 초기화
+                    context.getPlayer().sendMessage(Text.literal("ELECTRICITY RESET TO 0!"), true);
+                } else {
+                    wireEntity.updateElectricity(100); // 전류 100으로 설정
                     context.getPlayer().sendMessage(Text.literal("ELECTRICITY SET TO 100!"), true);
                 }
+
+                return ActionResult.SUCCESS;
             }
 
-            return ActionResult.SUCCESS;
         }
 
         return ActionResult.FAIL;
     }
+
 
 }

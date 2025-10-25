@@ -24,13 +24,7 @@ public class ElectroDector extends Block {
 
     public static final DirectionProperty FACING = Properties.FACING;
 
-    // VoxelShape 정의 (JSON 모델 기준)
-    private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
-    private static final VoxelShape SOUTH_SHAPE = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
-    private static final VoxelShape EAST_SHAPE  = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
-    private static final VoxelShape WEST_SHAPE  = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
-    private static final VoxelShape UP_SHAPE    = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
-    private static final VoxelShape DOWN_SHAPE  = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
+    private static final VoxelShape SHAPE = Block.createCuboidShape(0, 0, 0, 16, 8, 16);
 
     public ElectroDector(Settings settings) {
         super(settings);
@@ -48,42 +42,33 @@ public class ElectroDector extends Block {
         return this.getDefaultState().with(FACING, ctx.getSide());
     }
 
-
     @Override
     protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return switch (state.get(FACING)) {
-            case NORTH -> NORTH_SHAPE;
-            case SOUTH -> SOUTH_SHAPE;
-            case EAST  -> EAST_SHAPE;
-            case WEST  -> WEST_SHAPE;
-            case UP    -> UP_SHAPE;
-            case DOWN  -> DOWN_SHAPE;
-        };
+        return SHAPE;
     }
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!world.isClient) {
-            double maxElectrocity = Double.NEGATIVE_INFINITY;
+            double maxElectro = Double.NEGATIVE_INFINITY;
             BlockPos.Mutable mutablePos = new BlockPos.Mutable();
-
-            int range = 1; // 탐색 범위 반경 1블록
+            int range = 1; // 탐색 범위 1블록
 
             for (int x = -range; x <= range; x++) {
                 for (int y = -range; y <= range; y++) {
                     for (int z = -range; z <= range; z++) {
                         mutablePos.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-                        BlockEntity blockEntity = world.getBlockEntity(mutablePos);
-                        if (blockEntity instanceof WireBlockEntity wire) {
+                        BlockEntity be = world.getBlockEntity(mutablePos);
+                        if (be instanceof WireBlockEntity wire) {
                             double e = wire.getElectricity();
-                            if (e > maxElectrocity) maxElectrocity = e;
+                            if (e > maxElectro) maxElectro = e;
                         }
                     }
                 }
             }
 
-            if (maxElectrocity != Double.NEGATIVE_INFINITY) {
-                player.sendMessage(Text.literal("Electrocity: " + maxElectrocity), true);
+            if (maxElectro != Double.NEGATIVE_INFINITY) {
+                player.sendMessage(Text.literal("Nearby WireBlock electricity: " + maxElectro), true);
             } else {
                 player.sendMessage(Text.literal("No WireBlock nearby."), true);
             }
@@ -93,56 +78,18 @@ public class ElectroDector extends Block {
 
     @Override
     protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
-
         if (world.isClient) return;
 
-        float maxElectrocity = 0f;
-        boolean found = false;
-        Direction[] horizontals = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
-
-        // 최대 전류 탐색
-        for (Direction dir : horizontals) {
-            BlockPos currentPos = pos.offset(dir);
-
-            while (true) {
-                BlockEntity be = world.getBlockEntity(currentPos);
-                Block block = world.getBlockState(currentPos).getBlock();
-
-                if (be instanceof WireBlockEntity wire) {
-                    float e = wire.getElectricity();
-                    if (!found || e > maxElectrocity) {
-                        maxElectrocity = e;
-                        found = true;
-                    }
-                    break; // Wire 만나면 종료
-                } else if (block instanceof ElectroDector) {
-                    currentPos = currentPos.offset(dir); // 같은 방향으로 계속 이동
-                } else {
-                    break; // Wire, PNDiode, ElectroDector 없으면 종료
-                }
-            }
-        }
-
-        if (found) {
-            // 최대 전류 적용
-            for (Direction dir : horizontals) {
-                BlockPos currentPos = pos.offset(dir);
-
-                while (true) {
-                    BlockEntity be = world.getBlockEntity(currentPos);
-                    Block block = world.getBlockState(currentPos).getBlock();
-
-                    if (be instanceof WireBlockEntity wire) {
-                        wire.updateElectricity(maxElectrocity);
-                        break; // 적용 후 종료
-                    } else if (block instanceof ElectroDector) {
-                        currentPos = currentPos.offset(dir); // 같은 방향으로 계속 이동
-                    } else {
-                        break; // Wire, PNDiode, ElectroDector 없으면 종료
-                    }
-                }
+        BlockEntity be = world.getBlockEntity(sourcePos);
+        if (be instanceof WireBlockEntity wire) {
+            double electricity = wire.getElectricity();
+            if (electricity > 0) {
+                // 전류량에 비례해 폭발
+                float explosionPower = (float) electricity; // 필요시 스케일링 가능
+                world.createExplosion(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, explosionPower, World.ExplosionSourceType.BLOCK);
+                world.removeBlock(pos, false);
             }
         }
     }
+
 }
