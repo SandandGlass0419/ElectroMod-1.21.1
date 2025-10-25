@@ -1,5 +1,6 @@
 package net.devs.electromod.block.custom.magnetic;
 
+import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
@@ -193,17 +194,20 @@ public abstract class CoilBlock extends AbstractMagneticBlock
             wireBE.updateElectricity(power);
         }
 
+        if (power == 0) return;
         world.scheduleBlockTick(pos, this, (int) maxUsageMargin);
     }
 
     @Override
     protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random)
     {
+        ElectroMod.LOGGER.info("reseting");
         if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return;
 
         if (coilBE.getTimeDiff(world.getTime()) < maxUsageMargin) return;
 
         updateWireElectricity(world, pos, state, 0);
+        ElectroMod.LOGGER.info("resetted");
     }
 
     public Set<Direction> getOutputDirections(Direction direction)
