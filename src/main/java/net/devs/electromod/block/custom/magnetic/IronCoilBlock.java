@@ -42,7 +42,9 @@ public class IronCoilBlock extends CoilBlock
 
         if (stack.getItem() instanceof MagnetItem) // custom action
         {
-            int magnet_force = stack.getOrDefault(ModDataComponentTypes.MAGNET_FORCE, ModDataComponentTypes.min_force);
+            if (world.isClient()) return ActionResult.FAIL;
+
+            int magnet_force = stack.getOrDefault(ModDataComponentTypes.MAGNETIC_POWER, ModDataComponentTypes.min_power);
             player.sendMessage(Text.literal("Current force: " + magnet_force), true);
 
             return ActionResult.SUCCESS;
@@ -55,6 +57,7 @@ public class IronCoilBlock extends CoilBlock
             world.setBlockState(pos, newBlockState, Block.NOTIFY_ALL);
             world.playSound(null, pos, SoundEvents.BLOCK_CHAIN_HIT, SoundCategory.BLOCKS);
 
+
             return ActionResult.success(world.isClient);
         }
     }
@@ -66,5 +69,11 @@ public class IronCoilBlock extends CoilBlock
     public int defaultForceFormula(int redstonePower, int density)
     {
         return redstonePower == 0 ? 0 : redstonePower * density + ironAdditiveFactor;
+    }
+
+    @Override
+    public int defaultForceFormula(int magneticPower, int density, Double diff)
+    {
+        return 3;
     }
 }

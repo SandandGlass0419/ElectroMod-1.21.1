@@ -12,12 +12,12 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.util.hit.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class ElectroDector extends Block {
@@ -75,7 +75,7 @@ public class ElectroDector extends Block {
                         mutablePos.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
                         BlockEntity blockEntity = world.getBlockEntity(mutablePos);
                         if (blockEntity instanceof WireBlockEntity wire) {
-                            double e = wire.getElectrocity();
+                            double e = wire.getElectricity();
                             if (e > maxElectrocity) maxElectrocity = e;
                         }
                     }
@@ -110,13 +110,13 @@ public class ElectroDector extends Block {
                 Block block = world.getBlockState(currentPos).getBlock();
 
                 if (be instanceof WireBlockEntity wire) {
-                    float e = wire.getElectrocity();
+                    float e = wire.getElectricity();
                     if (!found || e > maxElectrocity) {
                         maxElectrocity = e;
                         found = true;
                     }
                     break; // Wire 만나면 종료
-                } else if (block instanceof PNDiode || block instanceof ElectroDector) {
+                } else if (block instanceof ElectroDector) {
                     currentPos = currentPos.offset(dir); // 같은 방향으로 계속 이동
                 } else {
                     break; // Wire, PNDiode, ElectroDector 없으면 종료
@@ -134,10 +134,9 @@ public class ElectroDector extends Block {
                     Block block = world.getBlockState(currentPos).getBlock();
 
                     if (be instanceof WireBlockEntity wire) {
-                        BlockState wireState = world.getBlockState(currentPos);
-                        wire.setElectrocity(maxElectrocity, world, currentPos, wireState, wire);
+                        wire.updateElectricity(maxElectrocity);
                         break; // 적용 후 종료
-                    } else if (block instanceof PNDiode || block instanceof ElectroDector) {
+                    } else if (block instanceof ElectroDector) {
                         currentPos = currentPos.offset(dir); // 같은 방향으로 계속 이동
                     } else {
                         break; // Wire, PNDiode, ElectroDector 없으면 종료
@@ -146,8 +145,4 @@ public class ElectroDector extends Block {
             }
         }
     }
-
-
-
-
 }

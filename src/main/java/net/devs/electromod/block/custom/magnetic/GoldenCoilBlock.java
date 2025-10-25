@@ -42,7 +42,7 @@ public class GoldenCoilBlock extends CoilBlock
 
         if (stack.getItem() instanceof MagnetItem) // custom action
         {
-            int magnet_force = stack.getOrDefault(ModDataComponentTypes.MAGNET_FORCE, ModDataComponentTypes.min_force);
+            int magnet_force = stack.getOrDefault(ModDataComponentTypes.MAGNETIC_POWER, ModDataComponentTypes.min_power);
             player.sendMessage(Text.literal("Current force: " + magnet_force), true);
 
             return ActionResult.SUCCESS;
@@ -66,5 +66,10 @@ public class GoldenCoilBlock extends CoilBlock
     public int defaultForceFormula(int redstonePower, int density)
     {
         return redstonePower == 0 ? 0 : redstonePower * density + goldAdditiveFactor;
+    }
+
+    @Override
+    public int defaultForceFormula(int magneticPower, int density, Double diff) {
+        return 0;
     }
 }

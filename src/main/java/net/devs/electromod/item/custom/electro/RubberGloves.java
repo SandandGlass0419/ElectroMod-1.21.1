@@ -36,10 +36,10 @@ public class RubberGloves extends Item {
 
             // Shift 눌림 여부 체크
             if (context.getPlayer() != null && context.getPlayer().isSneaking()) {
-                wireEntity.setElectrocity(0, world, pos, state, wireEntity); // 전류 0으로 초기화
+                wireEntity.updateElectricity(0); // 전류 0으로 초기화
                 context.getPlayer().sendMessage(Text.literal("ELECTRICITY RESET TO 0!"), true);
             } else {
-                wireEntity.setElectrocity(100, world, pos, state, wireEntity); // 전류 100으로 설정
+                wireEntity.updateElectricity(100); // 전류 100으로 설정
                 if (context.getPlayer() != null) {
                     context.getPlayer().sendMessage(Text.literal("ELECTRICITY SET TO 100!"), true);
                 }

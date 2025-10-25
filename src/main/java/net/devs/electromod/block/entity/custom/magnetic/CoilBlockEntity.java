@@ -27,6 +27,15 @@ public class CoilBlockEntity extends AbstractMagneticBlockEntity
 
     public int getRedstoneInput() { return this.redstoneInput; }
 
+    private long lastUsedTick = 0;
+
+    public void setLastUsedTick(long lastUsedTick) { this.lastUsedTick = lastUsedTick; }
+
+    public double getTimeDiff(long usedTick)
+    {
+        return usedTick == this.lastUsedTick ? 0.5 : usedTick - this.lastUsedTick;
+    }
+
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup)
     {

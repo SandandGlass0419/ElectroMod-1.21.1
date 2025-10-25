@@ -64,7 +64,7 @@ public class ModBlocks
                     .requiresTool()));
 
     public static final Block WIRE = addBlock("wire",
-            new Wire(AbstractBlock.Settings.create()
+            new IronWire(AbstractBlock.Settings.create()
                     .strength(1f)
                     .sounds(BlockSoundGroup.METAL)
                     .nonOpaque()

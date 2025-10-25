@@ -19,7 +19,7 @@ public class MagnetItem extends Item
     {
         super(settings
                 .maxCount(1)
-                .component(ModDataComponentTypes.MAGNET_FORCE, ModDataComponentTypes.min_force));
+                .component(ModDataComponentTypes.MAGNETIC_POWER, ModDataComponentTypes.min_power));
     }
 
     @Override
@@ -46,17 +46,17 @@ public class MagnetItem extends Item
     {
         int NewForce = getNewForce(itemStack, 1);
 
-        itemStack.set(ModDataComponentTypes.MAGNET_FORCE, NewForce);
+        itemStack.set(ModDataComponentTypes.MAGNETIC_POWER, NewForce);
         return NewForce;
     }
 
     public static int getNewForce(ItemStack itemStack, int increment)
     {
-        int current_force = itemStack.getOrDefault(ModDataComponentTypes.MAGNET_FORCE, ModDataComponentTypes.max_force);
-        int new_force = current_force >= ModDataComponentTypes.max_force ?
-                ModDataComponentTypes.min_force : current_force + Math.abs(increment);
+        int current_force = itemStack.getOrDefault(ModDataComponentTypes.MAGNETIC_POWER, ModDataComponentTypes.max_power);
+        int new_force = current_force >= ModDataComponentTypes.max_power ?
+                ModDataComponentTypes.min_power : current_force + Math.abs(increment);
 
-        if (!(ModDataComponentTypes.min_force <= new_force && new_force <= ModDataComponentTypes.max_force))
+        if (!(ModDataComponentTypes.min_power <= new_force && new_force <= ModDataComponentTypes.max_power))
         { return current_force; }
 
         return new_force;

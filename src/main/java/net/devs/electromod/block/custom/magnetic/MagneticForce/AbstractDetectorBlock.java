@@ -21,5 +21,5 @@ public abstract class AbstractDetectorBlock extends BlockWithEntity
         watchIntick(world1, pos, state1, detectorBE);
     }
 
-    public void watchIntick(World world1, BlockPos pos, BlockState state1, AbstractDetectorBlockEntity abstractBE) { }
+    public abstract void watchIntick(World world1, BlockPos pos, BlockState state1, AbstractDetectorBlockEntity abstractBE);
 }

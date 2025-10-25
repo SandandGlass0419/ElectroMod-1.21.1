@@ -5,16 +5,14 @@ import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class GoldWire extends WireBlock {
     public static final MapCodec<GoldWire> CODEC = GoldWire.createCodec(GoldWire::new);
+    public static final float goldResistance = 1.5f;
 
     public GoldWire(Settings settings) {
         super(settings);
-        resistance = 1.5f;
-
     }
 
     @Override
@@ -23,13 +21,12 @@ public class GoldWire extends WireBlock {
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return CODEC;
+    public float getElectricResistance() {
+        return goldResistance;
     }
 
     @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        WireBlock mywire = (WireBlock) world.getBlockState(pos).getBlock();
-        mywire.resistance = resistance;
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 }

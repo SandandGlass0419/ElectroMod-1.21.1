@@ -1,6 +1,6 @@
 package net.devs.electromod.block.custom.electro;
 
-import com.mojang.serialization.MapCodec;
+import com.google.common.base.Suppliers;
 import net.devs.electromod.block.ModBlocks;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
@@ -26,7 +26,10 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
+import java.util.Set;
+import java.util.function.Supplier;
+
+public abstract class WireBlock extends BlockWithEntity implements BlockEntityProvider {
 
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty NORTH = Properties.NORTH;
@@ -40,9 +43,6 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
     private static final VoxelShape SOUTH_SHAPE = Block.createCuboidShape(5, 5, 11, 11, 11, 16);
     private static final VoxelShape EAST_SHAPE  = Block.createCuboidShape(11, 5, 5, 16, 11, 11);
     private static final VoxelShape WEST_SHAPE  = Block.createCuboidShape(0, 5, 5, 5, 11, 11);
-
-    public static final MapCodec<WireBlock> CODEC = WireBlock.createCodec(WireBlock::new);
-    public float resistance = 1.0f;
 
     public WireBlock(Settings settings) {
         super(settings);
@@ -61,7 +61,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof WireBlockEntity wireBlock) {
-            absElectrocity = Math.abs(wireBlock.getElectrocity());
+            absElectrocity = Math.abs(wireBlock.getElectricity());
         }
 
         if (world.isClient()) return ActionResult.FAIL;
@@ -94,7 +94,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof WireBlockEntity wireBlock &&
-                Math.abs(wireBlock.getElectrocity()) <= 1f) return;
+                Math.abs(wireBlock.getElectricity()) <= 1f) return;
 
         if (entity instanceof LivingEntity living &&
                 living.getEquippedStack(EquipmentSlot.FEET).isOf(Items.LEATHER_BOOTS)) return;
@@ -117,6 +117,11 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
         return this.getDefaultState().with(FACING, ctx.getSide());
     }
 
+    public static final Supplier<Set<Block>> interactableTargets = Suppliers.memoize(() -> Set.of(
+            ModBlocks.ACDC_CONVERTER,
+            ModBlocks.ELECTRO_DECTOR
+    ));
+
     @Override
     protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
@@ -127,12 +132,13 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
         boolean eastHasWire = false;
         boolean westHasWire = false;
 
-        for (Direction dir : new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
-            BlockPos targetPos = pos.offset(dir);
-            BlockState targetState = world.getBlockState(targetPos);
-            Block targetBlock = targetState.getBlock();
+        for (Direction dir : Direction.values()) {
+            if (dir.getAxis() == Direction.Axis.Y) continue;
 
-            if (targetBlock instanceof WireBlock || targetBlock == ModBlocks.ACDC_CONVERTER || targetBlock == ModBlocks.ELECTRO_DECTOR || targetBlock == ModBlocks.PN_DIODE) {
+            Block targetBlock = world.getBlockState(pos.offset(dir)).getBlock();
+
+            if (targetBlock instanceof WireBlock || interactableTargets.get().contains(targetBlock))
+            {
                 switch (dir) {
                     case NORTH -> northHasWire = true;
                     case SOUTH -> southHasWire = true;
@@ -142,8 +148,7 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
             }
         }
 
-        Direction dir = state.get(FACING);
-        switch (dir) {
+        switch (state.get(FACING)) {
             case NORTH -> state = setState(state, eastHasWire, westHasWire, northHasWire, southHasWire);
             case SOUTH -> state = setState(state, westHasWire, eastHasWire, southHasWire, northHasWire);
             case EAST  -> state = setState(state, southHasWire, northHasWire, eastHasWire, westHasWire);
@@ -192,60 +197,53 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return CODEC;
-    }
-
-    @Override
     protected BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
-    public void onBlockElectrocityUpdated(World w, BlockPos pos, BlockState state, WireBlockEntity wireBE) {
-        float value = wireBE.getElectrocity() / resistance;
-        wireBE.Electrocity = value;
+    public abstract float getElectricResistance();
+
+    public void onBlockElectricityUpdated(World w, BlockPos pos, WireBlockEntity wireBE)
+    {
+        BlockState state = w.getBlockState(pos);
+        if (!(state.getBlock() instanceof WireBlock)) return;
+
+        float value = wireBE.getElectricity() / getElectricResistance();
+        wireBE.setElectricity(value);
 
         for (Direction dir : Direction.values()) {
             // 위/아래 방향일 때 FACING 체크
             if ((dir == Direction.UP || dir == Direction.DOWN) &&
-                    (state.get(FACING) != Direction.UP && state.get(FACING) != Direction.DOWN)) {
-                continue; // 위/아래 전도 불가, 스킵
-            }
+                (state.get(FACING) != Direction.UP && state.get(FACING) != Direction.DOWN)
+            ) continue; // 위/아래 전도 불가, 스킵
 
             BlockPos targetPos = pos.offset(dir);
-            BlockState targetState = w.getBlockState(targetPos);
+            if (!(w.getBlockEntity(targetPos) instanceof WireBlockEntity targetWireBE)) continue;
 
-            if (targetState.getBlock() instanceof WireBlock) {
-                BlockEntity targetBE = w.getBlockEntity(targetPos);
-                if (targetBE instanceof WireBlockEntity targetWireBE) {
-                    targetWireBE.setElectrocity(value, w, targetPos, targetState, targetWireBE);
-                }
-            }
+            targetWireBE.updateElectricity(value);
         }
     }
 
-
-    public boolean IsDidElectrified(BlockState state) {
+    public boolean IsElectrified(BlockState state) {
         return state.get(ELECTRIFIED);
     }
 
     @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        if (type == ModBlockEntities.WIRE_BE) {
-            return (w, pos, s, blockEntity) -> {
+    @Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        if (type != ModBlockEntities.WIRE_BE) return null;
+
+        return (w, pos, s, blockEntity) -> {
                 WireBlockEntity wireBE = (WireBlockEntity) blockEntity;
 
-                wireBE.tickCounter++;
-                if (wireBE.tickCounter >= 20) {
-                    wireBE.tickCounter = 0;
+                wireBE.incrementTickCounter(1);
+                if (wireBE.getTickCounter() >= 20) {
+                    wireBE.setTickCounter(0);
 
                     // 월드에 상태 적용
                     w.setBlockState(pos, s.with(ELECTRIFIED, false), Block.NOTIFY_ALL);
                 }
             };
-        }
-
-        return null;
     }
 
     @Override
@@ -260,23 +258,20 @@ public class WireBlock extends BlockWithEntity implements BlockEntityProvider {
         float minElectrocity = Float.MAX_VALUE; // 최소 전기값 저장용
         boolean foundNeighbor = false;
 
-        for (Direction dir : Direction.values()) {
-            BlockPos neighborPos = pos.offset(dir);
-            BlockEntity neighborBE = world.getBlockEntity(neighborPos);
+        for (Direction dir : Direction.values())
+        {
+            if (!(world.getBlockEntity(pos.offset(dir)) instanceof WireBlockEntity neighborWireBE)) continue;
 
-            if (neighborBE instanceof WireBlockEntity neighborWireBE) {
-                float neighborValue = neighborWireBE.getElectrocity();
-                if (neighborValue < minElectrocity) {
+            float neighborValue = neighborWireBE.getElectricity();
+            if (neighborValue < minElectrocity) {
                     minElectrocity = neighborValue;
                     foundNeighbor = true;
-                }
             }
         }
 
         // 인접 와이어가 하나라도 있었을 경우
         if (foundNeighbor) {
-            float newValue = selfWireBE.getElectrocity() + minElectrocity;
-            selfWireBE.setElectrocity(newValue/resistance, world, pos, state, selfWireBE);
+            selfWireBE.updateElectricity(selfWireBE.getElectricity() + minElectrocity);
         }
     }
 

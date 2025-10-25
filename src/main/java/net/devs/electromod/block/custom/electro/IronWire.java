@@ -5,16 +5,14 @@ import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class Wire extends WireBlock {
-    public static final MapCodec<Wire> CODEC = Wire.createCodec(Wire::new);
+public class IronWire extends WireBlock {
+    public static final MapCodec<IronWire> CODEC = IronWire.createCodec(IronWire::new);
+    public static final float ironResistance = 2f;
 
-    public Wire(Settings settings) {
+    public IronWire(Settings settings) {
         super(settings);
-        resistance = 1.0f;
-
     }
 
     @Override
@@ -23,13 +21,12 @@ public class Wire extends WireBlock {
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return CODEC;
+    public float getElectricResistance() {
+        return ironResistance;
     }
 
     @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        WireBlock mywire = (WireBlock) world.getBlockState(pos).getBlock();
-        mywire.resistance = resistance;
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 }

@@ -1,7 +1,10 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
+import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
+import net.devs.electromod.components.ModDataComponentTypes;
+import net.devs.electromod.item.custom.magnetic.MagnetItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -9,6 +12,8 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.IntProperty;
@@ -17,11 +22,14 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
 
 public abstract class CoilBlock extends AbstractMagneticBlock
 {
@@ -86,14 +94,6 @@ public abstract class CoilBlock extends AbstractMagneticBlock
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite());
-    }
-
-    // custom features
-
-    @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
-    {
-        return super.onUse(state, world, pos, player, hit);
     }
 
     // redstone
@@ -163,6 +163,79 @@ public abstract class CoilBlock extends AbstractMagneticBlock
     }
 
     // magnetic force features
+    public static final float maxUsageMargin = 40f;
 
-    public int defaultForceFormula(int redstonePower, int density) { return 0; }
+    @Nullable
+    public Integer getWireElectricity(World world, BlockPos pos, BlockState state, int magneticPower)
+    {
+        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return null;
+
+        int electricity = 0;
+
+        long time = world.getTime();
+        double tickDiff = coilBE.getTimeDiff(time);
+        coilBE.setLastUsedTick(time);
+
+        if (tickDiff <= maxUsageMargin)
+        {
+            electricity = defaultForceFormula(magneticPower, state.get(DENSITY), tickDiff);
+        }
+
+        return electricity;
+    }
+
+    public void updateWireElectricity(World world, BlockPos pos, BlockState state, int power)
+    {
+        for (var direction : getOutputDirections(state.get(FACING)))
+        {
+            if (!(world.getBlockEntity(pos.offset(direction)) instanceof WireBlockEntity wireBE)) continue;
+
+            wireBE.updateElectricity(power);
+        }
+
+        world.scheduleBlockTick(pos, this, (int) maxUsageMargin);
+    }
+
+    @Override
+    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random)
+    {
+        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return;
+
+        if (coilBE.getTimeDiff(world.getTime()) < maxUsageMargin) return;
+
+        updateWireElectricity(world, pos, state, 0);
+    }
+
+    public Set<Direction> getOutputDirections(Direction direction)
+    {
+        return Set.of(direction, direction.getOpposite());
+    }
+
+    @Override
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
+    {
+        var returned = super.onUse(state, world, pos, player, hit);
+        if (returned != ActionResult.PASS) return returned;
+
+        ItemStack stack = player.getMainHandStack();
+
+        if (stack.getItem() instanceof MagnetItem)
+        {
+            if (world.isClient()) return ActionResult.FAIL;
+
+            int magneticPower = stack.getOrDefault(ModDataComponentTypes.MAGNETIC_POWER, ModDataComponentTypes.min_power);
+
+            Integer wireElectricity = getWireElectricity(world, pos, state, magneticPower);
+            if (wireElectricity == null) return ActionResult.FAIL;
+
+            updateWireElectricity(world, pos, state, wireElectricity);
+
+            return ActionResult.SUCCESS;
+        }
+
+        return super.onUse(state, world, pos, player, hit);
+    }
+
+    public abstract int defaultForceFormula(int redstonePower, int density);
+    public abstract int defaultForceFormula(int magneticPower, int density, Double diff);
 }

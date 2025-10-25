@@ -34,7 +34,7 @@ public class ElectroStaff extends Item {
             WireBlockEntity wireEntity = (WireBlockEntity) world.getBlockEntity(context.getBlockPos());
             assert context.getPlayer() != null;
             assert wireEntity != null;
-            context.getPlayer().sendMessage(Text.literal("ELECTRICITY : " + wireEntity.getElectrocity()), true);
+            context.getPlayer().sendMessage(Text.literal("ELECTRICITY : " + wireEntity.getElectricity()), true);
 
             return ActionResult.SUCCESS;
         }

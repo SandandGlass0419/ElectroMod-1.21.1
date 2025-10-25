@@ -49,7 +49,6 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
             updateHelper(this.pos, magneticPos, field.get(magneticPos));
         }
 
-        onWatchUpdate();
         this.startWatch = true;
     }
 
@@ -61,7 +60,6 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
         if (field == null) return;
 
         updateHelper(detectorPos, magneticPos, field.get(magneticPos));
-        onWatchUpdate();
     }
 
     public void removeWatchElement(BlockPos detectorPos, BlockPos magneticPos)
@@ -69,7 +67,6 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
         if (!this.pos.equals(detectorPos)) return;
 
         this.Watch.remove(magneticPos);
-        onWatchUpdate();
 
         ElectroMod.LOGGER.info("removed watch: {}, {}", detectorPos, magneticPos);
     }
@@ -91,6 +88,4 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
     {
         return field != null;
     }
-
-    public void onWatchUpdate() { }
 }

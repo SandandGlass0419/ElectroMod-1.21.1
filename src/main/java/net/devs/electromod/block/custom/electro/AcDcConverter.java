@@ -50,7 +50,7 @@ public class AcDcConverter extends BlockWithEntity implements BlockEntityProvide
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 
         return (w, pos, s, entity) -> {
-            if (!(entity instanceof AcDcConvertEntity converter)) return;
+            if (!(entity instanceof AcDcConvertEntity)) return;
 
             int maxElectro = 0; // 주변 WireBlock 중 최대 전류 값을 사용
 
@@ -60,7 +60,7 @@ public class AcDcConverter extends BlockWithEntity implements BlockEntityProvide
                 if (neighborState.getBlock() instanceof WireBlock) {
                     BlockEntity neighborBE = w.getBlockEntity(neighborPos);
                     if (neighborBE instanceof WireBlockEntity wireBE) {
-                        maxElectro = Math.max(maxElectro, MathHelper.clamp((int)wireBE.getElectrocity(),0,15));
+                        maxElectro = Math.max(maxElectro, MathHelper.clamp((int)wireBE.getElectricity(),0,15));
                     }
                 }
             }
