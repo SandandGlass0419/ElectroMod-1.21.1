@@ -6,6 +6,7 @@ import net.devs.electromod.block.entity.custom.electro.AcDcConvertEntity;
 import net.devs.electromod.block.entity.custom.electro.PNDiodeEntity;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
+import net.devs.electromod.block.entity.custom.magnetic.MagnetBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
@@ -21,6 +22,12 @@ public class ModBlockEntities
                             ModBlocks.IRON_COIL,
                             ModBlocks.GOLDEN_COIL,
                             ModBlocks.COPPER_COIL
+                    ).build());
+
+    public static final BlockEntityType<MagnetBlockEntity> MAGNET_BE =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "coil_be"),
+                    BlockEntityType.Builder.create(MagnetBlockEntity::new,
+                            ModBlocks.MAGNET_BLOCK
                     ).build());
 
     public static final BlockEntityType<MagneticDetectorEntity> DETECTOR_BE =

@@ -7,7 +7,6 @@ import net.devs.electromod.block.custom.magnetic.*;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
@@ -46,8 +45,7 @@ public class ModBlocks
     public static final Block MAGNET_BLOCK = addBlock("magnet_block",
             new MagnetBlock(AbstractBlock.Settings.create()
                     .strength(3.5f)
-                    .sounds(BlockSoundGroup.LODESTONE)
-                    .pistonBehavior(PistonBehavior.BLOCK)));
+                    .sounds(BlockSoundGroup.LODESTONE)));
 
     public static final Block MAGNETIC_DETECTOR = addBlock("magnetic_detector",
             new MagneticDetector(AbstractBlock.Settings.create()
@@ -81,7 +79,6 @@ public class ModBlocks
             new Battery(AbstractBlock.Settings.create()
                     .strength(1f)
                     .sounds(BlockSoundGroup.METAL)
-                    .nonOpaque()
                     .requiresTool()));
 
     public static final Block ACDC_CONVERTER = addBlock("ac_dc_converter",

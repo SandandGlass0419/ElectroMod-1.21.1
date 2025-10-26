@@ -49,8 +49,8 @@ public class ElectroDector extends Block {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient) {
-            double maxElectro = Double.NEGATIVE_INFINITY;
+        if (!world.isClient()) {
+            double maxElectro = 0;
             BlockPos.Mutable mutablePos = new BlockPos.Mutable();
             int range = 1; // 탐색 범위 1블록
 
@@ -67,7 +67,7 @@ public class ElectroDector extends Block {
                 }
             }
 
-            if (maxElectro != Double.NEGATIVE_INFINITY) {
+            if (maxElectro != 0) {
                 player.sendMessage(Text.literal("Nearby WireBlock electricity: " + maxElectro), true);
             } else {
                 player.sendMessage(Text.literal("No WireBlock nearby."), true);
@@ -76,16 +76,18 @@ public class ElectroDector extends Block {
         return ActionResult.SUCCESS;
     }
 
+    public static final double explosionThreshold = 150;
+
     @Override
     protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        if (world.isClient) return;
+        if (world.isClient()) return;
 
         BlockEntity be = world.getBlockEntity(sourcePos);
         if (be instanceof WireBlockEntity wire) {
             double electricity = wire.getElectricity();
-            if (electricity > 0) {
+            if (electricity > explosionThreshold) {
                 // 전류량에 비례해 폭발
-                float explosionPower = (float) electricity; // 필요시 스케일링 가능
+                float explosionPower = (float) (electricity - explosionThreshold) / 2; // 필요시 스케일링 가능
                 world.createExplosion(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, explosionPower, World.ExplosionSourceType.BLOCK);
                 world.removeBlock(pos, false);
             }
