@@ -37,7 +37,9 @@ import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 import java.util.function.Supplier;
 
 public class  MagneticDetector extends AbstractDetectorBlock
@@ -61,7 +63,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
     {
         super(settings);
         this.setDefaultState(this.getDefaultState()
-                .with(DETECT_STATE, DetectState.EMPTY)
+                .with(DETECT_STATE, DetectState.GENERIC)
                 .with(FACING, Direction.UP)
                 .with(HORIZONTAL_AXIS, Direction.Axis.Z)
                 .with(POWERED, false));
@@ -214,7 +216,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
     {
         if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return;
 
-        int newPower = defaultPowerConverter(state, magenticPower);
+        int newPower = defaultPowerConverter(magenticPower);
         ElectroMod.LOGGER.info("newPower: {}", newPower);
 
         if (newPower == 0 && state.get(POWERED))       { world.setBlockState(pos, state.with(POWERED, false), Block.NOTIFY_ALL); }
@@ -224,13 +226,8 @@ public class  MagneticDetector extends AbstractDetectorBlock
         detectorEntity.setRedstoneOutput(newPower);
     }
 
-    public static int defaultPowerConverter(BlockState state, int magneticPower)
+    public static int defaultPowerConverter(int magneticPower)
     {
-        if (state.get(DETECT_STATE) == DetectState.EMPTY)
-        {
-            // code for generic
-        }
-
         return Math.min(magneticPower / CoilBlock.DENSITY_MAX, 15);
     }
 
@@ -251,7 +248,6 @@ public class  MagneticDetector extends AbstractDetectorBlock
         BlockField blockField = MagneticForceInteractor.getBlockField(world1, pos); if (blockField == null) return;
         Direction.Axis detectionAxis = getDetectionAxis(state1);
         ForceProfile.powerCategory powerCategory = getPowerCategory(state1.get(DETECT_STATE));
-        Integer normalizer = MagneticForceInteractor.getAdditiveFactor(powerCategory); if (normalizer == null) return;
 
         Set<BlockPos> excludedPos = new HashSet<>();
 
@@ -259,7 +255,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
         excludeUnaligned(excludedPos, blockField, detectionAxis);
         excludeWrongCategory(excludedPos, world1, blockField, powerCategory);
 
-        int power = BlockField.normalize(blockField.getPureAdditive(excludedPos), normalizer);
+        int power = getProcessedPower(blockField, excludedPos, powerCategory);
         ElectroMod.LOGGER.info("magneticPower: {}", power);
 
         updatePower(world1, pos, state1, power);
@@ -318,17 +314,103 @@ public class  MagneticDetector extends AbstractDetectorBlock
 
     public static void excludeWrongCategory(Set<BlockPos> excludedPos, World world, BlockField blockField, ForceProfile.powerCategory stateCat)
     {
+        if (stateCat == ForceProfile.powerCategory.GENERIC) return;
+
         int magneticBlockPower;
+        ForceProfile.powerCategory posCat;
 
         for (var magneticPos : blockField.getFields().keySet())
         {
             if (excludedPos.contains(magneticPos)) continue;
 
             magneticBlockPower = MagneticForceInteractor.getField(world, magneticPos).getMagneticPower();
+            posCat = MagneticForceInteractor.getPowerCategory(magneticBlockPower);
 
-            if (MagneticForceInteractor.getPowerCategory(magneticBlockPower) != stateCat)
+            if (posCat != ForceProfile.powerCategory.MAGNET && posCat != stateCat)
             { ElectroMod.LOGGER.info("cat: {}, {}", MagneticForceInteractor.getPowerCategory(magneticBlockPower), stateCat); excludedPos.add(magneticPos); }
         }
+    }
+
+    public static int getProcessedPower(BlockField blockField, Set<BlockPos> excludedPos, ForceProfile.powerCategory stateCat)
+    {
+        if (stateCat == ForceProfile.powerCategory.GENERIC) // all categories
+        {
+            return genericNormalizer(genericNetPower(blockField, excludedPos));
+        }
+
+        else // same category
+        {
+            Integer normalizer = getNormalizer(stateCat);
+            if (normalizer == null) return 0;
+
+            return BlockField.normalizer(blockField.getPureNetPower(excludedPos), normalizer);
+        }
+    }
+
+    public static Vector<Integer> genericNetPower(BlockField blockField, Set<BlockPos> excludedPos)
+    {
+        int netPower = 0;
+        int netIronCount = 0;
+        int netGoldCount = 0;
+        int netCopperCount = 0;
+
+        for (var magneticPos : blockField.getFields().keySet())
+        {
+            if (excludedPos.contains(magneticPos)) continue;
+
+            switch (blockField.get(magneticPos).getForceDirection().getDirection())
+            {
+                case POSITIVE:
+                    netPower += blockField.get(magneticPos).getMagneticPower();
+
+                    switch (MagneticForceInteractor.getPowerCategory(blockField.get(magneticPos).getMagneticPower()))
+                    {
+                        case IRON -> netIronCount++;
+                        case GOLD -> netGoldCount++;
+                        case COPPER -> netCopperCount++;
+                        case null, default -> {}
+                    }
+                    break;
+
+                case NEGATIVE:
+                    netPower -= blockField.get(magneticPos).getMagneticPower();
+
+                    switch (MagneticForceInteractor.getPowerCategory(blockField.get(magneticPos).getMagneticPower()))
+                    {
+                        case IRON -> netIronCount--;
+                        case GOLD -> netGoldCount--;
+                        case COPPER -> netCopperCount--;
+                        case null, default -> {}
+                    }
+                    break;
+            }
+        }
+
+        return new Vector<>(List.of(netPower, netIronCount, netGoldCount, netCopperCount));
+    }
+
+    private static final int ironNormalizer = MagneticForceInteractor.getAdditiveFactor(ForceProfile.powerCategory.IRON);
+    private static final int goldNormalizer = MagneticForceInteractor.getAdditiveFactor(ForceProfile.powerCategory.GOLD);
+    private static final int copperNormalizer = MagneticForceInteractor.getAdditiveFactor(ForceProfile.powerCategory.COPPER);
+
+    @Nullable
+    private static Integer getNormalizer(ForceProfile.powerCategory powerCategory)
+    {
+        return switch (powerCategory)
+        {
+            case IRON -> ironNormalizer;
+            case GOLD -> goldNormalizer;
+            case COPPER -> copperNormalizer;
+            default -> null;
+        };
+    }
+
+    public static int genericNormalizer(Vector<Integer> Additive)
+    {
+         return Math.abs(Additive.getFirst()
+                       - Additive.get(1) * ironNormalizer
+                       - Additive.get(2) * goldNormalizer
+                       - Additive.get(3) * copperNormalizer);
     }
 
     private static ForceProfile.powerCategory getPowerCategory(DetectState detectState)
@@ -338,7 +420,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
             case IRON_COIL -> ForceProfile.powerCategory.IRON;
             case GOLDEN_COIL -> ForceProfile.powerCategory.GOLD;
             case COPPER_COIL -> ForceProfile.powerCategory.COPPER;
-            case EMPTY -> ForceProfile.powerCategory.GENERIC;
+            case GENERIC -> ForceProfile.powerCategory.GENERIC;
         };
     }
 
@@ -361,10 +443,10 @@ public class  MagneticDetector extends AbstractDetectorBlock
             return ActionResult.SUCCESS;
         }
 
-        if (detect_state != DetectState.EMPTY) // give item to player
+        if (detect_state != DetectState.GENERIC) // give item to player
         {
             player.giveItemStack(detect_state.getStoredItem());
-            world.setBlockState(pos, state.with(DETECT_STATE, DetectState.EMPTY), Block.NOTIFY_ALL);
+            world.setBlockState(pos, state.with(DETECT_STATE, DetectState.GENERIC), Block.NOTIFY_ALL);
 
             world.playSound(null, pos, SoundEvents.BLOCK_COPPER_BULB_STEP, SoundCategory.BLOCKS);
             player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.2f, 1f);

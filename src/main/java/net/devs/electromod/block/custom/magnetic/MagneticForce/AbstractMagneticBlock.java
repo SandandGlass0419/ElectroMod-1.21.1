@@ -1,6 +1,8 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
+import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
+import net.devs.electromod.block.entity.custom.magnetic.MagnetBlockEntity;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -27,7 +29,7 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit)
     {
-        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity)) return ActionResult.FAIL;
+        if (!(world.getBlockEntity(pos) instanceof AbstractMagneticBlockEntity)) return ActionResult.FAIL;
 
         ItemStack stack = player.getMainHandStack();
 
@@ -55,41 +57,53 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
     private void testMagneticField(World world, BlockPos pos)
     {
         if (world.isClient()) return;
-        if (!(world.getBlockEntity(pos) instanceof AbstractMagneticBlockEntity)) return;
+        if (!(world.getBlockEntity(pos) instanceof AbstractMagneticBlockEntity abstractBE)) return;
 
         ForceProfile profile = MagneticForceInteractor.getForceProfile(MagneticForceInteractor.getField(world, pos));
 
         BlockState[] forceBlocks = {
                 Blocks.RED_STAINED_GLASS.getDefaultState(),
                 Blocks.CYAN_STAINED_GLASS.getDefaultState(),
-                Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState()
+                Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState(),
+                Blocks.MAGENTA_STAINED_GLASS.getDefaultState()
         };
+
+        int index = abstractBE instanceof MagnetBlockEntity ? 3 : 0;
 
         for (var headSet : profile.headProfile())
         {
             for (var mvec : headSet)
             {
+                index = index == 3 ? 3 : Math.abs(mvec.getPowerDelta());
+
                 world.setBlockState(new BlockPos(mvec.add(pos)),
-                        forceBlocks[Math.abs(mvec.getPowerDelta())]);
+                        forceBlocks[index]);
             }
         }
+        ElectroMod.LOGGER.info("head length: {}", profile.headProfile().size());
 
         for (var bodySet : profile.bodyProfile())
         {
             for (var mvec : bodySet)
             {
+                index = index == 3 ? 3 : Math.abs(mvec.getPowerDelta());
+
                 world.setBlockState(new BlockPos(mvec.add(pos)),
-                        forceBlocks[Math.abs(mvec.getPowerDelta())]);
+                        forceBlocks[index]);
             }
         }
+        ElectroMod.LOGGER.info("head length: {}", profile.headProfile().size());
 
         for (var tailSet : profile.tailProfile())
         {
             for (var mvec : tailSet)
             {
+                index = index == 3 ? 3 : Math.abs(mvec.getPowerDelta());
+
                 world.setBlockState(new BlockPos(mvec.add(pos)),
-                        forceBlocks[Math.abs(mvec.getPowerDelta())]);
+                        forceBlocks[index]);
             }
         }
+        ElectroMod.LOGGER.info("head length: {}", profile.headProfile().size());
     }
 }

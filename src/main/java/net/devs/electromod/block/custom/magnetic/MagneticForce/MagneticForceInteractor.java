@@ -4,6 +4,7 @@ import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.magnetic.CopperCoilBlock;
 import net.devs.electromod.block.custom.magnetic.GoldenCoilBlock;
 import net.devs.electromod.block.custom.magnetic.IronCoilBlock;
+import net.devs.electromod.block.custom.magnetic.MagnetBlock;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
@@ -166,12 +167,13 @@ public class MagneticForceInteractor
     {
         ElectroMod.LOGGER.info("FindMVec start");
 
-        ForceProfile profile = getForceProfile(getField(world, magneticPos));
+        MagneticField mapField = getField(world, magneticPos);
+        ForceProfile profile = getForceProfile(mapField);
 
         var foundMVec = profile.find(magneticPos, detectorPos);
 
         return foundMVec == null ? null :
-               foundMVec.toMagneticField(getField(world, magneticPos).getMagneticPower());
+               foundMVec.toMagneticField(mapField.getMagneticPower());
     }
 
     public static ForceProfile getForceProfile(MagneticField field)
@@ -185,7 +187,8 @@ public class MagneticForceInteractor
     @Nullable
     public static ForceProfile.powerCategory getPowerCategory(int magneticPower)
     {
-        if (magneticPower > CopperCoilBlock.copperAdditiveFactor) return ForceProfile.powerCategory.COPPER;
+        if (magneticPower == MagnetBlock.MAGNET_POWER_IDENT) return ForceProfile.powerCategory.MAGNET;
+        else if (magneticPower > CopperCoilBlock.copperAdditiveFactor) return ForceProfile.powerCategory.COPPER;
         else if (magneticPower > GoldenCoilBlock.goldAdditiveFactor) return ForceProfile.powerCategory.GOLD;
         else if (magneticPower > IronCoilBlock.ironAdditiveFactor) return ForceProfile.powerCategory.IRON;
 
@@ -200,8 +203,8 @@ public class MagneticForceInteractor
             case IRON -> IronCoilBlock.ironAdditiveFactor;
             case GOLD -> GoldenCoilBlock.goldAdditiveFactor;
             case COPPER -> CopperCoilBlock.copperAdditiveFactor;
-            case GENERIC -> 100;    // change
-            case null -> null;
+            case MAGNET -> MagnetBlock.MAGNET_POWER_IDENT;    // change
+            default -> null;
         };
     }
 

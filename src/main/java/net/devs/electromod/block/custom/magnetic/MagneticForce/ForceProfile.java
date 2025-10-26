@@ -27,11 +27,15 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
     private static final Vector<Set<MVec3i>> COPPER_BODY_NORTH = createCopperBodyNorth();
     private static final Vector<Set<MVec3i>> COPPER_TAIL_NORTH = createCopperTailNorth();
 
-    public static final int minmumDistance = 3;
+    private static final Vector<Set<MVec3i>> MAGNET_HEAD_NORTH = createMagnetHeadNorth();
+    private static final Vector<Set<MVec3i>> MAGNET_BODY_NORTH = createMagnetBodyNorth();
+    private static final Vector<Set<MVec3i>> MAGNET_TAIL_NORTH = createMagnetTailNorth();
+
+    public static final int minmumDistance = 15;
 
     public static void registerForceProfiles()
     {
-        ElectroMod.LOGGER.info("Registering ForceProfile");
+        ElectroMod.LOGGER.info("Registering ForceProfiles");
     }
 
     public static Set<BlockPos> deployPos(BlockPos pos, Set<MVec3i> deltas)
@@ -157,9 +161,10 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
     {
         return switch (powerCategory)
         {
-            case ForceProfile.powerCategory.IRON -> rotateNorthProfile(IRON_HEAD_NORTH, forceDirection);
-            case ForceProfile.powerCategory.GOLD -> rotateNorthProfile(GOLD_HEAD_NORTH, forceDirection);
-            case ForceProfile.powerCategory.COPPER -> rotateNorthProfile(COPPER_HEAD_NORTH, forceDirection);
+            case IRON -> rotateNorthProfile(IRON_HEAD_NORTH, forceDirection);
+            case GOLD -> rotateNorthProfile(GOLD_HEAD_NORTH, forceDirection);
+            case COPPER -> rotateNorthProfile(COPPER_HEAD_NORTH, forceDirection);
+            case MAGNET -> rotateNorthProfile(MAGNET_HEAD_NORTH, forceDirection);
             default -> EMPTY;
         };
     }
@@ -168,9 +173,10 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
     {
         return switch (powerCategory)
         {
-            case ForceProfile.powerCategory.IRON -> rotateNorthProfile(IRON_BODY_NORTH, forceDirection);
-            case ForceProfile.powerCategory.GOLD -> rotateNorthProfile(GOLD_BODY_NORTH, forceDirection);
-            case ForceProfile.powerCategory.COPPER -> rotateNorthProfile(COPPER_BODY_NORTH, forceDirection);
+            case IRON -> rotateNorthProfile(IRON_BODY_NORTH, forceDirection);
+            case GOLD -> rotateNorthProfile(GOLD_BODY_NORTH, forceDirection);
+            case COPPER -> rotateNorthProfile(COPPER_BODY_NORTH, forceDirection);
+            case MAGNET -> rotateNorthProfile(MAGNET_BODY_NORTH, forceDirection);
             default -> EMPTY;
         };
     }
@@ -179,9 +185,10 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
     {
         return switch (powerCategory)
         {
-            case ForceProfile.powerCategory.IRON -> rotateNorthProfile(IRON_TAIL_NORTH, forceDirection);
-            case ForceProfile.powerCategory.GOLD -> rotateNorthProfile(GOLD_TAIL_NORTH, forceDirection);
-            case ForceProfile.powerCategory.COPPER -> rotateNorthProfile(COPPER_TAIL_NORTH, forceDirection);
+            case IRON -> rotateNorthProfile(IRON_TAIL_NORTH, forceDirection);
+            case GOLD -> rotateNorthProfile(GOLD_TAIL_NORTH, forceDirection);
+            case COPPER -> rotateNorthProfile(COPPER_TAIL_NORTH, forceDirection);
+            case MAGNET -> rotateNorthProfile(MAGNET_TAIL_NORTH, forceDirection);
             default -> EMPTY;
         };
     }
@@ -453,18 +460,108 @@ public record ForceProfile(Vector<Set<MVec3i>> headProfile, Vector<Set<MVec3i>> 
         return northProfile;
     }
 
+    private static Vector<Set<MVec3i>> createMagnetHeadNorth()
+    {
+        Vector<Set<MVec3i>> wipedNorthProfile = new Vector<>();
+
+        for (var forceElement : createCopperHeadNorth())
+        {
+            wipedNorthProfile.add(MVec3i.wipePowerDeltas(forceElement, powerCategory.MAGNET.get()));
+        }
+
+        wipedNorthProfile.getFirst().clear();   // clears core (no core for magnet block
+
+        Set<MVec3i> genericHeadElement = createNorthElement(new MVec3i(0, 0, -1, Direction.NORTH, powerCategory.MAGNET.get()),
+                                                            new MVec3i(0, 0, -15, Direction.NORTH, powerCategory.MAGNET.get()));
+
+        wipedNorthProfile.add(genericHeadElement);  // head
+        wipedNorthProfile.add(Set.of());    // tail
+
+        return wipedNorthProfile;
+    }
+
+    private static Vector<Set<MVec3i>> createMagnetBodyNorth()
+    {
+        Vector<Set<MVec3i>> wipedNorthProfile = new Vector<>();
+
+        // no additional cores
+
+        for (var forceElement : createCopperBodyNorth())
+        {
+            wipedNorthProfile.add(MVec3i.wipePowerDeltas(forceElement, powerCategory.MAGNET.get()));
+        }
+
+        wipedNorthProfile.add(Set.of());    // head
+        wipedNorthProfile.add(Set.of());    // tail
+
+        wipedNorthProfile.getFirst().clear();
+
+        return wipedNorthProfile;
+    }
+
+    private static Vector<Set<MVec3i>> createMagnetTailNorth()
+    {
+        Vector<Set<MVec3i>> wipedNorthProfile = new Vector<>();
+
+        // no additional cores
+
+        for (var forceElement : createCopperTailNorth())
+        {
+            wipedNorthProfile.add(MVec3i.wipePowerDeltas(forceElement, powerCategory.MAGNET.get()));
+        }
+
+        Set<MVec3i> genericTailElement = createNorthElement(new MVec3i(0, 0, 1, Direction.NORTH, powerCategory.MAGNET.get()),
+                                                            new MVec3i(0, 0, 15, Direction.NORTH, powerCategory.MAGNET.get()));
+
+        wipedNorthProfile.add(Set.of());    // head
+        wipedNorthProfile.add(genericTailElement);  // tail
+
+        wipedNorthProfile.getFirst().clear();
+
+        return wipedNorthProfile;
+    }
+
     public enum powerCategory
     {
         IRON(0),
         GOLD(-1),
         COPPER(-2),
-        GENERIC(1);
+        MAGNET(0),
+        GENERIC(null);
 
-        private final int forceDelta;
+        private final Integer powerDelta;
 
-        powerCategory(int delta) { this.forceDelta = delta; }
+        powerCategory(Integer delta) { this.powerDelta = delta; }
 
-        public int get() {  return this.forceDelta; }
+        public Integer get() {  return this.powerDelta; }
+    }
+
+    private static Set<MVec3i> createNorthElement(MVec3i pos1, MVec3i pos2)
+    {
+        Set<MVec3i> northElement = new HashSet<>();
+
+        Direction pos1Direction = pos1.getForceDirection();
+        int pos1PowerDelta = pos1.getPowerDelta();
+
+        int bigX = Math.max(pos1.getX(), pos2.getX());
+        int smallX = Math.min(pos1.getX(), pos2.getX());
+        int bigY = Math.max(pos1.getY(), pos2.getY());
+        int smallY = Math.min(pos1.getY(), pos2.getY());
+        int bigZ = Math.max(pos1.getZ(), pos2.getZ());
+        int smallZ = Math.min(pos1.getZ(), pos2.getZ());
+
+        for (int x = smallX;x <= bigX;x++)
+        {
+            for (int y = smallY;y <= bigY;y++)
+            {
+                for (int z = smallZ;z <= bigZ;z++)
+                {
+                    northElement.add(new MVec3i(x, y, z, pos1Direction, pos1PowerDelta));
+                }
+            }
+        }
+
+        return northElement;
     }
 
     private static Set<MVec3i> createNorthElement(Set<MVec3i> northElementElement, Vec3i... variations)

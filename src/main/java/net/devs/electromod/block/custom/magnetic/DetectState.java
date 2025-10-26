@@ -7,7 +7,7 @@ import net.minecraft.util.StringIdentifiable;
 
 public enum DetectState implements StringIdentifiable
 {
-    EMPTY("empty", null),
+    GENERIC("generic", null),
     IRON_COIL("iron", ModBlocks.IRON_COIL.asItem()),
     GOLDEN_COIL("gold", ModBlocks.GOLDEN_COIL.asItem()),
     COPPER_COIL("copper", ModBlocks.COPPER_COIL.asItem());

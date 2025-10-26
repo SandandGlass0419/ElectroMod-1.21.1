@@ -91,6 +91,18 @@ public class MVec3i extends Vec3i
         return vecSet;
     }
 
+    public static Set<MVec3i> wipePowerDeltas(Set<MVec3i> deltas, int newPowerDelta)
+    {
+        Set<MVec3i> newDeltas = new HashSet<>();
+
+        for (MVec3i mVec3i : deltas)
+        {
+            newDeltas.add(new MVec3i(mVec3i, mVec3i.getForceDirection(), newPowerDelta));
+        }
+
+        return newDeltas;
+    }
+
     public enum Angles
     {
         CLOCK_360,

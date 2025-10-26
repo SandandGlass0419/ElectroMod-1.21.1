@@ -33,7 +33,7 @@ public class ElectroMod implements ModInitializer
 
         // register events
         // block entity load events
-        ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((
+        ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register(
         (blockEntity, world) ->
         {
             if (world.isClient()) return;
@@ -44,29 +44,22 @@ public class ElectroMod implements ModInitializer
             else if (blockEntity instanceof AbstractDetectorBlockEntity detectorBE)
             { detectorBE.blockentityLoaded(); }
 
-        }));
+        });
 
-        ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((
+        ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(
         (blockEntity, world) ->
         {
             if (world.isClient()) return;
 
-            if (blockEntity instanceof AbstractMagneticBlockEntity forceBE)
-            { forceBE.blockentityUnloaded(); }
+            if (blockEntity instanceof AbstractMagneticBlockEntity magneticBE)
+            { magneticBE.blockentityUnloaded(); }
 
             else if (blockEntity instanceof AbstractDetectorBlockEntity detectorBE)
             { detectorBE.blockentityUnloaded(); }
-        }));
+        });
 
         // server load events
-        ServerWorldEvents.LOAD.register((MagneticForceInteractor::initPosMap));
-        ServerWorldEvents.UNLOAD.register((MagneticForceInteractor::initPosMap));
-
-        //Test();
+        ServerWorldEvents.UNLOAD.register(MagneticForceInteractor::initPosMap);
+        ServerWorldEvents.LOAD.register(MagneticForceInteractor::initPosMap);
 	}
-
-    private static void Test()
-    {
-
-    }
 }

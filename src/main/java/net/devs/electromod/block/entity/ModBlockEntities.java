@@ -15,7 +15,7 @@ import net.minecraft.util.Identifier;
 
 public class ModBlockEntities
 {
-    //magnetic
+    // magnetic
     public static final BlockEntityType<CoilBlockEntity> COIL_BE =
             Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "coil_be"),
                     BlockEntityType.Builder.create(CoilBlockEntity::new,
@@ -25,7 +25,7 @@ public class ModBlockEntities
                     ).build());
 
     public static final BlockEntityType<MagnetBlockEntity> MAGNET_BE =
-            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "coil_be"),
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "magnet_be"),
                     BlockEntityType.Builder.create(MagnetBlockEntity::new,
                             ModBlocks.MAGNET_BLOCK
                     ).build());
@@ -35,7 +35,7 @@ public class ModBlockEntities
                     BlockEntityType.Builder.create(MagneticDetectorEntity::new,
                             ModBlocks.MAGNETIC_DETECTOR
                     ).build());
-    //electro
+    // electro
     public static final BlockEntityType<WireBlockEntity> WIRE_BE =
             Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "wire_be"),
                     BlockEntityType.Builder.create(WireBlockEntity::new,

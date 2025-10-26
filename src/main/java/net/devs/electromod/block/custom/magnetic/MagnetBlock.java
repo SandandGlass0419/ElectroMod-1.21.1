@@ -44,6 +44,9 @@ public class MagnetBlock extends AbstractMagneticBlock
     @Override
     @Nullable
     public BlockState getPlacementState(ItemPlacementContext ctx)
-    { return this.getDefaultState().with(FACING, ctx.getSide().getOpposite()); }
+    { return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite()); }
 
+    // magnetic features
+
+    public static final int MAGNET_POWER_IDENT = 200;
 }

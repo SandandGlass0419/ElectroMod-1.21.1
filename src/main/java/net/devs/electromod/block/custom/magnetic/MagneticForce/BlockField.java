@@ -1,6 +1,5 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
-import net.devs.electromod.ElectroMod;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -28,12 +27,11 @@ public class BlockField
     public void removeField(BlockPos magneticPos)
     { this.Fields.remove(magneticPos); }
 
-    public Pair<Integer, Integer> getPureAdditive(Set<BlockPos> excludedPos)
+    public Pair<Integer, Integer> getPureNetPower(Set<BlockPos> excludedPos)
     {
         int netPower = 0;
         int netCount = 0;
 
-        ElectroMod.LOGGER.info("size: {}", this.Fields.size());
         for (var magneticPos : this.Fields.keySet())
         {
             if (excludedPos.contains(magneticPos)) continue;
@@ -55,13 +53,13 @@ public class BlockField
         return new Pair<>(netPower, netCount);
     }
 
-    public static int normalize(Pair<Integer, Integer> pureAdditive, int normalizer)
+    public static int normalizer(Pair<Integer, Integer> Additive, int normalizer)
     {
-        return Math.abs(pureAdditive.getLeft() - pureAdditive.getRight() * normalizer);
+        return Math.abs(Additive.getLeft() - Additive.getRight() * normalizer);
     }
 
     @Deprecated
-    public int getMaxAdditive(Set<BlockPos> excludedPos)
+    public int getMaxNetPower(Set<BlockPos> excludedPos)
     {
         int maxPositive = 0;
         int maxNegative = 0;

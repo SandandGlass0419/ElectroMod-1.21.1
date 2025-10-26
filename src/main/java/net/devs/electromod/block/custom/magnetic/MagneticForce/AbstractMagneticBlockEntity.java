@@ -1,5 +1,6 @@
 package net.devs.electromod.block.custom.magnetic.MagneticForce;
 
+import net.devs.electromod.ElectroMod;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -43,7 +44,8 @@ public abstract class AbstractMagneticBlockEntity extends BlockEntity
 
     public void blockentityLoaded()
     {
-        if (this.magneticPower == defaultPower) return;    // only runs on world loaded to load existing be
+        if (this.magneticPower == defaultPower) {
+            ElectroMod.LOGGER.info("is default"); return; }    // only runs on world loaded to load existing be
 
         MagneticForceInteractor.subscribeMagneticBlock(this.world, this.pos, new MagneticField(this.magneticPower, this.getFacing()));
     }
@@ -55,7 +57,7 @@ public abstract class AbstractMagneticBlockEntity extends BlockEntity
 
     protected void onMagneticForceUpdate(int magneticPower)
     {
-        if (magneticPower > 0)
+        if (magneticPower > defaultPower)
         {
             MagneticForceInteractor.subscribeMagneticBlock(this.world, this.pos, new MagneticField(magneticPower, this.getFacing()));
         }
