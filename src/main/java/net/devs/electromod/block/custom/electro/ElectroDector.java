@@ -76,22 +76,22 @@ public class ElectroDector extends Block {
     }
 
 
-//    public static final double explosionThreshold = 150;
-//
-//    Override
-//    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-//        if (world.isClient()) return;
-//
-//        BlockEntity be = world.getBlockEntity(sourcePos);
-//        if (be instanceof WireBlockEntity wire) {
-//            double electricity = wire.getElectricity();
-//            if (electricity > explosionThreshold) {
-//                // 전류량에 비례해 폭발
-//                float explosionPower = (float) (electricity - explosionThreshold) / 2; // 필요시 스케일링 가능
-//                world.createExplosion(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, explosionPower, World.ExplosionSourceType.BLOCK);
-//                world.removeBlock(pos, false);
-//            }
-//        }
-//    }
+    public static final double explosionThreshold = 150;
+
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        if (world.isClient()) return;
+
+        BlockEntity be = world.getBlockEntity(sourcePos);
+        if (be instanceof WireBlockEntity wire) {
+            double electricity = wire.getElectricity();
+            if (electricity > explosionThreshold) {
+                // 전류량에 비례해 폭발
+                float explosionPower = (float) (electricity - explosionThreshold) / 2; // 필요시 스케일링 가능
+                world.createExplosion(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, explosionPower, World.ExplosionSourceType.BLOCK);
+                world.removeBlock(pos, false);
+            }
+        }
+    }
 
 }
