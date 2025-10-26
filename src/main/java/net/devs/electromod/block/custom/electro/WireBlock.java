@@ -205,8 +205,7 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
 
     public abstract float getElectricResistance();
 
-    public void onBlockElectricityUpdated(World w, BlockPos pos, WireBlockEntity wireBE)
-    {
+    public void onBlockElectricityUpdated(World w, BlockPos pos, WireBlockEntity wireBE) {
         BlockState state = w.getBlockState(pos);
         if (!(state.getBlock() instanceof WireBlock)) return;
 
@@ -216,15 +215,24 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
         for (Direction dir : Direction.values()) {
             // 위/아래 방향일 때 FACING 체크
             if ((dir == Direction.UP || dir == Direction.DOWN) &&
-                (state.get(FACING) != Direction.UP && state.get(FACING) != Direction.DOWN)
+                    (state.get(FACING) != Direction.UP && state.get(FACING) != Direction.DOWN)
             ) continue; // 위/아래 전도 불가, 스킵
 
             BlockPos targetPos = pos.offset(dir);
+            BlockState targetState = w.getBlockState(targetPos);
+
+            // ElectroDector라면 연속으로 있는 동안 계속 한 칸씩 더 감
+            while (targetState.getBlock() instanceof ElectroDector) {
+                targetPos = targetPos.offset(dir);
+                targetState = w.getBlockState(targetPos);
+            }
+
             if (!(w.getBlockEntity(targetPos) instanceof WireBlockEntity targetWireBE)) continue;
 
             targetWireBE.updateElectricity(value);
         }
     }
+
 
     public boolean IsElectrified(BlockState state) {
         return state.get(ELECTRIFIED);
