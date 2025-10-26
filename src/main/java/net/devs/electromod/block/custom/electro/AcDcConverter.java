@@ -52,7 +52,7 @@ public class AcDcConverter extends BlockWithEntity implements BlockEntityProvide
         return (w, pos, s, entity) -> {
             if (!(entity instanceof AcDcConvertEntity)) return;
 
-            int maxElectro = 0; // 주변 WireBlock 중 최대 전류 값을 사용
+            int maxPower = 0; // 주변 WireBlock 중 최대 전류 값을 사용
 
             for (Direction dir : Direction.values()) {
                 BlockPos neighborPos = pos.offset(dir);
@@ -60,20 +60,23 @@ public class AcDcConverter extends BlockWithEntity implements BlockEntityProvide
                 if (neighborState.getBlock() instanceof WireBlock) {
                     BlockEntity neighborBE = w.getBlockEntity(neighborPos);
                     if (neighborBE instanceof WireBlockEntity wireBE) {
-                        maxElectro = Math.max(maxElectro, MathHelper.clamp((int)wireBE.getElectricity(),0,15));
+                        maxPower = Math.max(maxPower, toRedstonePower(wireBE.getElectricity()));
                     }
                 }
             }
 
             BlockState currentState = w.getBlockState(pos);
-            if (currentState.get(POWER) != maxElectro) {
-                w.setBlockState(pos, currentState.with(POWER, maxElectro), 3);
+            if (currentState.get(POWER) != maxPower) {
+                w.setBlockState(pos, currentState.with(POWER, maxPower), Block.NOTIFY_ALL);
             }
         };
 
     }
 
-
+    public int toRedstonePower(float wirePower)
+    {
+        return MathHelper.clamp((int) (wirePower * 15 / WireBlock.MAX_POWER), 0, 15);
+    }
 
     @Override
     protected boolean emitsRedstonePower(BlockState state) {

@@ -66,7 +66,7 @@ public class Battery extends Block {
     public void onPlaced(World world, BlockPos pos, BlockState state,
                          @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
-        setNearbyWireElectrocity(world, pos, 15f);
+        setNearbyWireElectrocity(world, pos, WireBlock.MAX_POWER);
     }
 
     // 🔁 주변 변경 시 전류 유지
@@ -74,7 +74,7 @@ public class Battery extends Block {
     public void neighborUpdate(BlockState state, World world, BlockPos pos,
                                Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
-        setNearbyWireElectrocity(world, pos, 15f);
+        setNearbyWireElectrocity(world, pos, WireBlock.MAX_POWER);
     }
 
     // ❌ 파괴 시 전류 차단

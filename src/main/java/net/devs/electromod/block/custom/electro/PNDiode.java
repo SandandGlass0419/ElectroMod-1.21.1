@@ -1,9 +1,7 @@
 package net.devs.electromod.block.custom.electro;
 
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.block.entity.custom.electro.AcDcConvertEntity;
 import net.devs.electromod.block.entity.custom.electro.PNDiodeEntity;
-import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,13 +14,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 import org.jetbrains.annotations.Nullable;
-
-import static net.devs.electromod.block.custom.electro.WireBlock.ELECTRIFIED;
 
 public class PNDiode extends BlockWithEntity {
 

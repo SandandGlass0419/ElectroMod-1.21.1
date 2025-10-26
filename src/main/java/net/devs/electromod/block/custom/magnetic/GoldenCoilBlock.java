@@ -69,7 +69,8 @@ public class GoldenCoilBlock extends CoilBlock
     }
 
     @Override
-    public int defaultForceFormula(int magneticPower, int density, Double diff) {
-        return 0;
+    public float defaultForceFormula(int magneticPower, int density, float tickDiff)
+    {
+        return magneticPower == 0 ? 0 : density * magneticPower / tickDiff + goldAdditiveFactor;
     }
 }

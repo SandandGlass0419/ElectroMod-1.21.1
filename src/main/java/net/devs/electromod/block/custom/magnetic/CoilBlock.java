@@ -1,6 +1,5 @@
 package net.devs.electromod.block.custom.magnetic;
 
-import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
@@ -164,29 +163,31 @@ public abstract class CoilBlock extends AbstractMagneticBlock
     }
 
     // magnetic force features
-    public static final float maxUsageMargin = 40f;
+    public static final float maxMargin = 20f;
+    public static final float minMargin = 1f;
 
     @Nullable
-    public Integer getWireElectricity(World world, BlockPos pos, BlockState state, int magneticPower)
+    public Float getWireElectricity(World world, BlockPos pos, BlockState state, int magneticPower)
     {
         if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return null;
 
-        int electricity = 0;
+        float electricity;
 
         long time = world.getTime();
-        double tickDiff = coilBE.getTimeDiff(time);
+        float tickDiff = coilBE.getTickDiff(time);
         coilBE.setLastUsedTick(time);
 
-        if (tickDiff <= maxUsageMargin)
-        {
-            electricity = defaultForceFormula(magneticPower, state.get(DENSITY), tickDiff);
-        }
+        if (tickDiff > maxMargin) return null;
+
+        electricity = defaultForceFormula(magneticPower, state.get(DENSITY), tickDiff);
 
         return electricity;
     }
 
-    public void updateWireElectricity(World world, BlockPos pos, BlockState state, int power)
+    public void updateWireElectricity(World world, BlockPos pos, BlockState state, float power)
     {
+        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return;
+
         for (var direction : getOutputDirections(state.get(FACING)))
         {
             if (!(world.getBlockEntity(pos.offset(direction)) instanceof WireBlockEntity wireBE)) continue;
@@ -194,20 +195,30 @@ public abstract class CoilBlock extends AbstractMagneticBlock
             wireBE.updateElectricity(power);
         }
 
-        if (power == 0) return;
-        world.scheduleBlockTick(pos, this, (int) maxUsageMargin);
+        if (power != 0 && !coilBE.getIsTicking())
+        {
+            world.scheduleBlockTick(pos, this, (int) maxMargin);
+            coilBE.setIsTicking(true);
+        }
     }
 
     @Override
     protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random)
     {
-        ElectroMod.LOGGER.info("reseting");
         if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return;
 
-        if (coilBE.getTimeDiff(world.getTime()) < maxUsageMargin) return;
+        float tickDiff = coilBE.getTickDiff(world.getTime());
 
-        updateWireElectricity(world, pos, state, 0);
-        ElectroMod.LOGGER.info("resetted");
+        if (tickDiff < maxMargin)
+        {
+            world.scheduleBlockTick(pos, this, (int) (maxMargin - tickDiff));
+        }
+
+        else
+        {
+            updateWireElectricity(world, pos, state, 0);
+            coilBE.setIsTicking(false);
+        }
     }
 
     public Set<Direction> getOutputDirections(Direction direction)
@@ -229,8 +240,8 @@ public abstract class CoilBlock extends AbstractMagneticBlock
 
             int magneticPower = stack.getOrDefault(ModDataComponentTypes.MAGNETIC_POWER, ModDataComponentTypes.min_power);
 
-            Integer wireElectricity = getWireElectricity(world, pos, state, magneticPower);
-            if (wireElectricity == null) return ActionResult.FAIL;
+            Float wireElectricity = getWireElectricity(world, pos, state, magneticPower);
+            if (wireElectricity == null) return ActionResult.SUCCESS;
 
             updateWireElectricity(world, pos, state, wireElectricity);
 
@@ -241,5 +252,5 @@ public abstract class CoilBlock extends AbstractMagneticBlock
     }
 
     public abstract int defaultForceFormula(int redstonePower, int density);
-    public abstract int defaultForceFormula(int magneticPower, int density, Double diff);
+    public abstract float defaultForceFormula(int magneticPower, int density, float diff);
 }

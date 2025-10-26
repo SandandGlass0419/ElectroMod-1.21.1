@@ -68,12 +68,12 @@ public class IronCoilBlock extends CoilBlock
     @Override
     public int defaultForceFormula(int redstonePower, int density)
     {
-        return redstonePower == 0 ? 0 : redstonePower * density + ironAdditiveFactor;
+        return redstonePower == 0 ? 0 : density * redstonePower + ironAdditiveFactor;
     }
 
     @Override
-    public int defaultForceFormula(int magneticPower, int density, Double diff)
+    public float defaultForceFormula(int magneticPower, int density, float tickDiff)
     {
-        return 3;
+        return magneticPower == 0 ? 0 : density * magneticPower / tickDiff + ironAdditiveFactor;
     }
 }

@@ -44,6 +44,8 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
     private static final VoxelShape EAST_SHAPE  = Block.createCuboidShape(11, 5, 5, 16, 11, 11);
     private static final VoxelShape WEST_SHAPE  = Block.createCuboidShape(0, 5, 5, 5, 11, 11);
 
+    public static final float MAX_POWER = 180f;
+
     public WireBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState()
@@ -255,7 +257,7 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
         BlockEntity selfBE = world.getBlockEntity(pos);
         if (!(selfBE instanceof WireBlockEntity selfWireBE)) return;
 
-        float minElectrocity = Float.MAX_VALUE; // 최소 전기값 저장용
+        float minElectrocity = MAX_POWER; // 최소 전기값 저장용
         boolean foundNeighbor = false;
 
         for (Direction dir : Direction.values())

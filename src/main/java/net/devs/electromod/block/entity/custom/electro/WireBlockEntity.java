@@ -8,6 +8,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 
 import static net.devs.electromod.block.custom.electro.WireBlock.ELECTRIFIED;
 
@@ -24,7 +25,7 @@ public class WireBlockEntity extends BlockEntity {
     {
         if (this.Electricity != electricity)
         {
-            this.Electricity = electricity;
+            this.Electricity = MathHelper.clamp(electricity, 0, WireBlock.MAX_POWER);
             markDirty();
         }
     }

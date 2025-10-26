@@ -1,5 +1,6 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
+import net.devs.electromod.block.custom.magnetic.CoilBlock;
 import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlockEntity;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
@@ -11,10 +12,8 @@ public class CoilBlockEntity extends AbstractMagneticBlockEntity
 {
     private int redstoneInput = 0;
 
-    public CoilBlockEntity(BlockPos pos, BlockState state)
-    {
-        super(ModBlockEntities.COIL_BE, pos, state);
-    }
+    private long lastUsedTick = 0;
+    private boolean isTicking = false;
 
     public void setRedstoneInput(int power)
     {
@@ -27,13 +26,19 @@ public class CoilBlockEntity extends AbstractMagneticBlockEntity
 
     public int getRedstoneInput() { return this.redstoneInput; }
 
-    private long lastUsedTick = 0;
-
     public void setLastUsedTick(long lastUsedTick) { this.lastUsedTick = lastUsedTick; }
 
-    public double getTimeDiff(long usedTick)
+    public float getTickDiff(long usedTick)
     {
-        return usedTick == this.lastUsedTick ? 0.5 : usedTick - this.lastUsedTick;
+        return usedTick == this.lastUsedTick ? CoilBlock.minMargin : usedTick - this.lastUsedTick;
+    }
+
+    public void setIsTicking(boolean isTicking) { this.isTicking = isTicking; }
+    public boolean getIsTicking() { return this.isTicking; }
+
+    public CoilBlockEntity(BlockPos pos, BlockState state)
+    {
+        super(ModBlockEntities.COIL_BE, pos, state);
     }
 
     @Override

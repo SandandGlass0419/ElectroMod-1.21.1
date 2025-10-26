@@ -1,11 +1,9 @@
 package net.devs.electromod.datagen;
 
 import net.devs.electromod.block.ModBlocks;
-import net.devs.electromod.item.ModItemGroups;
 import net.devs.electromod.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
@@ -180,8 +178,5 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .input('N', Blocks.NETHERITE_BLOCK)
                 .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
                 .offerTo(recipeExporter);
-
-
-
     }
 }
