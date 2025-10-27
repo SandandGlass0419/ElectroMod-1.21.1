@@ -27,7 +27,7 @@ public class ModRecipeProvider extends FabricRecipeProvider
     @Override
     public void generate(RecipeExporter recipeExporter)
     {
-        // magnetic item
+        // magnetic items
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModItems.MAGNET_ITEM)
                 .pattern("R")
                 .pattern("#")
@@ -38,8 +38,8 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT)) // important!
                 .offerTo(recipeExporter);
 
-        // magnetic block
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.IRON_COIL)
+        // magnetic blocks
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.IRON_COIL, 2)
                 .pattern("#*#")
                 .pattern("# #")
                 .pattern("# #")
@@ -48,7 +48,7 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(NumberRange.IntRange.atLeast(6), Items.IRON_INGOT))
                 .offerTo(recipeExporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.GOLDEN_COIL)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.GOLDEN_COIL, 2)
                 .pattern("#*#")
                 .pattern("# #")
                 .pattern("# #")
@@ -57,7 +57,7 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .criterion(hasItem(Items.GOLD_INGOT), conditionsFromItem(NumberRange.IntRange.atLeast(6), Items.GOLD_INGOT))
                 .offerTo(recipeExporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.COPPER_COIL)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.COPPER_COIL, 2)
                 .pattern("#*#")
                 .pattern("# #")
                 .pattern("# #")
@@ -76,69 +76,19 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .criterion(hasItem(Items.LODESTONE), conditionsFromItem(Items.LODESTONE))
                 .offerTo(recipeExporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.MAGNETIC_DETECTOR, 2)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.MAGNETIC_DETECTOR)
                 .pattern("===")
-                .pattern("=*=")
-                .pattern("###")
+                .pattern("=C=")
+                .pattern("#*#")
                 .input('=', Items.COPPER_INGOT)
-                .input('*', Items.COMPASS)
+                .input('*', Items.NETHER_STAR)
+                .input('C', Items.COMPASS)
                 .input('#', Items.POLISHED_DEEPSLATE_SLAB)
-                .criterion(hasItem(Items.COMPASS), conditionsFromItem(Items.COMPASS))
-                .offerTo(recipeExporter);
-        // electro
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.COPPER_WIRE, 2)
-                .pattern("   ")
-                .pattern("===")
-                .pattern("   ")
-                .input('=', Items.COPPER_INGOT)
-                .criterion(hasItem(Items.COPPER_INGOT), conditionsFromItem(Items.COPPER_INGOT))
+                .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
                 .offerTo(recipeExporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.WIRE, 2)
-                .pattern("   ")
-                .pattern("===")
-                .pattern("   ")
-                .input('=', Items.IRON_INGOT)
-                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
-                .offerTo(recipeExporter);
-
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.GOLDEN_WIRE, 2)
-                .pattern("   ")
-                .pattern("===")
-                .pattern("   ")
-                .input('=', Items.GOLD_INGOT)
-                .criterion(hasItem(Items.GOLD_INGOT), conditionsFromItem(Items.GOLD_INGOT))
-                .offerTo(recipeExporter);
-
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.RUBBER_GLOVES, 1)
-                .pattern("***")
-                .pattern("*=*")
-                .pattern("***")
-                .input('=', Items.PINK_DYE)
-                .input('*', Items.SLIME_BALL)
-                .criterion(hasItem(Items.REDSTONE), conditionsFromItem(Items.REDSTONE))
-                .offerTo(recipeExporter);
-
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_STAFF, 1)
-                .pattern(" * ")
-                .pattern(" = ")
-                .pattern(" = ")
-                .input('=', Items.STICK)
-                .input('*', ModItems.ELECTRO_ITEM)
-                .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.STICK))
-                .offerTo(recipeExporter);
-
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ACDC_CONVERTER, 1)
-                .pattern("P=P")
-                .pattern("=*=")
-                .pattern("P=P")
-                .input('=', Items.CHAIN)
-                .input('*', ModItems.ELECTRO_ITEM)
-                .input('P', ModBlocks.PN_DIODE)
-                .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(Items.CHAIN))
-                .offerTo(recipeExporter);
-
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_ITEM, 1)
+        // electro items
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_ITEM)
                 .pattern("N=N")
                 .pattern("=*=")
                 .pattern("N=N")
@@ -148,7 +98,54 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
                 .offerTo(recipeExporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ELECTRO_DECTOR, 1)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.RUBBER_GLOVES, 2)
+                .pattern("***")
+                .pattern("*=*")
+                .pattern("***")
+                .input('=', Items.PINK_DYE)
+                .input('*', Items.SLIME_BALL)
+                .criterion(hasItem(Items.SLIME_BALL), conditionsFromItem(Items.SLIME_BALL))
+                .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ELECTRO_STAFF)
+                .pattern("*")
+                .pattern("|")
+                .pattern("|")
+                .input('|', Items.BLAZE_ROD)
+                .input('*', ModItems.ELECTRO_ITEM)
+                .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(ModItems.ELECTRO_ITEM))
+                .offerTo(recipeExporter);
+
+        // electro blocks
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.COPPER_WIRE, 3)
+                .pattern("===")
+                .input('=', Items.COPPER_INGOT)
+                .criterion(hasItem(Items.COPPER_INGOT), conditionsFromItem(Items.COPPER_INGOT))
+                .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.WIRE, 3)
+                .pattern("===")
+                .input('=', Items.IRON_INGOT)
+                .criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
+                .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, ModBlocks.GOLDEN_WIRE, 3)
+                .pattern("===")
+                .input('=', Items.GOLD_INGOT)
+                .criterion(hasItem(Items.GOLD_INGOT), conditionsFromItem(Items.GOLD_INGOT))
+                .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ACDC_CONVERTER)
+                .pattern("P=P")
+                .pattern("=*=")
+                .pattern("P=P")
+                .input('=', Items.CHAIN)
+                .input('*', ModItems.ELECTRO_ITEM)
+                .input('P', ModBlocks.PN_DIODE)
+                .criterion(hasItem(ModItems.ELECTRO_ITEM), conditionsFromItem(ModItems.ELECTRO_ITEM))
+                .offerTo(recipeExporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ELECTRO_DECTOR)
                 .pattern("N=N")
                 .pattern("=*=")
                 .pattern("N=N")
@@ -159,16 +156,14 @@ public class ModRecipeProvider extends FabricRecipeProvider
                 .offerTo(recipeExporter);
 
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.PN_DIODE, 1)
-                .pattern("   ")
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.PN_DIODE)
                 .pattern("=*=")
-                .pattern("   ")
                 .input('*', Items.NETHER_STAR)
                 .input('=', ModItems.ELECTRO_ITEM)
                 .criterion(hasItem(Items.NETHER_STAR), conditionsFromItem(Items.NETHER_STAR))
                 .offerTo(recipeExporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.BATTERY, 1)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.BATTERY, 3)
                 .pattern("NNN")
                 .pattern("=*=")
                 .pattern("WWW")

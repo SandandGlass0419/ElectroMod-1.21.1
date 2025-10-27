@@ -1,8 +1,8 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
 import net.devs.electromod.block.custom.magnetic.MagneticDetector;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlockEntity;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticField;
+import net.devs.electromod.block.custom.magnetic.force.AbstractDetectorBlockEntity;
+import net.devs.electromod.block.custom.magnetic.force.MagneticField;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
@@ -20,7 +20,7 @@ public class MagneticDetectorEntity extends AbstractDetectorBlockEntity
 
     public MagneticDetectorEntity(BlockPos pos, BlockState state)
     {
-        super(ModBlockEntities.DETECTOR_BE, pos, state);
+        super(ModBlockEntities.MAGNETIC_DETECTOR_BE, pos, state);
 
         this.detectionAxisID = MagneticDetector.getDetectionAxis(state).ordinal();
         markDirty();

@@ -45,10 +45,11 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
     private static final VoxelShape WEST_SHAPE  = Block.createCuboidShape(0, 5, 5, 5, 11, 11);
 
     public static final float MAX_POWER = 180f;
+    public static final float MIN_DEATH_POWER = 10f;
 
     public WireBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.stateManager.getDefaultState()
+        this.setDefaultState(this.getDefaultState()
                 .with(FACING, Direction.NORTH)
                 .with(NORTH, false)
                 .with(EAST, false)
@@ -61,9 +62,8 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         float absElectrocity = 0f;
 
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof WireBlockEntity wireBlock) {
-            absElectrocity = Math.abs(wireBlock.getElectricity());
+        if (world.getBlockEntity(pos) instanceof WireBlockEntity wireBE) {
+            absElectrocity = Math.abs(wireBE.getElectricity());
         }
 
         if (world.isClient()) return ActionResult.FAIL;
@@ -71,10 +71,11 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
         Item stackItem = player.getMainHandStack().getItem();
         Item leftHandStackItem = player.getOffHandStack().getItem();
 
-        if (stackItem instanceof DebugStickItem ||
-                stackItem.equals(ModBlocks.COPPER_WIRE.asItem()) || absElectrocity <= 1f
-                || stackItem.equals(ModBlocks.WIRE.asItem())
-                || stackItem.equals(ModBlocks.GOLDEN_WIRE.asItem()))
+        if (stackItem instanceof DebugStickItem
+            || stackItem.equals(ModBlocks.COPPER_WIRE.asItem())
+            || stackItem.equals(ModBlocks.WIRE.asItem())
+            || stackItem.equals(ModBlocks.GOLDEN_WIRE.asItem())
+            || absElectrocity <= MIN_DEATH_POWER)
             return ActionResult.FAIL;
 
         if (!stackItem.equals(ModItems.RUBBER_GLOVES) && !leftHandStackItem.equals(ModItems.RUBBER_GLOVES)) {
@@ -94,9 +95,8 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (world.isClient()) return;
 
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof WireBlockEntity wireBlock &&
-                Math.abs(wireBlock.getElectricity()) <= 1f) return;
+        if (world.getBlockEntity(pos) instanceof WireBlockEntity wireBE &&
+                Math.abs(wireBE.getElectricity()) <= MIN_DEATH_POWER) return;
 
         if (entity instanceof LivingEntity living &&
                 living.getEquippedStack(EquipmentSlot.FEET).isOf(Items.LEATHER_BOOTS)) return;
@@ -194,7 +194,8 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    @Nullable
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new WireBlockEntity(pos, state);
     }
 
@@ -284,5 +285,4 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
             selfWireBE.updateElectricity(selfWireBE.getElectricity() + minElectrocity);
         }
     }
-
 }

@@ -5,14 +5,14 @@
     "*": {
       "item": "electromod:electro_item"
     },
-    "=": {
-      "item": "minecraft:stick"
+    "|": {
+      "item": "minecraft:blaze_rod"
     }
   },
   "pattern": [
-    " * ",
-    " = ",
-    " = "
+    "*",
+    "|",
+    "|"
   ],
   "result": {
     "count": 1,

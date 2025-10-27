@@ -47,33 +47,32 @@ public class AcDcConverter extends BlockWithEntity implements BlockEntityProvide
 
     //솔직히 ㅅㅂ 나도 왜 이 전류알고리즘이 작동하는지 모르겠다..
     @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    @Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 
-        return (w, pos, s, entity) -> {
+        return (world1, pos, state1, entity) -> {
             if (!(entity instanceof AcDcConvertEntity)) return;
 
             int maxPower = 0; // 주변 WireBlock 중 최대 전류 값을 사용
 
             for (Direction dir : Direction.values()) {
+
                 BlockPos neighborPos = pos.offset(dir);
-                BlockState neighborState = w.getBlockState(neighborPos);
-                if (neighborState.getBlock() instanceof WireBlock) {
-                    BlockEntity neighborBE = w.getBlockEntity(neighborPos);
-                    if (neighborBE instanceof WireBlockEntity wireBE) {
-                        maxPower = Math.max(maxPower, toRedstonePower(wireBE.getElectricity()));
-                    }
+
+                if (world1.getBlockEntity(neighborPos) instanceof WireBlockEntity wireBE) {
+                    maxPower = Math.max(maxPower, toRedstonePower(wireBE.getElectricity()));
                 }
+
             }
 
-            BlockState currentState = w.getBlockState(pos);
-            if (currentState.get(POWER) != maxPower) {
-                w.setBlockState(pos, currentState.with(POWER, maxPower), Block.NOTIFY_ALL);
+            if (state1.get(POWER) != maxPower) {
+                world1.setBlockState(pos, state1.with(POWER, maxPower), Block.NOTIFY_ALL);
             }
         };
 
     }
 
-    public int toRedstonePower(float wirePower)
+    public static int toRedstonePower(float wirePower)
     {
         return MathHelper.clamp((int) (wirePower * 15 / WireBlock.MAX_POWER), 0, 15);
     }

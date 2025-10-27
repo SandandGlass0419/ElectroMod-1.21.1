@@ -26,6 +26,7 @@ public class ModModelProvider extends FabricModelProvider
         // copper_coil (custom json)
         // magnet_block (custom json)
         // magnetic_detector (custom json)
+
         // electro
         // copper_wire (custom json)
         // golden_wire (custom json)
@@ -43,8 +44,9 @@ public class ModModelProvider extends FabricModelProvider
     {
         // magnetic
         itemModelGenerator.register(ModItems.MAGNET_ITEM, Models.HANDHELD);
+
         //electro
-        itemModelGenerator.register(ModItems.ELECTRO_ITEM, Models.HANDHELD);
+        itemModelGenerator.register(ModItems.ELECTRO_ITEM, Models.GENERATED);
         itemModelGenerator.register(ModItems.RUBBER_GLOVES, Models.HANDHELD);
         itemModelGenerator.register(ModItems.ELECTRO_STAFF, Models.HANDHELD);
     }

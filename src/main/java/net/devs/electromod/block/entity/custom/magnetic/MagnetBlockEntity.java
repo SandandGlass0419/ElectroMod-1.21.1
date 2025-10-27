@@ -1,9 +1,9 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
 import net.devs.electromod.block.custom.magnetic.MagnetBlock;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlockEntity;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticField;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
+import net.devs.electromod.block.custom.magnetic.force.AbstractMagneticBlockEntity;
+import net.devs.electromod.block.custom.magnetic.force.MagneticField;
+import net.devs.electromod.block.custom.magnetic.force.MagneticForceInteractor;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;

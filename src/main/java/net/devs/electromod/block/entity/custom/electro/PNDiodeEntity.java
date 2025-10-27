@@ -19,8 +19,11 @@ public class PNDiodeEntity extends BlockEntity {
     }
 
     public void setRedstonePower(int power) {
-        this.redstonePower = power;
-        markDirty(); // BlockEntity 변경 표시
+        if (this.redstonePower != power)
+        {
+            this.redstonePower = power;
+            markDirty(); // BlockEntity 변경 표시
+        }
     }
 
     @Override

@@ -1,4 +1,4 @@
-package net.devs.electromod.block.custom.magnetic.MagneticForce;
+package net.devs.electromod.block.custom.magnetic.force;
 
 import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.magnetic.CopperCoilBlock;
@@ -26,7 +26,7 @@ public class MagneticForceInteractor
     {
         magneticBlockPosMap.get(getDimensionKey(world)).put(pos, field);   // add + edit
 
-        ElectroMod.LOGGER.info("added on: {}, power: {}, direction: {}", pos, field.getMagneticPower(), field.getForceDirection().toString());
+        // ElectroMod.LOGGER.info("added on: {}, power: {}, direction: {}", pos, field.getMagneticPower(), field.getForceDirection().toString());
 
         updateValidPos(world, pos);
     }
@@ -35,7 +35,7 @@ public class MagneticForceInteractor
     {
         magneticBlockPosMap.get(getDimensionKey(world)).remove(pos);
 
-        ElectroMod.LOGGER.info("removed on (magnetic): {}", pos);
+        // ElectroMod.LOGGER.info("removed on (magnetic): {}", pos);
 
         removeValidPos(world, pos);
     }
@@ -59,15 +59,14 @@ public class MagneticForceInteractor
 
     public static void subscribeDetectorBlock(World world, BlockPos detectorPos, BlockField blockField)
     {
-        ElectroMod.LOGGER.info("subscribeDetectorBlock");
         detectorBlockPosMap.get(getDimensionKey(world)).put(detectorPos, blockField);
-        ElectroMod.LOGGER.info("added on(detector): {}", detectorPos);
+        // ElectroMod.LOGGER.info("added on(detector): {}", detectorPos);
     }
 
     public static void unsubscribeDetectorBlock(World world, BlockPos detectorPos)
     {
         detectorBlockPosMap.get(getDimensionKey(world)).remove(detectorPos);
-        ElectroMod.LOGGER.info("removed on(detector): {}", detectorPos);
+        // ElectroMod.LOGGER.info("removed on(detector): {}", detectorPos);
     }
 
     @Nullable
@@ -97,15 +96,13 @@ public class MagneticForceInteractor
 
     public static BlockField detectorPlacementCheck(World world, BlockPos detectorPos)
     {
-        ElectroMod.LOGGER.info("detectorPlacementCheck");
         BlockField passedPoses = new BlockField();
         MagneticField field;
 
         for (BlockPos magneticPos : magneticBlockPosMap.get(getDimensionKey(world)).keySet())
         {
             field = applyConditions(world, detectorPos, magneticPos);
-            if (field == null) {
-                ElectroMod.LOGGER.info("not met placement: {}", magneticPos); continue; }
+            if (field == null) continue;
 
             passedPoses.putField(magneticPos, field);
         }
@@ -121,7 +118,7 @@ public class MagneticForceInteractor
         for (BlockPos detectorPos : detectorBlockPosMap.get(dimensionKey).keySet())
         {
             field = applyConditions(world, detectorPos, updatedMagneticPos);
-            if (field == null) { ElectroMod.LOGGER.info("not met update"); continue; }
+            if (field == null) continue;
 
             detectorBlockPosMap.get(dimensionKey).get(detectorPos).putField(updatedMagneticPos, field);    // add + edit
             UpdateWatchCallBack.UPDATED.invoker().Broadcast(detectorPos, updatedMagneticPos);
@@ -142,15 +139,14 @@ public class MagneticForceInteractor
     @Nullable
     public static MagneticField applyConditions(World world, BlockPos detectorPos, BlockPos magneticPos)
     {
-        ElectroMod.LOGGER.info("applyCondition");
+        // ElectroMod.LOGGER.info("applyCondition");
 
         if (!RelativeDistanceCondition(detectorPos, magneticPos)) return null;
 
         MagneticField field = FindMagneticField(world, detectorPos, magneticPos);
-        if (field == null) { ElectroMod.LOGGER.info("vec not found"); return null; } // is there field?
+        if (field == null) return null; // is there field?
 
-        if (field.getMagneticPower() <= 0)  // is field force positive
-        { ElectroMod.LOGGER.info("field force under 0"); return null; }
+        if (field.getMagneticPower() <= 0) return null; // is field not positive?
 
         return field;
     }
@@ -165,7 +161,7 @@ public class MagneticForceInteractor
     @Nullable
     public static MagneticField FindMagneticField(World world, BlockPos detectorPos, BlockPos magneticPos)
     {
-        ElectroMod.LOGGER.info("FindMVec start");
+        //ElectroMod.LOGGER.info("FindMVec start");
 
         MagneticField mapField = getField(world, magneticPos);
         ForceProfile profile = getForceProfile(mapField);
@@ -178,7 +174,7 @@ public class MagneticForceInteractor
 
     public static ForceProfile getForceProfile(MagneticField field)
     {
-        ElectroMod.LOGGER.info("getForceProfile");
+        //ElectroMod.LOGGER.info("getForceProfile");
         ElectroMod.LOGGER.info(field.getForceDirection().toString());
 
         return ForceProfile.createForceProfile(getPowerCategory(field.getMagneticPower()), field.getForceDirection());

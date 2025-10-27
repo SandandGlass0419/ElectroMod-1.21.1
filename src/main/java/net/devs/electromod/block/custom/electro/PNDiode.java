@@ -39,7 +39,6 @@ public class PNDiode extends BlockWithEntity {
         return null;
     }
 
-
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(FACING);
@@ -71,7 +70,7 @@ public class PNDiode extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient) {
+        if (!world.isClient()) {
             Direction current = state.get(FACING);
             Direction opposite = current.getOpposite();
 
@@ -99,17 +98,17 @@ public class PNDiode extends BlockWithEntity {
 
     @Override
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        if (world.isClient) return;
+        if (world.isClient()) return;
 
         BlockEntity be = world.getBlockEntity(pos);
         if (!(be instanceof PNDiodeEntity diodeEntity)) return;
 
         Direction facing = state.get(FACING);
         Direction checkDir = switch (facing) {
-            case SOUTH -> Direction.EAST;
-            case WEST -> Direction.SOUTH;
-            case NORTH -> Direction.WEST;
-            case EAST -> Direction.NORTH;
+            case SOUTH -> Direction.WEST;
+            case WEST -> Direction.NORTH;
+            case NORTH -> Direction.EAST;
+            case EAST -> Direction.SOUTH;
             default -> null;
         };
         if (checkDir == null) return;
@@ -151,10 +150,10 @@ public class PNDiode extends BlockWithEntity {
         BlockEntity be = world.getBlockEntity(pos);
         if (be instanceof PNDiodeEntity diodeEntity) {
             Direction checkDir = switch (state.get(FACING)) {
-                case SOUTH -> Direction.EAST;
-                case WEST -> Direction.SOUTH;
-                case NORTH -> Direction.WEST;
-                case EAST -> Direction.NORTH;
+                case SOUTH -> Direction.WEST;
+                case WEST -> Direction.NORTH;
+                case NORTH -> Direction.EAST;
+                case EAST -> Direction.SOUTH;
                 default -> null;
             };
             // checkDir 방향으로만 신호 출력
@@ -170,10 +169,10 @@ public class PNDiode extends BlockWithEntity {
         BlockEntity be = world.getBlockEntity(pos);
         if (be instanceof PNDiodeEntity diodeEntity) {
             Direction checkDir = switch (state.get(FACING)) {
-                case SOUTH -> Direction.EAST;
-                case WEST -> Direction.SOUTH;
-                case NORTH -> Direction.WEST;
-                case EAST -> Direction.NORTH;
+                case SOUTH -> Direction.WEST;
+                case WEST -> Direction.NORTH;
+                case NORTH -> Direction.EAST;
+                case EAST -> Direction.SOUTH;
                 default -> null;
             };
             // checkDir 방향으로만 강한 신호 출력
@@ -183,8 +182,6 @@ public class PNDiode extends BlockWithEntity {
         }
         return 0;
     }
-
-
 
     @Override
     protected boolean emitsRedstonePower(BlockState state) {
@@ -202,8 +199,4 @@ public class PNDiode extends BlockWithEntity {
             default   -> SHAPE_NORTH;
         };
     }
-
-
-
 }
-

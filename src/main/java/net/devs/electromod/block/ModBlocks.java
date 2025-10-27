@@ -106,7 +106,7 @@ public class ModBlocks
 
     public static void registerModBlocks()
     {
-        ElectroMod.LOGGER.info("Registering Mod Blocks (" + ElectroMod.MOD_ID + ")");
+        ElectroMod.LOGGER.info("Registering Mod Blocks");
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries ->
         {

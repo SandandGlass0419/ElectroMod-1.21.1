@@ -28,6 +28,6 @@ public class ModDataComponentTypes
 
     public static void registerModDataComponentTypes()
     {
-        ElectroMod.LOGGER.info("Registering Mod Data Component Types (" + ElectroMod.MOD_ID + ")");
+        ElectroMod.LOGGER.info("Registering Mod Data Component Types");
     }
 }

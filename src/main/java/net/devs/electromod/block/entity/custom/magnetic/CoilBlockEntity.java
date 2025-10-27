@@ -1,7 +1,7 @@
 package net.devs.electromod.block.entity.custom.magnetic;
 
 import net.devs.electromod.block.custom.magnetic.CoilBlock;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlockEntity;
+import net.devs.electromod.block.custom.magnetic.force.AbstractMagneticBlockEntity;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;

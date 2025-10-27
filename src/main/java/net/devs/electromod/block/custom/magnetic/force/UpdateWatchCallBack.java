@@ -1,4 +1,4 @@
-package net.devs.electromod.block.custom.magnetic.MagneticForce;
+package net.devs.electromod.block.custom.magnetic.force;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

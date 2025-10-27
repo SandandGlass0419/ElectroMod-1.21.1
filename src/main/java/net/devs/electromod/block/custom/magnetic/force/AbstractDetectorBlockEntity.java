@@ -1,6 +1,5 @@
-package net.devs.electromod.block.custom.magnetic.MagneticForce;
+package net.devs.electromod.block.custom.magnetic.force;
 
-import net.devs.electromod.ElectroMod;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -68,7 +67,7 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
 
         this.Watch.remove(magneticPos);
 
-        ElectroMod.LOGGER.info("removed watch: {}, {}", detectorPos, magneticPos);
+        //ElectroMod.LOGGER.info("removed watch: {}, {}", detectorPos, magneticPos);
     }
 
     private void updateHelper(BlockPos detectorPos, BlockPos magneticPos, MagneticField detectorField)
@@ -80,8 +79,8 @@ public abstract class AbstractDetectorBlockEntity extends BlockEntity
         if (index == null) return;
 
         this.Watch.put(magneticPos, profile.getWatch(index, magneticPos));
-        ElectroMod.LOGGER.info("updated watch: {}, {}", detectorPos, magneticPos);
-        ElectroMod.LOGGER.info("added: {}", profile.getWatch(index , magneticPos));
+        //ElectroMod.LOGGER.info("updated watch: {}, {}", detectorPos, magneticPos);
+        //ElectroMod.LOGGER.info("added: {}", profile.getWatch(index , magneticPos));
     }
 
     public boolean additionalConditions(MagneticField field)

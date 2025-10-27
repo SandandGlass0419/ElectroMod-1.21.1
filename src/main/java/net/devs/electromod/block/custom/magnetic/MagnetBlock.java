@@ -1,7 +1,7 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
+import net.devs.electromod.block.custom.magnetic.force.AbstractMagneticBlock;
 import net.devs.electromod.block.entity.custom.magnetic.MagnetBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;

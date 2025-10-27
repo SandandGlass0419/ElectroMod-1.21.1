@@ -1,10 +1,10 @@
 package net.devs.electromod;
 
 import net.devs.electromod.block.ModBlocks;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractDetectorBlockEntity;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlockEntity;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.ForceProfile;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.MagneticForceInteractor;
+import net.devs.electromod.block.custom.magnetic.force.AbstractDetectorBlockEntity;
+import net.devs.electromod.block.custom.magnetic.force.AbstractMagneticBlockEntity;
+import net.devs.electromod.block.custom.magnetic.force.ForceProfile;
+import net.devs.electromod.block.custom.magnetic.force.MagneticForceInteractor;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.components.ModDataComponentTypes;
 import net.devs.electromod.item.ModItemGroups;

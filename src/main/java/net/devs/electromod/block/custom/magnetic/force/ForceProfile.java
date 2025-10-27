@@ -1,4 +1,4 @@
-package net.devs.electromod.block.custom.magnetic.MagneticForce;
+package net.devs.electromod.block.custom.magnetic.force;
 
 import net.devs.electromod.ElectroMod;
 import net.minecraft.util.math.BlockPos;

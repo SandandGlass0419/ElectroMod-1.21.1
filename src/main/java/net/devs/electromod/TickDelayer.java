@@ -11,6 +11,7 @@ public class TickDelayer
     private static final Map<Integer, AtomicInteger> waitedMap = new HashMap<>();
     private static final Map<Integer, Runnable> taskMap = new HashMap<>();
 
+    @Deprecated
     public static void counter(MinecraftServer server)
     {
         for (int id : waitedMap.keySet())

@@ -2,9 +2,8 @@ package net.devs.electromod.block.custom.magnetic;
 
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.ModBlocks;
-import net.devs.electromod.block.custom.magnetic.MagneticForce.*;
+import net.devs.electromod.block.custom.magnetic.force.*;
 import net.devs.electromod.block.entity.ModBlockEntities;
 import net.devs.electromod.block.entity.custom.magnetic.MagneticDetectorEntity;
 import net.minecraft.block.*;
@@ -85,7 +84,8 @@ public class  MagneticDetector extends AbstractDetectorBlock
     @Override protected BlockRenderType getRenderType(BlockState state) { return BlockRenderType.MODEL; }
 
     // voxel methods
-    @Override protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context)
+    @Override
+    protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context)
     {
         Direction facing = state.get(FACING);
         Direction.Axis axis = state.get(HORIZONTAL_AXIS);
@@ -135,7 +135,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
         if (world.isClient()) return;
         if (state.getBlock() == oldState.getBlock()) return;
 
-        ElectroMod.LOGGER.info("onBlockAdded ran updatePower");
+        //ElectroMod.LOGGER.info("onBlockAdded ran updatePower");
         updatePower(world, pos, state, 0);
         this.updateNeighbors(world, pos, state);
     }
@@ -217,7 +217,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
         if (!(world.getBlockEntity(pos) instanceof MagneticDetectorEntity detectorEntity)) return;
 
         int newPower = defaultPowerConverter(magenticPower);
-        ElectroMod.LOGGER.info("newPower: {}", newPower);
+        //ElectroMod.LOGGER.info("newPower: {}", newPower);
 
         if (newPower == 0 && state.get(POWERED))       { world.setBlockState(pos, state.with(POWERED, false), Block.NOTIFY_ALL); }
         else if (newPower != 0 && !state.get(POWERED)) { world.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL); }
@@ -236,11 +236,11 @@ public class  MagneticDetector extends AbstractDetectorBlock
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type)
     {
-        return validateTicker(type, ModBlockEntities.DETECTOR_BE, this::tick);
+        return validateTicker(type, ModBlockEntities.MAGNETIC_DETECTOR_BE, this::tick);
     }
 
     @Override
-    public void watchIntick(World world1, BlockPos pos, BlockState state1, AbstractDetectorBlockEntity abstractBE)
+    public void watchInTick(World world1, BlockPos pos, BlockState state1, AbstractDetectorBlockEntity abstractBE)
     {
         if (world1.isClient()) return;
         if (!(abstractBE instanceof MagneticDetectorEntity detectorBE)) return;
@@ -256,7 +256,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
         excludeWrongCategory(excludedPos, world1, blockField, powerCategory);
 
         int power = getProcessedPower(blockField, excludedPos, powerCategory);
-        ElectroMod.LOGGER.info("magneticPower: {}", power);
+        //ElectroMod.LOGGER.info("magneticPower: {}", power);
 
         updatePower(world1, pos, state1, power);
     }
@@ -272,7 +272,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
                 if (isFilled(world.getBlockState(fieldPos)))
                 {
                     excludedPos.add(magneticPos);
-                    ElectroMod.LOGGER.info("excluded: {}, {}", magneticPos, world.getBlockState(fieldPos).toString());
+                    //ElectroMod.LOGGER.info("excluded: {}, {}", magneticPos, world.getBlockState(fieldPos).toString());
                 }
             }
         }
@@ -307,8 +307,9 @@ public class  MagneticDetector extends AbstractDetectorBlock
             if (excludedPos.contains(magneticPos)) continue;
 
             var debug = blockField.get(magneticPos).getForceDirection().getAxis();
+
             if (debug != detectionAxis)
-            { ElectroMod.LOGGER.info("axis: {}, {}", debug.asString(), detectionAxis.asString()); excludedPos.add(magneticPos); }
+            { excludedPos.add(magneticPos); }
         }
     }
 
@@ -327,7 +328,7 @@ public class  MagneticDetector extends AbstractDetectorBlock
             posCat = MagneticForceInteractor.getPowerCategory(magneticBlockPower);
 
             if (posCat != ForceProfile.powerCategory.MAGNET && posCat != stateCat)
-            { ElectroMod.LOGGER.info("cat: {}, {}", MagneticForceInteractor.getPowerCategory(magneticBlockPower), stateCat); excludedPos.add(magneticPos); }
+            { excludedPos.add(magneticPos); }
         }
     }
 

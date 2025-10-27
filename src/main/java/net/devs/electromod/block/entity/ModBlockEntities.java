@@ -30,8 +30,8 @@ public class ModBlockEntities
                             ModBlocks.MAGNET_BLOCK
                     ).build());
 
-    public static final BlockEntityType<MagneticDetectorEntity> DETECTOR_BE =
-            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "detector_be"),
+    public static final BlockEntityType<MagneticDetectorEntity> MAGNETIC_DETECTOR_BE =
+            Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ElectroMod.MOD_ID, "magnetic_detector_be"),
                     BlockEntityType.Builder.create(MagneticDetectorEntity::new,
                             ModBlocks.MAGNETIC_DETECTOR
                     ).build());
@@ -62,6 +62,6 @@ public class ModBlockEntities
 
     public static void registerModBlockEntities()
     {
-        ElectroMod.LOGGER.info("Registering BlockEntities (" + ElectroMod.MOD_ID + ")");
+        ElectroMod.LOGGER.info("Registering BlockEntities");
     }
 }

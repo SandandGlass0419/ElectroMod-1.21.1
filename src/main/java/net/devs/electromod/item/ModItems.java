@@ -34,7 +34,7 @@ public class ModItems
 
     public static void registerModItems()
     {
-        ElectroMod.LOGGER.info("Registering Mod Items (" + ElectroMod.MOD_ID + ")");
+        ElectroMod.LOGGER.info("Registering Mod Items");
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries ->
         {

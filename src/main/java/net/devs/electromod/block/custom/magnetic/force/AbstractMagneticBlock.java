@@ -1,6 +1,5 @@
-package net.devs.electromod.block.custom.magnetic.MagneticForce;
+package net.devs.electromod.block.custom.magnetic.force;
 
-import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.MagnetBlockEntity;
 import net.minecraft.block.BlockEntityProvider;
@@ -50,7 +49,7 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
     {
         if (world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)
         {
-            player.sendMessage(Text.literal(coilBE.getMagneticPower() + "," + coilBE.getRedstoneInput() + "," + coilBE.getFacing().toString()), true);
+            player.sendMessage(Text.literal("Magnetic Power: " + coilBE.getMagneticPower() + ", Redstone Input: " + coilBE.getRedstoneInput() + ", Facing: " + coilBE.getFacing().toString()), true);
         }
     }
 
@@ -80,7 +79,6 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
                         forceBlocks[index]);
             }
         }
-        ElectroMod.LOGGER.info("head length: {}", profile.headProfile().size());
 
         for (var bodySet : profile.bodyProfile())
         {
@@ -92,7 +90,6 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
                         forceBlocks[index]);
             }
         }
-        ElectroMod.LOGGER.info("head length: {}", profile.headProfile().size());
 
         for (var tailSet : profile.tailProfile())
         {
@@ -104,6 +101,5 @@ public abstract class AbstractMagneticBlock extends BlockWithEntity implements B
                         forceBlocks[index]);
             }
         }
-        ElectroMod.LOGGER.info("head length: {}", profile.headProfile().size());
     }
 }

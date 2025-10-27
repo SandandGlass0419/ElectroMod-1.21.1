@@ -1,4 +1,4 @@
-package net.devs.electromod.block.custom.magnetic.MagneticForce;
+package net.devs.electromod.block.custom.magnetic.force;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -18,8 +18,8 @@ public abstract class AbstractDetectorBlock extends BlockWithEntity
         if (!(blockEntity instanceof AbstractDetectorBlockEntity detectorBE)) return;
         if (!detectorBE.getStartWatch()) return;
 
-        watchIntick(world1, pos, state1, detectorBE);
+        watchInTick(world1, pos, state1, detectorBE);
     }
 
-    public abstract void watchIntick(World world1, BlockPos pos, BlockState state1, AbstractDetectorBlockEntity abstractBE);
+    public abstract void watchInTick(World world1, BlockPos pos, BlockState state1, AbstractDetectorBlockEntity abstractBE);
 }

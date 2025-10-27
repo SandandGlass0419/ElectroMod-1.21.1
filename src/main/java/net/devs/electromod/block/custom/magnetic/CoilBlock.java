@@ -1,6 +1,6 @@
 package net.devs.electromod.block.custom.magnetic;
 
-import net.devs.electromod.block.custom.magnetic.MagneticForce.AbstractMagneticBlock;
+import net.devs.electromod.block.custom.magnetic.force.AbstractMagneticBlock;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
 import net.devs.electromod.components.ModDataComponentTypes;
@@ -51,7 +51,7 @@ public abstract class CoilBlock extends AbstractMagneticBlock
     public CoilBlock(Settings settings)
     {
         super(settings);
-        this.setDefaultState(this.stateManager.getDefaultState()
+        this.setDefaultState(this.getDefaultState()
                 .with(FACING, Direction.UP)
                 .with(DENSITY, 2)
                 .with(POWERED, false));
