@@ -86,7 +86,7 @@ public class ElectroDector extends Block {
         double electricity = wireBE.getElectricity();
 
 
-        if (electricity >= explosionThreshold) {
+        if (electricity > explosionThreshold) {
             // 전류량에 비례해 폭발
             float explosionPower = (float) (electricity - explosionThreshold) / 2; // 필요시 스케일링 가능
             world.createExplosion(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, explosionPower, World.ExplosionSourceType.BLOCK);
