@@ -1,6 +1,5 @@
 package net.devs.electromod.block.custom.magnetic.force;
 
-import net.devs.electromod.ElectroMod;
 import net.devs.electromod.block.custom.magnetic.CopperCoilBlock;
 import net.devs.electromod.block.custom.magnetic.GoldenCoilBlock;
 import net.devs.electromod.block.custom.magnetic.IronCoilBlock;
@@ -175,7 +174,7 @@ public class MagneticForceInteractor
     public static ForceProfile getForceProfile(MagneticField field)
     {
         //ElectroMod.LOGGER.info("getForceProfile");
-        ElectroMod.LOGGER.info(field.getForceDirection().toString());
+        //ElectroMod.LOGGER.info(field.getForceDirection().toString());
 
         return ForceProfile.createForceProfile(getPowerCategory(field.getMagneticPower()), field.getForceDirection());
     }
