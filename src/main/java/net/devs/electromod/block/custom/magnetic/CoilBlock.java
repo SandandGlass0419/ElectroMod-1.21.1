@@ -1,5 +1,6 @@
 package net.devs.electromod.block.custom.magnetic;
 
+import net.devs.electromod.block.custom.electro.WireBlock;
 import net.devs.electromod.block.custom.magnetic.force.AbstractMagneticBlock;
 import net.devs.electromod.block.entity.custom.electro.WireBlockEntity;
 import net.devs.electromod.block.entity.custom.magnetic.CoilBlockEntity;
@@ -10,6 +11,7 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -234,6 +236,11 @@ public abstract class CoilBlock extends AbstractMagneticBlock
 
         ItemStack stack = player.getMainHandStack();
 
+        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE)) return ActionResult.FAIL;
+
+        if (coilBE.getIsTicking())
+        { WireBlock.killOnUse(world, player); }
+
         if (stack.getItem() instanceof MagnetItem)
         {
             if (world.isClient()) return ActionResult.FAIL;
@@ -249,6 +256,15 @@ public abstract class CoilBlock extends AbstractMagneticBlock
         }
 
         return super.onUse(state, world, pos, player, hit);
+    }
+
+    @Override
+    public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity)
+    {
+        if (!(world.getBlockEntity(pos) instanceof CoilBlockEntity coilBE) || !coilBE.getIsTicking()) return;
+
+        WireBlock.killOnSteppedOn(world, entity);
+
     }
 
     public abstract int defaultForceFormula(int redstonePower, int density);

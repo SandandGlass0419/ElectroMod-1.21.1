@@ -47,6 +47,5 @@ public class MagnetBlock extends AbstractMagneticBlock
     { return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite()); }
 
     // magnetic features
-
     public static final int MAGNET_POWER_IDENT = 200;
 }

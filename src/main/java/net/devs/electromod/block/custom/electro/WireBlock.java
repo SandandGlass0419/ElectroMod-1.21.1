@@ -11,7 +11,10 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
@@ -60,33 +63,31 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        float absElectrocity = 0f;
-
-        if (world.getBlockEntity(pos) instanceof WireBlockEntity wireBE) {
-            absElectrocity = Math.abs(wireBE.getElectricity());
-        }
-
         if (world.isClient()) return ActionResult.FAIL;
 
+        if (!(world.getBlockEntity(pos) instanceof WireBlockEntity wireBE)) return ActionResult.FAIL;
+
+        if (Math.abs(wireBE.getElectricity()) < MIN_DEATH_POWER) return ActionResult.PASS;
+
+        return killOnUse(world, player);
+    }
+
+    public static ActionResult killOnUse(World world, PlayerEntity player)
+    {
         Item stackItem = player.getMainHandStack().getItem();
-        Item leftHandStackItem = player.getOffHandStack().getItem();
+        Item lefthandStackItem = player.getOffHandStack().getItem();
 
-        if (stackItem instanceof DebugStickItem
-            || stackItem.equals(ModBlocks.COPPER_WIRE.asItem())
-            || stackItem.equals(ModBlocks.WIRE.asItem())
-            || stackItem.equals(ModBlocks.GOLDEN_WIRE.asItem())
-            || absElectrocity <= MIN_DEATH_POWER)
-            return ActionResult.FAIL;
+        if (stackItem.equals(Items.DEBUG_STICK)) return ActionResult.FAIL;
 
-        if (!stackItem.equals(ModItems.RUBBER_GLOVES) && !leftHandStackItem.equals(ModItems.RUBBER_GLOVES)) {
-            BlockPos blockpos = player.getBlockPos();
-            LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
-            lightning.refreshPositionAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(), 0, 0);
+        if (stackItem.equals(ModItems.RUBBER_GLOVES) || lefthandStackItem.equals(ModItems.RUBBER_GLOVES)) return ActionResult.PASS;
 
-            world.spawnEntity(lightning);
-            player.kill();
-            player.sendMessage(Text.literal("Oops!"));
-        }
+        BlockPos blockpos = player.getBlockPos();
+        LightningEntity lightning = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
+        lightning.refreshPositionAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(), 0, 0);
+
+        world.spawnEntity(lightning);
+        player.sendMessage(Text.literal("Oops!"));
+        player.kill();
 
         return ActionResult.PASS;
     }
@@ -95,9 +96,15 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (world.isClient()) return;
 
-        if (world.getBlockEntity(pos) instanceof WireBlockEntity wireBE &&
-                Math.abs(wireBE.getElectricity()) <= MIN_DEATH_POWER) return;
+        if (!(world.getBlockEntity(pos) instanceof WireBlockEntity wireBE)) return;
 
+        if (Math.abs(wireBE.getElectricity()) < MIN_DEATH_POWER) return;
+
+        killOnSteppedOn(world, entity);
+    }
+
+    public static void killOnSteppedOn(World world, Entity entity)
+    {
         if (entity instanceof LivingEntity living &&
                 living.getEquippedStack(EquipmentSlot.FEET).isOf(Items.LEATHER_BOOTS)) return;
 
@@ -106,6 +113,10 @@ public abstract class WireBlock extends BlockWithEntity implements BlockEntityPr
         lightning.refreshPositionAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(), 0, 0);
 
         world.spawnEntity(lightning);
+
+        if (entity instanceof PlayerEntity player && player.isAlive())
+        { player.sendMessage(Text.literal("Oops!")); }
+
         entity.kill();
     }
 

@@ -48,5 +48,10 @@
         "south": { "texture": "#side", "cullface": "south" }
       }
     }
-  ]
+  ],
+  "display": {
+    "head": {
+      "rotation": [-90, 0, 0]
+    }
+  }
 }

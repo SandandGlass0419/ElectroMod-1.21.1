@@ -1,16 +1,13 @@
 package net.devs.electromod.block.custom.magnetic;
 
 import com.mojang.serialization.MapCodec;
-import net.devs.electromod.components.ModDataComponentTypes;
-import net.devs.electromod.item.custom.magnetic.MagnetItem;
+import net.devs.electromod.block.custom.magnetic.force.ForceProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -38,29 +35,16 @@ public class CopperCoilBlock extends CoilBlock
         if (returned != ActionResult.PASS) return returned;
 
         if (!player.getAbilities().allowModifyWorld) return ActionResult.PASS;
-        ItemStack stack = player.getMainHandStack();
 
-        if (stack.getItem() instanceof MagnetItem) // custom action
-        {
-            int magnet_force = stack.getOrDefault(ModDataComponentTypes.MAGNETIC_POWER, ModDataComponentTypes.min_power);
-            player.sendMessage(Text.literal("Current force: " + magnet_force), true);
+        // default action
+        world.setBlockState(pos, state.cycle(DENSITY), Block.NOTIFY_ALL);
+        world.playSound(null, pos, SoundEvents.BLOCK_COPPER_GRATE_HIT, SoundCategory.BLOCKS);
 
-            return ActionResult.SUCCESS;
-        }
-
-        else // default action
-        {
-            BlockState newBlockState = state.cycle(DENSITY);
-
-            world.setBlockState(pos, newBlockState, Block.NOTIFY_ALL);
-            world.playSound(null, pos, SoundEvents.BLOCK_COPPER_GRATE_HIT, SoundCategory.BLOCKS);
-
-            return ActionResult.success(world.isClient);
-        }
+        return ActionResult.success(world.isClient);
     }
 
     // magnetic force features
-    public static final int copperAdditiveFactor = 2 * 15 * DENSITY_MAX;
+    public static final int copperAdditiveFactor = Math.abs(ForceProfile.powerCategory.COPPER.get()) * 15 * DENSITY_MAX;
 
     @Override
     public int defaultForceFormula(int redstonePower, int density)
