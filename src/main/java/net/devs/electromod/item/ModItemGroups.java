@@ -51,7 +51,7 @@ public class ModItemGroups
                         entries.add(ModBlocks.BATTERY);
 
                         entries.add(ModItems.RUBBER_GLOVES);
-                        entries.add(ModItems.ELECTRO_STAFF);
+                        //entries.add(ModItems.ELECTRO_STAFF);
                         entries.add(ModItems.ELECTRO_ITEM);
                     })).build());
 
